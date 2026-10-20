@@ -87,6 +87,33 @@ Check that the final download summary reports **13 files** and **`"errors": []`*
 
 The common derived yield column is **`yield_kg_ha`**. `source_yield`, `source_yield_units`, and `yield_field` document its origin; `source_id` and `source_row` link back to the input. Spreadsheet/CSV row numbers include the header, while GeoJSON/shapefile row numbers are one-based feature indices. Curated OAF identifiers are synthetic row identifiers.
 
+## Sentinel-2 imagery
+
+[`scripts/download_sentinel2.py`](scripts/download_sentinel2.py) searches the free Sentinel-2 Level-2A Cloud-Optimized GeoTIFF archive through the [Earth Search STAC API](https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a). The [AWS Open Data Registry](https://registry.opendata.aws/sentinel-2-l2a-cogs/) documents public, no-account-required access and the archive’s open data terms. Earth Search is a public, best-effort catalogue without a guaranteed service level. Credit ESA/Copernicus and cite the AWS Sentinel-2 COG archive as described by its registry page in research outputs.
+
+The default selection uses the same **18,939 screened OAF, Zimbabwe, and Malawi records from 2019 onward** counted above. The overlapping OAF curated release is excluded because its field, town, or district location is not identified per row. The script uses recorded planting-to-harvest dates when available. For missing or inconsistent dates, its default policy infers a 180-day window before harvest or crop-cut observation, then records that the timing needs review. Use `--date-policy observed-only` to skip records without a valid observed date window, or pass a CSV of reviewed date overrides.
+
+For each selected record, the downloader searches for Sentinel-2 scenes intersecting its location during the observation window. It considers months spread across the window, tries scenes in order of catalogue cloud cover, and accepts at most one scene per selected month. It then checks the scene classification over the field or location and requires at least 80% clear, valid pixels there by default. It reads the selected small chip from public cloud-optimized rasters instead of saving full satellite scenes. Imagery is atmospheric-corrected Level-2A bottom-of-atmosphere reflectance. The default output contains 10 spectral bands, an SCL scene-classification raster, a valid-pixel mask, an AOI mask, and JSON provenance per accepted scene. The bands originally measured at 20 m are resampled onto the default 10 m output grid; this resampling does not add spatial detail to those bands. OAF and Zimbabwe observations have point coordinates, so the mask marks their location pixel rather than asserting a known field boundary. Malawi records use the available field polygons; check the Malawi 2022 datum-offset caveat above.
+
+Install the imagery dependencies and make a small offline plan first:
+
+```bash
+python -m pip install -r scripts/requirements-sentinel2.txt
+python scripts/download_sentinel2.py plan --limit 5
+```
+
+`plan` estimates timing and output size without contacting the imagery catalogue or confirming that scenes exist. Try a small download batch next:
+
+```bash
+python scripts/download_sentinel2.py download --limit 5
+```
+
+For later batches, change `--offset` and `--limit`, for example `--offset 5 --limit 5`. The downloader caches STAC searches, writes progress files, and verifies existing scene files by SHA-256 when rerun. Common options include `--datasets`, `--date-policy observed-only`, `--max-cloud-cover`, `--min-clear-fraction`, `--bands`, and `--date-overrides`; use `python scripts/download_sentinel2.py --help` for the complete list.
+
+A complete default run can generate **about 40 GB of uncompressed chips** at the maximum of 12 scenes per record. Actual output is usually smaller because only clear scenes that pass the field-pixel check are retained and the GeoTIFFs are compressed. Review the plan and run in batches. Imagery outputs are stored under `data/imagery/sentinel2/`, which is ignored by Git; the repository contains the script and instructions, not the generated image files.
+
+Per-record JSON files record the crop observation, date-window basis, search results, and whether the AOI fits inside the chip. Each accepted scene's `scene.json` stores the full source item metadata, acquisition date, tile cloud cover, clear-pixel fraction, processing settings, and chip checksums. A point passing the pixel check does not prove that its coordinates identify the crop field. Imagery and time-window checks also do not validate each provider’s yield units. Review those issues and the 2022 Malawi position uncertainty before using chips as model labels.
+
 ## Repository layout
 
 ```text
@@ -94,10 +121,13 @@ data/
   raw/          Original datasets and supporting documents
   metadata/     Provider records, download URLs, and checksums
   audit/        Row-level audits, candidate CSVs, boundaries, and reports
+  imagery/      Local Sentinel-2 search caches and image chips (Git-ignored)
   README.txt    Additional data-use and reproduction notes
 scripts/
   download_datasets.py
   audit_datasets.py
   requirements-audit.txt
+  download_sentinel2.py
+  requirements-sentinel2.txt
 Notes/          Project notes
 ```
