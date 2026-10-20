@@ -1,0 +1,84 @@
+{
+  "catalogue_checked_date": "2026-10-20",
+  "files": [
+    {
+      "path": "data/raw/one_acre_fund_full/one_acre_fund_mel_data_all_countries.xlsx",
+      "url": "https://data.harvestportal.org/dataset/667320b8-6a39-4e42-8b29-25a2fa91d2fd/resource/a63713a6-e00b-4953-89b9-7472aab94dd6/download/one_acre_fund_mel_data_all_countries.xlsx",
+      "bytes": 23793719,
+      "sha256": "ed812dc779a57377fcdb3b002346343d62e3a90cb6b5248f8fa0de62a08a39c8"
+    },
+    {
+      "path": "data/raw/one_acre_fund_curated/One_Acre_Fund_MEL_maize_survey_data_2016-2022.csv",
+      "url": "https://zenodo.org/api/records/11122388/files/One_Acre_Fund_MEL_maize_survey_data_2016-2022.csv/content",
+      "bytes": 5637560,
+      "sha256": "f305a3d3e48015bd877dc9df5c53b1715c61f940d58383d57d4dfb68c59c6ff0"
+    },
+    {
+      "path": "data/raw/zimbabwe/Yield_forecasting _and_Crop_Mask_LACUNA_Technical_Manual_2.pdf",
+      "url": "https://zenodo.org/api/records/10060610/files/Yield_forecasting%20_and_Crop_Mask_LACUNA_Technical_Manual_2.pdf/content",
+      "bytes": 1369526,
+      "sha256": "24b9f4eb1682e4fcc32c62479e94a1e8412a43da09ddb2b6e5b598185b8ca905"
+    },
+    {
+      "path": "data/raw/zimbabwe/Yield_forecasting _and_Crop_Mask_LACUNA_Technical_Manual.slides.html",
+      "url": "https://zenodo.org/api/records/10060610/files/Yield_forecasting%20_and_Crop_Mask_LACUNA_Technical_Manual.slides.html/content",
+      "bytes": 2095850,
+      "sha256": "1433110f962afd08551fd73af39fd74fb0e0a4ff4e68206ed4eff6d3efec8b59"
+    },
+    {
+      "path": "data/raw/zimbabwe/Yield_forecasting _and_Crop_Mask_LACUNA_Technical_Manual.py",
+      "url": "https://zenodo.org/api/records/10060610/files/Yield_forecasting%20_and_Crop_Mask_LACUNA_Technical_Manual.py/content",
+      "bytes": 13441,
+      "sha256": "6387ca5c8b7c400ae35cad4859cfc035981abc54cd155b3970b05b59392c7d41"
+    },
+    {
+      "path": "data/raw/zimbabwe/Lacuna_Yield_data_geojson-2023.geojson",
+      "url": "https://zenodo.org/api/records/10060610/files/Lacuna_Yield_data_geojson-2023.geojson/content",
+      "bytes": 1481197,
+      "sha256": "0dc4301509072c4306c951d88cf7cc6e0832c46aab921d237341c17bc6bb78cd"
+    },
+    {
+      "path": "data/raw/malawi/mwi_mwi_lc_fo_202205_averageyield_v1.zip",
+      "url": "https://data.harvestportal.org/dataset/61615c12-2724-4f56-9385-4eb09eabea64/resource/2e8e0faa-6ddd-4e57-b66d-3db6cb1868c8/download/mwi_mwi_lc_fo_202205_averageyield_v1.zip",
+      "bytes": 465919,
+      "sha256": "4adcadf8fc790d3c91f2fcce1a5033fb8cafbf4d73310a779d396f03999dd95d"
+    },
+    {
+      "path": "data/raw/malawi/mwi_kas_lc_fo_202305_cc_yield.zip",
+      "url": "https://data.harvestportal.org/dataset/61615c12-2724-4f56-9385-4eb09eabea64/resource/60d40547-4b61-4cb4-8a9f-e35ceeaf3bfb/download/mwi_kas_lc_fo_202305_cc_yield.zip",
+      "bytes": 167269,
+      "sha256": "6ba8dc16762beec48ee1b0498a5540a67088d3b1a0aa2efbcb918afbcee7a304"
+    },
+    {
+      "path": "data/raw/malawi/nasa-harvest-fao-crop-cut-campaign-2023-sampling-frame-methodology.docx",
+      "url": "https://data.harvestportal.org/dataset/61615c12-2724-4f56-9385-4eb09eabea64/resource/8b7c9e38-2dc8-47cb-b028-323df8687070/download/nasa-harvest-fao-crop-cut-campaign-2023-sampling-frame-methodology.docx",
+      "bytes": 6058938,
+      "sha256": "d6cb1cafb50cff5fcf6fc9aebf94aea4b792c36773ae8d3beb67774ebbce3d2f"
+    },
+    {
+      "path": "data/raw/malawi_field_dictionary/mwi_cc_22_fieldnames.xlsx",
+      "url": "https://data.harvestportal.org/dataset/8c1d3892-abab-4008-9986-4c21adc24518/resource/619be2e4-3488-4dd0-b3d6-139020b4b97b/download/mwi_cc_22_fieldnames.xlsx",
+      "bytes": 16555,
+      "sha256": "560edfd3f646bd5e562573e1ef3b85cd57dcee56827447391d2ec337a1c3b677"
+    },
+    {
+      "path": "data/raw/malawi_field_dictionary/mwi_cc_2023_fieldnames.xlsx",
+      "url": "https://data.harvestportal.org/dataset/8c1d3892-abab-4008-9986-4c21adc24518/resource/dfbff34f-c9b4-41c0-b953-1a024c6ad8ad/download/mwi_cc_2023_fieldnames.xlsx",
+      "bytes": 162411,
+      "sha256": "7c166236785ad7598ce7c7ea3a43bbfa06c1ef4c76fe6ecc0f762710e11df788"
+    },
+    {
+      "path": "data/raw/malawi_metadata/metadata-fao_-nasa-harvest-malawi-crop-cut-2022-sheet1.csv",
+      "url": "https://data.harvestportal.org/dataset/53a79b82-bfc4-4ba3-9232-4bedb3ab06fa/resource/7f70cd96-6282-47e1-9cf3-e76404763c02/download/metadata-fao_-nasa-harvest-malawi-crop-cut-2022-sheet1.csv",
+      "bytes": 3877,
+      "sha256": "50929a9dd5d7c2088823d28d31578663bf86807dca5eaeadfa11bf7aba28f438"
+    },
+    {
+      "path": "data/raw/malawi_metadata/mwi_cc_23.csv",
+      "url": "https://data.harvestportal.org/dataset/53a79b82-bfc4-4ba3-9232-4bedb3ab06fa/resource/bdc20fcb-82ee-4bce-a6f6-67b7681247ca/download/mwi_cc_23.csv",
+      "bytes": 4401,
+      "sha256": "db62a4acce6b1741fc321f07e1959f8de6dd2032470de137bbce40d3555481d0"
+    }
+  ],
+  "errors": []
+}

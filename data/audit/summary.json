@@ -1,0 +1,327 @@
+{
+  "audit_date": "2026-10-20",
+  "screening_not_imagery_validation": true,
+  "basic_checks": "Maize; finite yield >= 0; finite nonzero WGS84 point or valid nonempty polygon; representative location within a broad envelope of the reported country; exact duplicate source rows after first removed. Polygon topology is checked without automatic repair. Zero yields are retained and counted separately.",
+  "additional_yield_checks": "Excludes review flags for yield above 30 tonnes/ha, per-acre/per-hectare disagreement above 1%, Zimbabwe 40m2 conversion disagreement, or dry weight greater than wet weight. The 30 t/ha threshold is a review heuristic, not an agronomic impossibility limit. These extra checks still do not prove field-level location or yield protocol validity.",
+  "screened_candidates_definition": "Pass basic and additional yield checks and exclude OAF Uganda 2020 coordinates documented as site locations. All curated OAF rows remain flagged for unresolved field/town/district coordinate provenance; their candidate count is not a verified field-location count. Zimbabwe yield units remain provisionally interpreted as tonnes/ha. No screened file is a fully validated training set.",
+  "country_screening_envelopes": {
+    "kenya": [
+      33.8,
+      -4.9,
+      42.1,
+      5.2
+    ],
+    "tanzania": [
+      29.2,
+      -11.8,
+      40.7,
+      -0.8
+    ],
+    "uganda": [
+      29.4,
+      -1.6,
+      35.1,
+      4.4
+    ],
+    "rwanda": [
+      28.8,
+      -2.9,
+      31.0,
+      -1.0
+    ],
+    "burundi": [
+      28.9,
+      -4.6,
+      30.9,
+      -2.2
+    ],
+    "zambia": [
+      21.8,
+      -18.2,
+      33.8,
+      -8.1
+    ],
+    "malawi": [
+      32.5,
+      -17.2,
+      36.0,
+      -9.2
+    ],
+    "zimbabwe": [
+      25.1,
+      -22.5,
+      33.1,
+      -15.5
+    ],
+    "nigeria": [
+      2.5,
+      4.0,
+      14.8,
+      14.0
+    ]
+  },
+  "oaf_curated_matching_full_release_fingerprints": 0,
+  "overlap_definition": "Same country/year, coordinates rounded to 6 decimals and kg/ha yield rounded to 3 decimals. This is a lower-bound overlap warning, not a definitive field-ID linkage. No pooled unique-field count is asserted.",
+  "datasets": [
+    {
+      "dataset": "one_acre_fund_full",
+      "all_source_rows": 81411,
+      "all_crop_counts": {
+        "maize": 45569,
+        "climbing beans": 22951,
+        "potato": 4134,
+        "beans": 8749,
+        "": 8
+      },
+      "maize_records": 45569,
+      "nonnegative_numeric_yield": 44105,
+      "valid_coordinates_and_geometry": 30839,
+      "within_country_envelope": 30838,
+      "passes_basic_checks": 30720,
+      "passes_basic_checks_since_2019": 16130,
+      "passes_basic_checks_positive_yield": 30375,
+      "zero_yield_in_basic_candidates": 345,
+      "passes_additional_yield_consistency_checks": 30720,
+      "screened_candidates": 30474,
+      "screened_candidates_since_2019": 15884,
+      "zero_yield_in_screened_candidates": 344,
+      "distinct_locations_in_basic_candidates": 29530,
+      "exact_duplicate_rows_after_first": 0,
+      "repeated_source_ids": 0,
+      "flag_counts": {
+        "missing_or_invalid_coordinates": 14730,
+        "zero_yield_review": 807,
+        "coordinates_reused_across_records": 2216,
+        "outside_country_screening_envelope": 1,
+        "missing_or_nonnumeric_yield": 1464,
+        "documented_site_coordinates_not_field_coordinates": 246
+      },
+      "by_year": {
+        "2016": 4249,
+        "2017": 5043,
+        "2018": 5298,
+        "2019": 7204,
+        "2020": 8926
+      },
+      "by_country": {
+        "burundi": 1052,
+        "kenya": 23159,
+        "malawi": 1738,
+        "rwanda": 1253,
+        "tanzania": 1975,
+        "uganda": 246,
+        "zambia": 1297
+      },
+      "candidate_yield_kg_ha_min_median_max": [
+        0.0,
+        2867.8505,
+        23299.984
+      ],
+      "notes": [
+        "The audit reads only field_latitude / field_longitude; it never fills missing coordinates from site columns. However, the Variables sheet explicitly says the Uganda 2020 LR values use site coordinates. These 246 records are flagged and excluded by the additional screening step.",
+        "The workbook warns that some field coordinates were collected at homesteads or near the field. Passing checks does not establish that a point is inside the cultivated field.",
+        "Yield uses yield_kg_ph (kg/ha). A missing per-hectare value can be filled from a nonnegative yield_kg_pa / 0.40468564224 (kg/acre to kg/ha), and is flagged. Negative per-hectare values are not overwritten.",
+        "The year column is retained as the observation year. Crop cuts, generally two 6 x 6 m boxes, underpin the yield measurements. Some management and area measurements are self-reported.",
+        "Planting/harvest dates are retained when present. Records may contain intercropping."
+      ]
+    },
+    {
+      "dataset": "one_acre_fund_curated",
+      "all_source_rows": 14773,
+      "maize_records": 14773,
+      "nonnegative_numeric_yield": 14773,
+      "valid_coordinates_and_geometry": 14773,
+      "within_country_envelope": 14773,
+      "passes_basic_checks": 14773,
+      "passes_basic_checks_since_2019": 8055,
+      "passes_basic_checks_positive_yield": 14510,
+      "zero_yield_in_basic_candidates": 263,
+      "passes_additional_yield_consistency_checks": 14773,
+      "screened_candidates": 14773,
+      "screened_candidates_since_2019": 8055,
+      "zero_yield_in_screened_candidates": 263,
+      "distinct_locations_in_basic_candidates": 10941,
+      "exact_duplicate_rows_after_first": 0,
+      "repeated_source_ids": 0,
+      "flag_counts": {
+        "field_town_or_district_coordinate_provenance_unresolved": 14773,
+        "zero_yield_review": 263,
+        "coordinates_reused_across_records": 5082
+      },
+      "by_year": {
+        "2016": 2437,
+        "2017": 1094,
+        "2018": 3187,
+        "2019": 4333,
+        "2020": 3607,
+        "2022": 115
+      },
+      "by_country": {
+        "burundi": 640,
+        "kenya": 7258,
+        "nigeria": 115,
+        "rwanda": 2080,
+        "tanzania": 3710,
+        "uganda": 109,
+        "zambia": 861
+      },
+      "candidate_yield_kg_ha_min_median_max": [
+        0.0,
+        2713.866882165,
+        11139.130824725
+      ],
+      "notes": [
+        "This is a separate curated release, not independent of the full OAF data. Do not add its count to the full-release count.",
+        "Provider documentation states 70% had recorded field geolocation; 21% use a nearby town and 9% a district location. The CSV has no explicit location-source flag, so these cannot be reliably separated here.",
+        "All rows are maize in pure stands. Yield is yield_kg_ha. Row numbers are audit identifiers, not original field IDs."
+      ]
+    },
+    {
+      "dataset": "zimbabwe",
+      "all_source_rows": 3002,
+      "all_crop_counts": {
+        "Wheat": 304,
+        "Maize/Corn": 2269,
+        "Sorghum": 217,
+        "Soybeans": 212
+      },
+      "source_crs": "OGC:CRS84",
+      "maize_records": 2269,
+      "nonnegative_numeric_yield": 2269,
+      "valid_coordinates_and_geometry": 2269,
+      "within_country_envelope": 2269,
+      "passes_basic_checks": 2269,
+      "passes_basic_checks_since_2019": 2269,
+      "passes_basic_checks_positive_yield": 2241,
+      "zero_yield_in_basic_candidates": 28,
+      "passes_additional_yield_consistency_checks": 2266,
+      "screened_candidates": 2266,
+      "screened_candidates_since_2019": 2266,
+      "zero_yield_in_screened_candidates": 28,
+      "distinct_locations_in_basic_candidates": 2261,
+      "exact_duplicate_rows_after_first": 0,
+      "repeated_source_ids": 0,
+      "flag_counts": {
+        "yield_unit_interpretation_provisional": 2269,
+        "coordinates_reused_across_records": 16,
+        "zero_yield_review": 28,
+        "yield_disagrees_with_documented_40m2_crop_cut": 3
+      },
+      "by_year": {
+        "2022": 169,
+        "2023": 2100
+      },
+      "by_country": {
+        "zimbabwe": 2269
+      },
+      "candidate_yield_kg_ha_min_median_max": [
+        0.0,
+        2953.75,
+        12430.0
+      ],
+      "notes": [
+        "Filter Crop_Type == Maize/Corn. Geography is CRS84: longitude, latitude.",
+        "The source column is literally named Yield(Mt/H. Its catalogue incorrectly says Megatonnes. Metric tonnes/ha is the provisional interpretation, consistent with dry kg / 40 square metres * 10 for most rows. Do not pool with other sources until the units/protocol are confirmed.",
+        "For the stated 8 x 5 m crop cut, expected tonnes/ha = Dry_weight * 0.25. Deviations are flagged; source values are never corrected.",
+        "The 2023 release contains harvest dates in both 2022 and 2023. Zero yields are retained and separately reported."
+      ]
+    },
+    {
+      "dataset": "malawi_2022",
+      "all_source_rows": 529,
+      "source_crs": "EPSG:20936",
+      "derived_crs": "EPSG:4326",
+      "coordinate_operations_used": [
+        {
+          "description": "Inverse of UTM zone 36S + Arc 1950 to WGS 84 (5) (with axis order normalized for visualization)",
+          "reported_accuracy_m": 27.0,
+          "feature_count": 529
+        }
+      ],
+      "maize_records": 529,
+      "nonnegative_numeric_yield": 529,
+      "valid_coordinates_and_geometry": 529,
+      "within_country_envelope": 529,
+      "passes_basic_checks": 529,
+      "passes_basic_checks_since_2019": 529,
+      "passes_basic_checks_positive_yield": 526,
+      "zero_yield_in_basic_candidates": 3,
+      "passes_additional_yield_consistency_checks": 529,
+      "screened_candidates": 529,
+      "screened_candidates_since_2019": 529,
+      "zero_yield_in_screened_candidates": 3,
+      "distinct_locations_in_basic_candidates": 529,
+      "exact_duplicate_rows_after_first": 0,
+      "repeated_source_ids": 0,
+      "flag_counts": {
+        "zero_yield_review": 3
+      },
+      "by_year": {
+        "2022": 529
+      },
+      "by_country": {
+        "malawi": 529
+      },
+      "candidate_yield_kg_ha_min_median_max": [
+        0.0,
+        2418.0,
+        10927.0
+      ],
+      "notes": [
+        "The maize identity is established by the campaign metadata; this public shapefile has no per-row crop column.",
+        "The actual .prj is EPSG:20936, not EPSG:4326 as stated in the generic metadata CSV. The derived locations/GeoJSON are transformed using the actual .prj to EPSG:4326. The selected Arc 1950 to WGS84 datum operation reports 27 m accuracy; this is operation accuracy, not measured GPS error. Verify boundary alignment before extracting 10 m satellite pixels.",
+        "AVG_YLD is used as the field-average crop-cut yield, interpreted in tonnes/ha based on the campaign dictionary/methodology. The public subset does not expose the individual cuts for recalculation.",
+        "The public file has 529 rows, whereas the project narrative reports 523 sampled fields. No extra rows are arbitrarily removed to match the narrative.",
+        "The downloaded metadata explicitly states Creative Commons By Attribution (CC BY), despite the catalogue page lacking a licence."
+      ]
+    },
+    {
+      "dataset": "malawi_2023",
+      "all_source_rows": 267,
+      "source_crs": "EPSG:4326",
+      "derived_crs": "EPSG:4326",
+      "coordinate_operations_used": [
+        {
+          "description": "axis order change (2D) (with axis order normalized for visualization)",
+          "reported_accuracy_m": -1.0,
+          "feature_count": 267
+        }
+      ],
+      "maize_records": 267,
+      "nonnegative_numeric_yield": 267,
+      "valid_coordinates_and_geometry": 260,
+      "within_country_envelope": 267,
+      "passes_basic_checks": 260,
+      "passes_basic_checks_since_2019": 260,
+      "passes_basic_checks_positive_yield": 260,
+      "zero_yield_in_basic_candidates": 0,
+      "passes_additional_yield_consistency_checks": 260,
+      "screened_candidates": 260,
+      "screened_candidates_since_2019": 260,
+      "zero_yield_in_screened_candidates": 0,
+      "distinct_locations_in_basic_candidates": 260,
+      "exact_duplicate_rows_after_first": 0,
+      "repeated_source_ids": 0,
+      "flag_counts": {
+        "invalid_polygon_geometry": 7
+      },
+      "by_year": {
+        "2023": 260
+      },
+      "by_country": {
+        "malawi": 260
+      },
+      "candidate_yield_kg_ha_min_median_max": [
+        130.0,
+        2440.0,
+        8800.000000000002
+      ],
+      "notes": [
+        "All public rows explicitly say Maize. The actual .prj is EPSG:4326.",
+        "cc_ey_t is the primary yield (10 x 10 m crop cut, tonnes/ha). subc_ey_t is a nested 5 x 5 m cut, not a second independent field. ff_ey_t has only one nonmissing full-field value.",
+        "The public file has 267 rows, whereas the methodology reports 261 sampled fields. The public subset lacks a training-survey flag to explain this difference, so no six rows are arbitrarily removed.",
+        "The downloaded metadata explicitly states Creative Commons By Attribution (CC BY)."
+      ]
+    }
+  ]
+}

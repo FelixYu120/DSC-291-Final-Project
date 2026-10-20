@@ -1,0 +1,4 @@
+*.py text eol=lf
+*.txt text eol=lf
+# Keep downloaded data and audit outputs byte-for-byte identical to the snapshot.
+data/** -text
