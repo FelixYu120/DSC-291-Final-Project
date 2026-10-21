@@ -4,6 +4,19 @@ This project investigates whether fine-tuning an open-weight geospatial model im
 
 The repository currently contains public yield datasets, their documentation, and scripts for downloading and auditing them. Satellite imagery extraction and model training are subsequent steps.
 
+The research plan is in [`docs/RESEARCH_PLAN.md`](docs/RESEARCH_PLAN.md). It distinguishes AlphaEarth's released annual embeddings from Presto's fine-tunable pretrained model, defines spatial and low-label evaluation, and keeps the optional U.S. county-yield benchmark separate from field-level African labels.
+
+## Proposed modeling approach
+
+The target is harmonized maize yield in kg/ha. The main evaluation should ask how well models predict fields from locations excluded from training, and whether a pretrained representation is useful when only 10%, 25%, or 50% of available training labels are used. Report a random split only as a diagnostic; group fields, repeat observations, and nearby coordinates in the same spatial split.
+
+- **AlphaEarth downstream regression:** extract the 64-dimensional, 10 m annual embedding vector for each eligible field from Google's Earth Engine collection [`GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL`](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_SATELLITE_EMBEDDING_V1_ANNUAL), then fit downstream Ridge and tree-based regressors. AlphaEarth is supplied here as an embedding dataset; it is not the encoder being fine-tuned. Same-year annual embeddings are suitable for retrospective completed-season estimation, not a causal pre-harvest forecast because they summarize the annual observation period. For a pre-harvest task, use prior-year embeddings only.
+- **Presto transfer and fine-tuning:** load the [pretrained Presto model](https://github.com/nasaharvest/presto), represent each field as a dated and masked remote-sensing time series, and attach the official one-output regression head (`construct_finetuning_model(num_outputs=1, regression=True)`). Compare a frozen encoder with a Ridge/tree head, head-only training, and full or partial encoder fine-tuning. The released Presto architecture defaults and a proposed student-project hyperparameter search are documented in the [research plan](docs/RESEARCH_PLAN.md); the learning rate and regularization values are search candidates, not guaranteed best settings.
+- **Baselines:** training-fold mean/median, Ridge on seasonal band/index summaries, Random Forest, and HistGradientBoosting, all using the same eligible fields, date window, and spatial folds as far as each input allows.
+- **Optional United States comparison:** USDA NASS Quick Stats supplies county-level corn-yield estimates, not individual farm yields or field locations. Use it only as a separate county-scale benchmark, joined to county boundaries with FIPS and compared to county-aggregated predictions. The optional downloader is [`scripts/download_usda_nass.py`](scripts/download_usda_nass.py); instructions are in [`data/raw/USA/USDA_NASS/README.md`](data/raw/USA/USDA_NASS/README.md).
+
+The central citation is Burke and Lobell (2017), “Satellite-based assessment of yield variation and its determinants in smallholder African systems” ([PNAS](https://doi.org/10.1073/pnas.1616919114)). The project also builds on Tseng et al.'s [Presto paper](https://arxiv.org/abs/2304.14065) and Brown et al.'s [AlphaEarth Foundations paper](https://arxiv.org/abs/2507.22291). Full references, hypotheses, model settings, data checks, and evaluation design are in the research plan.
+
 ## How many usable maize records do we have?
 
 The **20 October 2026 data snapshot contains 33,529 screened candidate observations**, including **18,939 from 2019 onward**, across the full One Acre Fund release, Zimbabwe, and Malawi. These are observations that pass the implemented yield and location checks; field alignment with satellite imagery still needs validation. They are not a verified count of unique fields.
@@ -75,7 +88,7 @@ Check that the final download summary reports **13 files** and **`"errors": []`*
 
 ### Audit behaviour and outputs
 
-[`audit_datasets.py`](scripts/audit_datasets.py) reads local files without network access and regenerates `data/audit/`. It uses `openpyxl`, `pyshp`, `shapely`, and `pyproj`, installed by the requirements command above. Originals in `data/raw/` are preserved, and downloaded provider Python code is not executed.
+[`audit_datasets.py`](scripts/audit_datasets.py) reads local files without network access and regenerates `data/audit/` plus the country-partitioned outputs in `data/processed/by_country/`. It uses `openpyxl`, `pyshp`, `shapely`, and `pyproj`, installed by the requirements command above. Originals in `data/raw/` are preserved, and downloaded provider Python code is not executed. To rebuild the country partitions alone from existing audit CSVs, run `python scripts/organize_country_data.py`.
 
 | Output | Purpose |
 |---|---|
@@ -84,8 +97,13 @@ Check that the final download summary reports **13 files** and **`"errors": []`*
 | `data/audit/*_maize_audit.csv` | All maize observations, including excluded rows and their quality flags. |
 | `data/audit/*_screened_candidates.csv` | Rows where `passes_yield_and_known_location_checks` is true. Location and unit caveats above still apply. |
 | `data/audit/malawi_*_candidates_wgs84.geojson` | Valid candidate field boundaries in WGS84. Invalid source polygons remain in the originals. |
+| `data/processed/by_country/<ISO3>/` | Harmonized candidate CSVs partitioned by country, created by the audit run. |
 
 The common derived yield column is **`yield_kg_ha`**. `source_yield`, `source_yield_units`, and `yield_field` document its origin; `source_id` and `source_row` link back to the input. Spreadsheet/CSV row numbers include the header, while GeoJSON/shapefile row numbers are one-based feature indices. Curated OAF identifiers are synthetic row identifiers.
+
+### Country-organized analysis files
+
+Running the audit also writes harmonized candidates to [`data/processed/by_country/`](data/processed/by_country/), grouped by ISO3 country code (for example, `MWI`, `ZWE`, and `KEN`). Each folder contains a `screened_maize_yield_candidates.csv`; Malawi also has valid field polygons in WGS84. The `manifest.json` lists counts and contributing source releases. These outputs are still screening candidates, not confirmed training examples. Original files remain organized by provider release under `data/raw/`, since some releases (especially One Acre Fund) span multiple countries. The U.S. Quick Stats data are organized separately under `data/raw/USA/USDA_NASS/` because they have county-level labels.
 
 ## Sentinel-2 imagery
 
@@ -114,20 +132,37 @@ A complete default run can generate **about 40 GB of uncompressed chips** at the
 
 Per-record JSON files record the crop observation, date-window basis, search results, and whether the AOI fits inside the chip. Each accepted scene's `scene.json` stores the full source item metadata, acquisition date, tile cloud cover, clear-pixel fraction, processing settings, and chip checksums. A point passing the pixel check does not prove that its coordinates identify the crop field. Imagery and time-window checks also do not validate each provider’s yield units. Review those issues and the 2022 Malawi position uncertainty before using chips as model labels.
 
+## Optional U.S. county-yield data
+
+USDA NASS Quick Stats is free to query after requesting an API key. The project script checks the API's count endpoint before downloading and never saves the key:
+
+```bash
+export USDA_NASS_API_KEY="your-key"
+python scripts/download_usda_nass.py
+```
+
+This requests county-level annual corn yield rows for 2019–2024 and writes the CSV plus query provenance under `data/raw/USA/USDA_NASS/county_yield/`. The raw output may contain multiple published yield definitions or unavailable/suppressed values. Inspect its `short_desc`, `unit_desc`, and `Value` columns, retain NASS disclosure statuses, and select the corn-grain definition before analysis. These are county estimates; they do not increase the field-level maize candidate count above and should not be pooled with African field rows. See the [U.S. data notes](data/raw/USA/USDA_NASS/README.md).
+
 ## Repository layout
 
 ```text
 data/
-  raw/          Original datasets and supporting documents
+  raw/          Original datasets, kept by provider release
+    USA/USDA_NASS/ Optional U.S. county-yield data and notes
+  processed/
+    by_country/  Harmonized audit candidates partitioned by ISO3 country
   metadata/     Provider records, download URLs, and checksums
   audit/        Row-level audits, candidate CSVs, boundaries, and reports
   imagery/      Local Sentinel-2 search caches and image chips (Git-ignored)
   README.txt    Additional data-use and reproduction notes
+docs/           Research plan and model/evaluation protocol
 scripts/
   download_datasets.py
   audit_datasets.py
   requirements-audit.txt
   download_sentinel2.py
   requirements-sentinel2.txt
+  organize_country_data.py
+  download_usda_nass.py
 Notes/          Project notes
 ```

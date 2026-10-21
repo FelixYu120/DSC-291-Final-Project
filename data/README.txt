@@ -9,6 +9,9 @@ metadata/  Provider catalogue/API responses and a download manifest containing
            exact source URLs, byte sizes, and SHA-256 checksums.
 audit/     Counts, all maize records with audit flags, screened candidate CSVs,
            and Malawi candidate field boundaries converted to WGS84 GeoJSON.
+processed/by_country/<ISO3>/  Harmonized screened maize candidates partitioned
+           by country; these remain candidates, not imagery-validated labels.
+raw/USA/USDA_NASS/  Optional USDA county-level corn-yield extension; not field data.
 
 SOURCES AND ATTRIBUTION
 One Acre Fund full monitoring and evaluation workbook:
@@ -75,6 +78,15 @@ From the project directory, using a Python 3.10+ environment:
   python -m pip install -r scripts/requirements-audit.txt
   python scripts/download_datasets.py
   python scripts/audit_datasets.py
+
+The audit also writes data/processed/by_country/. To rebuild only those
+partitions from existing audit outputs, run:
+
+  python scripts/organize_country_data.py
+
+For the separate U.S. county-yield dataset, request a Quick Stats API key and
+follow raw/USA/USDA_NASS/README.md. Do not combine county estimates with
+field-level training labels.
 
 The downloader uses cached catalogue responses when present and verifies
 existing downloads. It records errors in metadata/download_manifest.json.

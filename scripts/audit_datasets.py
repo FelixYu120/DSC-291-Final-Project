@@ -2,6 +2,8 @@
 
 Outputs are screening candidates, not satellite-validated field observations.
 See data/audit/report.html for definitions, caveats and source-specific issues.
+The harmonized screened files are also partitioned by country under
+data/processed/by_country/.
 """
 from __future__ import annotations
 
@@ -354,6 +356,8 @@ def main():
         summaries.append(summary)
         all_rows[name] = rows
         print(json.dumps({k: summary[k] for k in ["dataset", "maize_records", "passes_basic_checks", "passes_basic_checks_since_2019", "flag_counts"]}), flush=True)
+    from organize_country_data import organize
+    organize()
     def fingerprint(r):
         if not r["passes_basic_checks"]:
             return None

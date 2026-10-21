@@ -1,0 +1,103 @@
+{
+  "definition": "Rows passing the audit's yield and known-location screening; candidates are not imagery-validated field labels.",
+  "country_directories": {
+    "BDI": {
+      "country": "burundi",
+      "records": 1692,
+      "records_since_2019": 325,
+      "by_dataset": {
+        "one_acre_fund_curated": 640,
+        "one_acre_fund_full": 1052
+      },
+      "field_boundary_features": 0,
+      "candidate_csv": "BDI/screened_maize_yield_candidates.csv"
+    },
+    "KEN": {
+      "country": "kenya",
+      "records": 30417,
+      "records_since_2019": 15213,
+      "by_dataset": {
+        "one_acre_fund_curated": 7258,
+        "one_acre_fund_full": 23159
+      },
+      "field_boundary_features": 0,
+      "candidate_csv": "KEN/screened_maize_yield_candidates.csv"
+    },
+    "MWI": {
+      "country": "malawi",
+      "records": 2527,
+      "records_since_2019": 2527,
+      "by_dataset": {
+        "malawi_2022": 529,
+        "malawi_2023": 260,
+        "one_acre_fund_full": 1738
+      },
+      "field_boundary_features": 789,
+      "candidate_csv": "MWI/screened_maize_yield_candidates.csv",
+      "boundary_geojson": "MWI/screened_field_boundaries_wgs84.geojson"
+    },
+    "NGA": {
+      "country": "nigeria",
+      "records": 115,
+      "records_since_2019": 115,
+      "by_dataset": {
+        "one_acre_fund_curated": 115
+      },
+      "field_boundary_features": 0,
+      "candidate_csv": "NGA/screened_maize_yield_candidates.csv"
+    },
+    "RWA": {
+      "country": "rwanda",
+      "records": 3333,
+      "records_since_2019": 2298,
+      "by_dataset": {
+        "one_acre_fund_curated": 2080,
+        "one_acre_fund_full": 1253
+      },
+      "field_boundary_features": 0,
+      "candidate_csv": "RWA/screened_maize_yield_candidates.csv"
+    },
+    "TZA": {
+      "country": "tanzania",
+      "records": 5685,
+      "records_since_2019": 2795,
+      "by_dataset": {
+        "one_acre_fund_curated": 3710,
+        "one_acre_fund_full": 1975
+      },
+      "field_boundary_features": 0,
+      "candidate_csv": "TZA/screened_maize_yield_candidates.csv"
+    },
+    "UGA": {
+      "country": "uganda",
+      "records": 109,
+      "records_since_2019": 109,
+      "by_dataset": {
+        "one_acre_fund_curated": 109
+      },
+      "field_boundary_features": 0,
+      "candidate_csv": "UGA/screened_maize_yield_candidates.csv"
+    },
+    "ZMB": {
+      "country": "zambia",
+      "records": 2158,
+      "records_since_2019": 1346,
+      "by_dataset": {
+        "one_acre_fund_curated": 861,
+        "one_acre_fund_full": 1297
+      },
+      "field_boundary_features": 0,
+      "candidate_csv": "ZMB/screened_maize_yield_candidates.csv"
+    },
+    "ZWE": {
+      "country": "zimbabwe",
+      "records": 2266,
+      "records_since_2019": 2266,
+      "by_dataset": {
+        "zimbabwe": 2266
+      },
+      "field_boundary_features": 0,
+      "candidate_csv": "ZWE/screened_maize_yield_candidates.csv"
+    }
+  }
+}
