@@ -2,7 +2,7 @@
 
 This project investigates whether fine-tuning an open-weight geospatial model improves field-level maize yield estimation when labelled data are limited and predictions are made for previously unseen locations. The planned evaluation compares the adapted model with simpler statistical and machine-learning baselines using spatially separated training and evaluation data.
 
-The repository currently contains public yield datasets, their documentation, and scripts for downloading and auditing them. Satellite imagery extraction and model training are subsequent steps.
+The repository contains public yield datasets, their documentation, and scripts for downloading and auditing them. A new field-photo dataset adds maize observations from Nigeria and Zimbabwe; the research data-source catalog also separates field labels from regional benchmarks and satellite/environmental predictors. Satellite imagery extraction and model training are subsequent steps.
 
 The research plan is in [`docs/RESEARCH_PLAN.md`](docs/RESEARCH_PLAN.md). It distinguishes AlphaEarth's released annual embeddings from Presto's fine-tunable pretrained model, defines spatial and low-label evaluation, and keeps the optional U.S. county-yield benchmark separate from field-level African labels.
 
@@ -19,7 +19,7 @@ The central citation is Burke and Lobell (2017), “Satellite-based assessment o
 
 ## How many usable maize records do we have?
 
-The **20 October 2026 data snapshot contains 33,529 screened candidate observations**, including **18,939 from 2019 onward**, across the full One Acre Fund release, Zimbabwe, and Malawi. These are observations that pass the implemented yield and location checks; field alignment with satellite imagery still needs validation. They are not a verified count of unique fields.
+The **21 October 2026 data snapshot contains 38,241 screened candidate observations**, including **23,651 from 2019 onward**, across the full One Acre Fund release, Zimbabwe, Malawi, and the new vision-guided field-photo dataset. These are observations that pass the implemented yield and location checks; field alignment with satellite imagery still needs validation. They are not a verified count of unique fields.
 
 | Dataset | Maize records before screening | Screened candidates | Candidates from 2019 onward |
 |---|---:|---:|---:|
@@ -27,12 +27,13 @@ The **20 October 2026 data snapshot contains 33,529 screened candidate observati
 | Zimbabwe — Lacuna | 2,269 | 2,266 | 2,266 |
 | Malawi — 2022 | 529 | 529 | 529 |
 | Malawi — 2023 | 267 | 260 | 260 |
-| **Total, excluding curated OAF** | **48,634** | **33,529** | **18,939** |
+| Vision-guided photo dataset — Zimbabwe/Nigeria | 5,729 | 4,712 | 4,712 |
+| **Total, excluding curated OAF** | **54,363** | **38,241** | **23,651** |
 | One Acre Fund — curated release, excluded from total | 14,773 | 14,773* | 8,055* |
 
-*The curated OAF release overlaps the full release and mixes field, town, and district coordinates without an explicit location-source flag for each row. Its screening count does not establish how many records have accurate field locations. Do not add these records to the total without resolving overlap and location provenance.*
+*The curated OAF release overlaps the full release and mixes field, town, and district coordinates without an explicit location-source flag for each row. Its screening count does not establish how many records have accurate field locations. Do not add these records to the total without resolving overlap and location provenance. Counts across other sources are observations and may still include cross-dataset overlap.*
 
-The counts come from [`data/audit/summary.json`](data/audit/summary.json), specifically `maize_records`, `screened_candidates`, and `screened_candidates_since_2019`. A compact [summary CSV](data/audit/summary.csv) and a detailed [HTML report](data/audit/report.html) are also included. Open the HTML file locally in a browser to view the formatted report.
+The counts come from [`data/audit/summary.json`](data/audit/summary.json), specifically `maize_records`, `screened_candidates`, and `screened_candidates_since_2019`. The new photo dataset contributes 5,729 maize rows, including 4,712 candidates (4,332 Zimbabwe and 380 Nigeria). A compact [summary CSV](data/audit/summary.csv) and a detailed [HTML report](data/audit/report.html) are also included. Open the HTML file locally in a browser to view the formatted report.
 
 ### What “screened” means
 
@@ -40,7 +41,7 @@ Each candidate must have a maize label, a finite nonnegative yield, and a valid 
 
 Additional screening excludes documented site coordinates and yield consistency flags: values above 30 tonnes/ha, disagreement between per-acre and per-hectare yields beyond the implemented tolerance, Zimbabwe crop-cut conversion discrepancies, and dry weights exceeding wet weights. The 30 tonnes/ha threshold is a review heuristic. These rules are implemented in [`scripts/audit_datasets.py`](scripts/audit_datasets.py).
 
-Zero yields are retained because they may represent crop failure. The total includes **375 zero-yield observations**; restricting it to positive yields would leave **33,154**. Repeated coordinates are not automatically removed because they can represent repeated observations or distinct fields. Keep observations from the same field or spatial cluster in the same evaluation split.
+Zero yields are retained because they may represent crop failure. The total includes **2,261 zero-yield observations**; restricting it to positive yields would leave **35,980**. Repeated coordinates are not automatically removed because they can represent repeated observations or distinct fields. Keep observations from the same field or spatial cluster in the same evaluation split.
 
 ## Datasets and limitations
 
@@ -50,6 +51,7 @@ Zero yields are retained because they may represent crop failure. The total incl
 | [One Acre Fund curated release](https://doi.org/10.5281/zenodo.11122388) | Maize in pure stands across seven African countries, 2016–2022. Includes yield and management/environmental variables with mixed location precision. | CC BY 4.0 |
 | [Zimbabwe Lacuna](https://doi.org/10.5281/zenodo.10060610) | 3,002 observations across four crops; 2,269 are maize. Maize harvest dates span 2022–2023. Includes point locations, crop-cut weights, and reported yields. | CC BY 4.0 |
 | [FAO / NASA Harvest Malawi](https://data.harvestportal.org/dataset/fao-bha-nasa-harvest-public-yield-datasets) | Field polygons and maize crop-cut yields: 2022 in Mzimba North, Kasungu, and Balaka; 2023 in Kasungu. Dictionaries and methodology documents are included. | CC BY, explicitly stated in the downloaded metadata |
+| [Vision-guided crop-yield dataset](https://zenodo.org/records/17626117) | 6,932 plot rows from Zimbabwe (2024) and Nigeria (2022), with maize/rice labels, field-photo links, crop-cut box measurements, mean yield, and coordinates. The audit screens 4,712 maize yield/location candidates. | CC BY 4.0. Metadata is included; the approximately 4.9 GB field-photo archive is downloaded separately and excluded from Git. |
 
 Important checks remain before using the candidates for satellite-based modelling:
 
@@ -59,6 +61,9 @@ Important checks remain before using the candidates for satellite-based modellin
 - **Malawi 2022:** The shapefile's actual coordinate system is **EPSG:20936**, despite generic metadata listing EPSG:4326. The audit transforms it to WGS84 using its `.prj`. The selected datum operation reports **27 m accuracy**; this is not a measurement of GPS error, but it warrants an alignment check before extracting 10 m satellite pixels.
 - **Malawi 2023:** Seven polygons are self-intersecting and are excluded without automatic repair. The primary yield is from a 10 × 10 m crop cut; the nested 5 × 5 m cut is an alternate measurement on the same field, not an independent record.
 - **Malawi sample counts:** The public files contain 529 and 267 rows, whereas campaign narratives report 523 and 261 fields. The audit retains the file counts and flags the discrepancy rather than removing unexplained rows.
+- **Vision-guided photo dataset:** The 5,729 maize rows include 4,332 Zimbabwe 2024 and 380 Nigeria 2022 candidates after yield/location checks. It includes 1,886 zero-yield observations, retained as possible crop failures. Its harvest-time field photos support a distinct image-based baseline; they are not satellite imagery. The audit extracts an approximate observation date from each field-photo filename so the Sentinel-2 script can form a seasonal window, but that timestamp still needs confirmation against survey records.
+
+The broader list of regional yield products, survey sources, satellite data, climate/soil predictors, access conditions, and scale-specific use is in [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md). GROW-Africa, CY-Bench, TAMASA, LSMS-ISA, and the other listed sources are cataloged there but are not downloaded into this checkout or included in the field-level count above.
 
 Retain the original provider citations and attribution when using or redistributing the data. Exact download URLs and checksums are in the [download manifest](data/metadata/download_manifest.json); cached provider records are in [`data/metadata/`](data/metadata/).
 
@@ -73,6 +78,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r scripts/requirements-audit.txt
 python scripts/download_datasets.py
+python scripts/download_vision_guided_yield_data.py --metadata-only
 python scripts/audit_datasets.py
 ```
 
@@ -85,6 +91,8 @@ If you already have the repository, start with the environment setup from its ro
 The repository already includes the data snapshot, so a normal rerun reuses existing files and cached metadata. Network access is needed for missing downloads or metadata. The script does not automatically refresh the snapshot to newer provider releases.
 
 Check that the final download summary reports **13 files** and **`"errors": []`** for this snapshot. Individual failures are recorded in the manifest; the script currently catches them rather than exiting with a failure status. Its recorded snapshot date is fixed, not the date of each rerun.
+
+[`download_vision_guided_yield_data.py`](scripts/download_vision_guided_yield_data.py) downloads the Zenodo metadata and, by default, the 4.9 GB `q_field_photo.zip`. It resumes partial files and verifies the Zenodo MD5 checksum; the archive is ignored by Git because of GitHub's per-file limit. `--metadata-only` downloads the small CSV without the images. The metadata CSV is needed to reproduce the added audit rows and is included in the project.
 
 ### Audit behaviour and outputs
 
@@ -109,9 +117,9 @@ Running the audit also writes harmonized candidates to [`data/processed/by_count
 
 [`scripts/download_sentinel2.py`](scripts/download_sentinel2.py) searches the free Sentinel-2 Level-2A Cloud-Optimized GeoTIFF archive through the [Earth Search STAC API](https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a). The [AWS Open Data Registry](https://registry.opendata.aws/sentinel-2-l2a-cogs/) documents public, no-account-required access and the archive’s open data terms. Earth Search is a public, best-effort catalogue without a guaranteed service level. Credit ESA/Copernicus and cite the AWS Sentinel-2 COG archive as described by its registry page in research outputs.
 
-The default selection uses the same **18,939 screened OAF, Zimbabwe, and Malawi records from 2019 onward** counted above. The overlapping OAF curated release is excluded because its field, town, or district location is not identified per row. The script uses recorded planting-to-harvest dates when available. For missing or inconsistent dates, its default policy infers a 180-day window before harvest or crop-cut observation, then records that the timing needs review. Use `--date-policy observed-only` to skip records without a valid observed date window, or pass a CSV of reviewed date overrides.
+The default selection uses the same **23,651 screened OAF, Zimbabwe, Malawi, and vision-guided records from 2019 onward** counted above. The overlapping OAF curated release is excluded because its field, town, or district location is not identified per row. The script uses recorded planting-to-harvest dates when available. For missing or inconsistent dates, its default policy infers a 180-day window before harvest or crop-cut observation; for the vision-guided records, the crop-cut date is approximated from the field-photo filename. These inferred windows are flagged for review. Use `--date-policy observed-only` to skip records without a planting/harvest date pair, or pass a CSV of reviewed date overrides.
 
-For each selected record, the downloader searches for Sentinel-2 scenes intersecting its location during the observation window. It considers months spread across the window, tries scenes in order of catalogue cloud cover, and accepts at most one scene per selected month. It then checks the scene classification over the field or location and requires at least 80% clear, valid pixels there by default. It reads the selected small chip from public cloud-optimized rasters instead of saving full satellite scenes. Imagery is atmospheric-corrected Level-2A bottom-of-atmosphere reflectance. The default output contains 10 spectral bands, an SCL scene-classification raster, a valid-pixel mask, an AOI mask, and JSON provenance per accepted scene. The bands originally measured at 20 m are resampled onto the default 10 m output grid; this resampling does not add spatial detail to those bands. OAF and Zimbabwe observations have point coordinates, so the mask marks their location pixel rather than asserting a known field boundary. Malawi records use the available field polygons; check the Malawi 2022 datum-offset caveat above.
+For each selected record, the downloader searches for Sentinel-2 scenes intersecting its location during the observation window. It considers months spread across the window, tries scenes in order of catalogue cloud cover, and accepts at most one scene per selected month. It then checks the scene classification over the field or location and requires at least 80% clear, valid pixels there by default. It reads the selected small chip from public cloud-optimized rasters instead of saving full satellite scenes. Imagery is atmospheric-corrected Level-2A bottom-of-atmosphere reflectance. The default output contains 10 spectral bands, an SCL scene-classification raster, a valid-pixel mask, an AOI mask, and JSON provenance per accepted scene. The bands originally measured at 20 m are resampled onto the default 10 m output grid; this resampling does not add spatial detail to those bands. OAF, Zimbabwe, and vision-guided observations have point coordinates, so the mask marks their location pixel rather than asserting a known field boundary. Malawi records use the available field polygons; check the Malawi 2022 datum-offset caveat above.
 
 Install the imagery dependencies and make a small offline plan first:
 
@@ -128,7 +136,7 @@ python scripts/download_sentinel2.py download --limit 5
 
 For later batches, change `--offset` and `--limit`, for example `--offset 5 --limit 5`. The downloader caches STAC searches, writes progress files, and verifies existing scene files by SHA-256 when rerun. Common options include `--datasets`, `--date-policy observed-only`, `--max-cloud-cover`, `--min-clear-fraction`, `--bands`, and `--date-overrides`; use `python scripts/download_sentinel2.py --help` for the complete list.
 
-A complete default run can generate **about 40 GB of uncompressed chips** at the maximum of 12 scenes per record. Actual output is usually smaller because only clear scenes that pass the field-pixel check are retained and the GeoTIFFs are compressed. Review the plan and run in batches. Imagery outputs are stored under `data/imagery/sentinel2/`, which is ignored by Git; the repository contains the script and instructions, not the generated image files.
+A complete default run can generate **about 50 GB of uncompressed chips** at the maximum of 12 scenes per record. Actual output is usually smaller because only clear scenes that pass the field-pixel check are retained and the GeoTIFFs are compressed. Review the plan and run in batches. Imagery outputs are stored under `data/imagery/sentinel2/`, which is ignored by Git; the repository contains the script and instructions, not the generated image files.
 
 Per-record JSON files record the crop observation, date-window basis, search results, and whether the AOI fits inside the chip. Each accepted scene's `scene.json` stores the full source item metadata, acquisition date, tile cloud cover, clear-pixel fraction, processing settings, and chip checksums. A point passing the pixel check does not prove that its coordinates identify the crop field. Imagery and time-window checks also do not validate each provider’s yield units. Review those issues and the 2022 Malawi position uncertainty before using chips as model labels.
 
@@ -149,6 +157,7 @@ This requests county-level annual corn yield rows for 2019–2024 and writes the
 data/
   raw/          Original datasets, kept by provider release
     USA/USDA_NASS/ Optional U.S. county-yield data and notes
+    vision_guided_yield_estimation/ Public Nigeria/Zimbabwe crop-cut metadata; photo archive downloaded separately
   processed/
     by_country/  Harmonized audit candidates partitioned by ISO3 country
   metadata/     Provider records, download URLs, and checksums
@@ -158,6 +167,7 @@ data/
 docs/           Research plan and model/evaluation protocol
 scripts/
   download_datasets.py
+  download_vision_guided_yield_data.py
   audit_datasets.py
   requirements-audit.txt
   download_sentinel2.py

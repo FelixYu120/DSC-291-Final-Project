@@ -1,0 +1,14 @@
+{
+  "record_id": 17626117,
+  "record_url": "https://zenodo.org/records/17626117",
+  "title": "Scalable Vision-Guided Crop Yield Estimation Dataset",
+  "license": "cc-by-4.0",
+  "files": {
+    "metadata.csv": {
+      "path": "data/raw/vision_guided_yield_estimation/metadata.csv",
+      "bytes": 6040484,
+      "zenodo_md5": "md5:7ae7344db993049896be9fba3cfebc84",
+      "sha256": "bbd1451564a24f0e2a7f7c6966cb13b5f9ae7948bd0608068310ef7c4867e003"
+    }
+  }
+}

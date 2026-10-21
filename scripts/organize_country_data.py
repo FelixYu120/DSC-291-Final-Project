@@ -11,7 +11,7 @@ AUDIT = ROOT / "data/audit"
 OUTPUT = ROOT / "data/processed/by_country"
 DATASETS = (
     "one_acre_fund_full", "one_acre_fund_curated", "zimbabwe",
-    "malawi_2022", "malawi_2023",
+    "malawi_2022", "malawi_2023", "vision_guided_yield_estimation",
 )
 COUNTRY_ISO3 = {
     "burundi": "BDI", "kenya": "KEN", "malawi": "MWI", "nigeria": "NGA", "rwanda": "RWA",

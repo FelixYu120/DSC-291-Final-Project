@@ -15,6 +15,7 @@ import io
 import json
 import math
 from pathlib import Path
+import re
 import statistics
 import zipfile
 
@@ -77,6 +78,13 @@ NOTES = {
         "The public file has 267 rows, whereas the methodology reports 261 sampled fields. The public subset lacks a training-survey flag to explain this difference, so no six rows are arbitrarily removed.",
         "The downloaded metadata explicitly states Creative Commons By Attribution (CC BY).",
     ],
+    "vision_guided_yield_estimation": [
+        "Zenodo record 17626117 contains field photographs and metadata for maize and rice in Nigeria (2022) and Zimbabwe (2024), under CC BY 4.0. The photos were manually screened by the provider to remove identifiable individuals.",
+        "Maize yield uses Avg_yield_mt_ha (metric tonnes/ha); the file also carries two-box yield calculations, weight confirmations, field-photo links, and point coordinates. Keep the original per-box fields for protocol review.",
+        "The candidate count requires nonnegative numeric yield, valid WGS84 coordinates within the project's broad country envelopes, and no exact duplicate row. It does not establish that each point falls inside the measured field or that photo-derived predictions match satellite observations.",
+        "Zero yields are retained as possible crop failures. Repeated coordinates are flagged but not removed automatically.",
+        "The q_field_photo.zip archive is about 4.9 GB and is excluded from Git. It is downloaded with scripts/download_vision_guided_yield_data.py; metadata.csv is sufficient to reproduce the row audit.",
+    ],
 }
 
 
@@ -92,6 +100,20 @@ def serial(value):
     if isinstance(value, (date, datetime)):
         return value.isoformat()
     return "" if value is None else str(value)
+
+
+def photo_capture_date(url):
+    """Read a YYYY-MM-DD or YYYYMMDD photo filename prefix when present."""
+    filename = serial(url).rsplit("/", 1)[-1]
+    for pattern, fmt in ((r"(20\d{2}-\d{2}-\d{2})", "%Y-%m-%d"),
+                         (r"(20\d{2}\d{2}\d{2})", "%Y%m%d")):
+        match = re.search(pattern, filename)
+        if match:
+            try:
+                return datetime.strptime(match.group(1), fmt).date().isoformat()
+            except ValueError:
+                return ""
+    return ""
 
 
 def base(dataset, source_row, source_id, country, year, season, yield_value,
@@ -274,6 +296,55 @@ def malawi(year):
                         for (description, accuracy), count in operations.items()]}
 
 
+def vision_guided_yield_estimation():
+    path = RAW / "vision_guided_yield_estimation/metadata.csv"
+    result = []
+    source_rows = 0
+    crop_counts = Counter()
+    with path.open(encoding="utf-8-sig", newline="") as file:
+        for row_num, d in enumerate(csv.DictReader(file), 2):
+            source_rows += 1
+            crop = serial(d.get("crop")).strip().lower()
+            crop_counts[crop] += 1
+            if "maize" not in crop and "corn" not in crop:
+                continue
+            raw_year = num(d.get("data_collection_year"))
+            year = int(raw_year) if raw_year is not None else ""
+            field_photo_url = serial(d.get("q_field_photo"))
+            photo_date = photo_capture_date(field_photo_url)
+            r = base(
+                "vision_guided_yield_estimation", row_num, d.get("cce_id"), d.get("country"),
+                year, "", d.get("Avg_yield_mt_ha"), "Avg_yield_mt_ha", "t/ha",
+                d.get("longitude"), d.get("latitude"),
+            )
+            r.update(
+                field_photo_url=field_photo_url,
+                field_photo_available=bool(field_photo_url.strip()),
+                observation_time=photo_date,
+                observation_time_source="q_field_photo filename" if photo_date else "",
+                box1_wet_weight_confirmation=serial(d.get("box1_wet_weight_confirmation")),
+                box2_wet_weight_confirmation=serial(d.get("box2_wet_weight_confirmation")),
+                box1_dry_weight_confirmation=serial(d.get("box1_dry_weight_confirmation")),
+                box2_dry_weight_confirmation=serial(d.get("box2_dry_weight_confirmation")),
+                box1_yield_t_ha=serial(d.get("box1_into_mt_ha")),
+                box2_yield_t_ha=serial(d.get("box2_into_mt_ha")),
+                box_used=serial(d.get("Box used")),
+                source_comments=serial(d.get("Comments")),
+                crop_source=serial(d.get("crop")),
+            )
+            if not r["field_photo_available"]:
+                r["quality_flags"].append("field_photo_url_missing")
+            r["_signature"] = tuple(d.items())
+            result.append(r)
+    return result, {
+        "all_source_rows": source_rows,
+        "all_crop_counts": dict(crop_counts),
+        "source_record": "https://zenodo.org/records/17626117",
+        "source_license": "CC BY 4.0",
+        "source_yield_units": "metric tonnes per hectare",
+    }
+
+
 def write_csv(path, rows):
     keys = list(dict.fromkeys(k for row in rows for k in row if not k.startswith("_")))
     with path.open("w", newline="", encoding="utf-8") as file:
@@ -349,7 +420,9 @@ def main():
     summaries = []
     all_rows = {}
     for name, loader in [("one_acre_fund_full", oaf_full), ("one_acre_fund_curated", oaf_curated),
-                         ("zimbabwe", zimbabwe), ("malawi_2022", lambda: malawi(2022)), ("malawi_2023", lambda: malawi(2023))]:
+                         ("zimbabwe", zimbabwe), ("malawi_2022", lambda: malawi(2022)),
+                         ("malawi_2023", lambda: malawi(2023)),
+                         ("vision_guided_yield_estimation", vision_guided_yield_estimation)]:
         print(f"Auditing {name}", flush=True)
         rows, details = loader()
         summary = finish(name, rows, details)
@@ -365,7 +438,7 @@ def main():
     full_keys = {fingerprint(r) for r in all_rows["one_acre_fund_full"]} - {None}
     overlap = sum(fingerprint(r) in full_keys for r in all_rows["one_acre_fund_curated"] if fingerprint(r) is not None)
     report = {
-        "audit_date": "2026-10-20", "screening_not_imagery_validation": True,
+        "audit_date": "2026-10-21", "screening_not_imagery_validation": True,
         "basic_checks": "Maize; finite yield >= 0; finite nonzero WGS84 point or valid nonempty polygon; representative location within a broad envelope of the reported country; exact duplicate source rows after first removed. Polygon topology is checked without automatic repair. Zero yields are retained and counted separately.",
         "additional_yield_checks": "Excludes review flags for yield above 30 tonnes/ha, per-acre/per-hectare disagreement above 1%, Zimbabwe 40m2 conversion disagreement, or dry weight greater than wet weight. The 30 t/ha threshold is a review heuristic, not an agronomic impossibility limit. These extra checks still do not prove field-level location or yield protocol validity.",
         "screened_candidates_definition": "Pass basic and additional yield checks and exclude OAF Uganda 2020 coordinates documented as site locations. All curated OAF rows remain flagged for unresolved field/town/district coordinate provenance; their candidate count is not a verified field-location count. Zimbabwe yield units remain provisionally interpreted as tonnes/ha. No screened file is a fully validated training set.",
@@ -388,7 +461,7 @@ def main():
             details_html += f'<p><a href="{name}_candidates_wgs84.geojson">Candidate field boundaries in WGS84</a></p>'
     page = '''<!doctype html><html lang="en"><meta charset="utf-8"><title>Maize dataset audit</title>
 <style>body{max-width:1120px;margin:40px auto;padding:0 24px;font:16px/1.55 system-ui;color:#202a27}table{border-collapse:collapse;width:100%;font-size:14px}th,td{padding:10px;text-align:left;border-bottom:1px solid #ccd5ce}th{background:#e9f1eb}h1,h2{color:#264b37}pre{white-space:pre-wrap;background:#f4f6f4;padding:16px}a{color:#176046}li{margin:8px 0}.note{border-left:4px solid #b78023;padding:12px 16px;background:#fff9ed}</style>
-<h1>Maize yield and location audit</h1><p>Checked 20 October 2026. Original files are preserved under <a href="../raw/">data/raw</a>.</p>
+<h1>Maize yield and location audit</h1><p>Checked 21 October 2026. Original files are preserved under <a href="../raw/">data/raw</a>.</p>
 <p class="note"><strong>These are screening candidates, not imagery-validated field observations.</strong> Numeric GPS values do not establish that a point lies inside its maize field. The OAF releases overlap and must not be added together.</p>
 <table><tr><th>Dataset</th><th>Maize rows</th><th>Basic candidates</th><th>After extra checks</th><th>2019+ after extra checks</th><th>Zero yields included after extra checks</th></tr>''' + rows_html + "</table>"
     page += "<h2>Checks and interpretation</h2><p>" + html.escape(report["basic_checks"]) + "</p><p>" + html.escape(report["additional_yield_checks"]) + "</p>"

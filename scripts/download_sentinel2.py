@@ -30,7 +30,8 @@ from shapely.geometry import Point, shape
 from urllib3.util.retry import Retry
 
 ROOT = Path(__file__).resolve().parents[1]
-DATASETS = ("one_acre_fund_full", "zimbabwe", "malawi_2022", "malawi_2023")
+DATASETS = ("one_acre_fund_full", "zimbabwe", "malawi_2022", "malawi_2023",
+            "vision_guided_yield_estimation")
 API = "https://earth-search.aws.element84.com/v1"
 COLLECTION = "sentinel-2-c1-l2a"
 BANDS = {"B02": "blue", "B03": "green", "B04": "red", "B05": "rededge1",

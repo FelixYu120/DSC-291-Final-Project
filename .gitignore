@@ -5,3 +5,4 @@ __pycache__/
 venv/
 *.part
 data/imagery/
+data/raw/vision_guided_yield_estimation/q_field_photo.zip

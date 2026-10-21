@@ -38,10 +38,11 @@
     },
     "NGA": {
       "country": "nigeria",
-      "records": 115,
-      "records_since_2019": 115,
+      "records": 495,
+      "records_since_2019": 495,
       "by_dataset": {
-        "one_acre_fund_curated": 115
+        "one_acre_fund_curated": 115,
+        "vision_guided_yield_estimation": 380
       },
       "field_boundary_features": 0,
       "candidate_csv": "NGA/screened_maize_yield_candidates.csv"
@@ -91,9 +92,10 @@
     },
     "ZWE": {
       "country": "zimbabwe",
-      "records": 2266,
-      "records_since_2019": 2266,
+      "records": 6598,
+      "records_since_2019": 6598,
       "by_dataset": {
+        "vision_guided_yield_estimation": 4332,
         "zimbabwe": 2266
       },
       "field_boundary_features": 0,

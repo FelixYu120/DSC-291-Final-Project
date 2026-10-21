@@ -1,0 +1,132 @@
+{
+  "created": "2025-11-17T04:45:22.895958+00:00",
+  "modified": "2025-11-17T04:45:23.153692+00:00",
+  "id": 17626117,
+  "conceptrecid": "17626116",
+  "doi": "10.5281/zenodo.17626117",
+  "conceptdoi": "10.5281/zenodo.17626116",
+  "doi_url": "https://doi.org/10.5281/zenodo.17626117",
+  "metadata": {
+    "title": "Scalable Vision-Guided Crop Yield Estimation Dataset",
+    "doi": "10.5281/zenodo.17626117",
+    "publication_date": "2025-11-17",
+    "description": "<p>This dataset contains field photographs and metadata of maize and rice fields collected in Zimbabwe (2024) and Nigeria (2022) for crop yield estimation. It includes approximately 7,000 field images along with a CSV file containing plot-level metadata and crop-cut yield measurements. All images were manually screened to remove identifiable individuals before public release. The dataset supports research in computer vision for agriculture and crop yield prediction. The data is released under a CC-BY 4.0 license.</p>",
+    "access_right": "open",
+    "creators": [
+      {
+        "name": "Irgau, Medhanie",
+        "affiliation": "Stanford University"
+      },
+      {
+        "name": "Li, Harrison",
+        "affiliation": "Harvey Mudd College"
+      },
+      {
+        "name": "Lobell, David",
+        "affiliation": "Stanford University"
+      },
+      {
+        "name": "Janmohamed, Nabil",
+        "affiliation": "Pula Advisors"
+      },
+      {
+        "name": "Rieckmann, Karen",
+        "affiliation": "Pula Advisors"
+      }
+    ],
+    "resource_type": {
+      "title": "Dataset",
+      "type": "dataset"
+    },
+    "license": {
+      "id": "cc-by-4.0"
+    },
+    "relations": {
+      "version": [
+        {
+          "index": 0,
+          "is_last": true,
+          "parent": {
+            "pid_type": "recid",
+            "pid_value": "17626116"
+          }
+        }
+      ]
+    }
+  },
+  "title": "Scalable Vision-Guided Crop Yield Estimation Dataset",
+  "links": {
+    "self": "https://zenodo.org/api/records/17626117",
+    "self_html": "https://zenodo.org/records/17626117",
+    "preview_html": "https://zenodo.org/records/17626117?preview=1",
+    "doi": "https://doi.org/10.5281/zenodo.17626117",
+    "self_doi": "https://doi.org/10.5281/zenodo.17626117",
+    "self_doi_html": "https://zenodo.org/doi/10.5281/zenodo.17626117",
+    "reserve_doi": "https://zenodo.org/api/records/17626117/draft/pids/doi",
+    "parent": "https://zenodo.org/api/records/17626116",
+    "parent_html": "https://zenodo.org/records/17626116",
+    "parent_doi": "https://doi.org/10.5281/zenodo.17626116",
+    "parent_doi_html": "https://zenodo.org/doi/10.5281/zenodo.17626116",
+    "self_iiif_manifest": "https://zenodo.org/api/iiif/record:17626117/manifest",
+    "self_iiif_sequence": "https://zenodo.org/api/iiif/record:17626117/sequence/default",
+    "files": "https://zenodo.org/api/records/17626117/files",
+    "media_files": "https://zenodo.org/api/records/17626117/media-files",
+    "latest": "https://zenodo.org/api/records/17626117/versions/latest",
+    "latest_html": "https://zenodo.org/records/17626117/latest",
+    "versions": "https://zenodo.org/api/records/17626117/versions",
+    "draft": "https://zenodo.org/api/records/17626117/draft",
+    "access_links": "https://zenodo.org/api/records/17626117/access/links",
+    "access_grants": "https://zenodo.org/api/records/17626117/access/grants",
+    "access_users": "https://zenodo.org/api/records/17626117/access/users",
+    "access_request": "https://zenodo.org/api/records/17626117/access/request",
+    "access": "https://zenodo.org/api/records/17626117/access",
+    "communities": "https://zenodo.org/api/records/17626117/communities",
+    "communities-suggestions": "https://zenodo.org/api/records/17626117/communities-suggestions",
+    "request_deletion": "https://zenodo.org/api/records/17626117/request-deletion",
+    "file_modification": "https://zenodo.org/api/records/17626117/file-modification",
+    "quota_increase": "https://zenodo.org/api/records/17626117/quota-increase",
+    "requests": "https://zenodo.org/api/records/17626117/requests"
+  },
+  "updated": "2025-11-17T04:45:23.153692+00:00",
+  "recid": "17626117",
+  "revision": 3,
+  "files": [
+    {
+      "id": "f3d07e32-be4c-44da-a1be-5a38dbfd692d",
+      "key": "metadata.csv",
+      "size": 6040484,
+      "checksum": "md5:7ae7344db993049896be9fba3cfebc84",
+      "links": {
+        "self": "https://zenodo.org/api/records/17626117/files/metadata.csv/content"
+      }
+    },
+    {
+      "id": "2e0f6050-244a-45b4-b07a-68a721aa77c3",
+      "key": "q_field_photo.zip",
+      "size": 4904281772,
+      "checksum": "md5:b5ef74a8608f72f034f35e3bb7462395",
+      "links": {
+        "self": "https://zenodo.org/api/records/17626117/files/q_field_photo.zip/content"
+      }
+    }
+  ],
+  "swh": {},
+  "owners": [
+    {
+      "id": "1464984"
+    }
+  ],
+  "status": "published",
+  "stats": {
+    "downloads": 106,
+    "unique_downloads": 69,
+    "views": 127,
+    "unique_views": 115,
+    "version_downloads": 106,
+    "version_unique_downloads": 69,
+    "version_unique_views": 115,
+    "version_views": 127
+  },
+  "state": "done",
+  "submitted": true
+}

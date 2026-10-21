@@ -1,6 +1,7 @@
-dataset,all_source_rows,maize_records,nonnegative_numeric_yield,valid_coordinates_and_geometry,within_country_envelope,passes_basic_checks,passes_basic_checks_since_2019,passes_basic_checks_positive_yield,zero_yield_in_basic_candidates,passes_additional_yield_consistency_checks,screened_candidates,screened_candidates_since_2019,zero_yield_in_screened_candidates,distinct_locations_in_basic_candidates,exact_duplicate_rows_after_first,repeated_source_ids,source_crs,derived_crs
-one_acre_fund_full,81411,45569,44105,30839,30838,30720,16130,30375,345,30720,30474,15884,344,29530,0,0,,
-one_acre_fund_curated,14773,14773,14773,14773,14773,14773,8055,14510,263,14773,14773,8055,263,10941,0,0,,
-zimbabwe,3002,2269,2269,2269,2269,2269,2269,2241,28,2266,2266,2266,28,2261,0,0,OGC:CRS84,
-malawi_2022,529,529,529,529,529,529,529,526,3,529,529,529,3,529,0,0,EPSG:20936,EPSG:4326
-malawi_2023,267,267,267,260,267,260,260,260,0,260,260,260,0,260,0,0,EPSG:4326,EPSG:4326
+dataset,all_source_rows,maize_records,nonnegative_numeric_yield,valid_coordinates_and_geometry,within_country_envelope,passes_basic_checks,passes_basic_checks_since_2019,passes_basic_checks_positive_yield,zero_yield_in_basic_candidates,passes_additional_yield_consistency_checks,screened_candidates,screened_candidates_since_2019,zero_yield_in_screened_candidates,distinct_locations_in_basic_candidates,exact_duplicate_rows_after_first,repeated_source_ids,source_crs,derived_crs,source_record,source_license,source_yield_units
+one_acre_fund_full,81411,45569,44105,30839,30838,30720,16130,30375,345,30720,30474,15884,344,29530,0,0,,,,,
+one_acre_fund_curated,14773,14773,14773,14773,14773,14773,8055,14510,263,14773,14773,8055,263,10941,0,0,,,,,
+zimbabwe,3002,2269,2269,2269,2269,2269,2269,2241,28,2266,2266,2266,28,2261,0,0,OGC:CRS84,,,,
+malawi_2022,529,529,529,529,529,529,529,526,3,529,529,529,3,529,0,0,EPSG:20936,EPSG:4326,,,
+malawi_2023,267,267,267,260,267,260,260,260,0,260,260,260,0,260,0,0,EPSG:4326,EPSG:4326,,,
+vision_guided_yield_estimation,6932,5729,4712,5729,5729,4712,4712,2826,1886,4712,4712,4712,1886,4708,0,0,,,https://zenodo.org/records/17626117,CC BY 4.0,metric tonnes per hectare

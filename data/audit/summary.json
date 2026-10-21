@@ -1,5 +1,5 @@
 {
-  "audit_date": "2026-10-20",
+  "audit_date": "2026-10-21",
   "screening_not_imagery_validation": true,
   "basic_checks": "Maize; finite yield >= 0; finite nonzero WGS84 point or valid nonempty polygon; representative location within a broad envelope of the reported country; exact duplicate source rows after first removed. Polygon topology is checked without automatic repair. Zero yields are retained and counted separately.",
   "additional_yield_checks": "Excludes review flags for yield above 30 tonnes/ha, per-acre/per-hectare disagreement above 1%, Zimbabwe 40m2 conversion disagreement, or dry weight greater than wet weight. The 30 t/ha threshold is a review heuristic, not an agronomic impossibility limit. These extra checks still do not prove field-level location or yield protocol validity.",
@@ -321,6 +321,57 @@
         "cc_ey_t is the primary yield (10 x 10 m crop cut, tonnes/ha). subc_ey_t is a nested 5 x 5 m cut, not a second independent field. ff_ey_t has only one nonmissing full-field value.",
         "The public file has 267 rows, whereas the methodology reports 261 sampled fields. The public subset lacks a training-survey flag to explain this difference, so no six rows are arbitrarily removed.",
         "The downloaded metadata explicitly states Creative Commons By Attribution (CC BY)."
+      ]
+    },
+    {
+      "dataset": "vision_guided_yield_estimation",
+      "all_source_rows": 6932,
+      "all_crop_counts": {
+        "rice": 1203,
+        "maize/corn": 5729
+      },
+      "source_record": "https://zenodo.org/records/17626117",
+      "source_license": "CC BY 4.0",
+      "source_yield_units": "metric tonnes per hectare",
+      "maize_records": 5729,
+      "nonnegative_numeric_yield": 4712,
+      "valid_coordinates_and_geometry": 5729,
+      "within_country_envelope": 5729,
+      "passes_basic_checks": 4712,
+      "passes_basic_checks_since_2019": 4712,
+      "passes_basic_checks_positive_yield": 2826,
+      "zero_yield_in_basic_candidates": 1886,
+      "passes_additional_yield_consistency_checks": 4712,
+      "screened_candidates": 4712,
+      "screened_candidates_since_2019": 4712,
+      "zero_yield_in_screened_candidates": 1886,
+      "distinct_locations_in_basic_candidates": 4708,
+      "exact_duplicate_rows_after_first": 0,
+      "repeated_source_ids": 0,
+      "flag_counts": {
+        "zero_yield_review": 1886,
+        "missing_or_nonnumeric_yield": 1017,
+        "coordinates_reused_across_records": 8
+      },
+      "by_year": {
+        "2022": 380,
+        "2024": 4332
+      },
+      "by_country": {
+        "nigeria": 380,
+        "zimbabwe": 4332
+      },
+      "candidate_yield_kg_ha_min_median_max": [
+        0.0,
+        145.9375,
+        9111.25
+      ],
+      "notes": [
+        "Zenodo record 17626117 contains field photographs and metadata for maize and rice in Nigeria (2022) and Zimbabwe (2024), under CC BY 4.0. The photos were manually screened by the provider to remove identifiable individuals.",
+        "Maize yield uses Avg_yield_mt_ha (metric tonnes/ha); the file also carries two-box yield calculations, weight confirmations, field-photo links, and point coordinates. Keep the original per-box fields for protocol review.",
+        "The candidate count requires nonnegative numeric yield, valid WGS84 coordinates within the project's broad country envelopes, and no exact duplicate row. It does not establish that each point falls inside the measured field or that photo-derived predictions match satellite observations.",
+        "Zero yields are retained as possible crop failures. Repeated coordinates are flagged but not removed automatically.",
+        "The q_field_photo.zip archive is about 4.9 GB and is excluded from Git. It is downloaded with scripts/download_vision_guided_yield_data.py; metadata.csv is sufficient to reproduce the row audit."
       ]
     }
   ]

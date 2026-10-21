@@ -1,10 +1,12 @@
 MAIZE YIELD DATA DOWNLOAD AND AUDIT
-Snapshot checked: 20 October 2026
+Snapshot checked: 21 October 2026
 
 Start with audit/report.html or audit/summary.csv.
 
 CONTENTS
-raw/       Original provider files, unchanged.
+raw/       Original provider files, unchanged, including the new vision-guided
+           Nigeria/Zimbabwe yield metadata; its 4.9 GB photo archive is fetched
+           separately and excluded from Git.
 metadata/  Provider catalogue/API responses and a download manifest containing
            exact source URLs, byte sizes, and SHA-256 checksums.
 audit/     Counts, all maize records with audit flags, screened candidate CSVs,
@@ -31,6 +33,13 @@ https://data.harvestportal.org/dataset/fao-bha-nasa-harvest-public-yield-dataset
 The accompanying 2022 and 2023 metadata CSVs explicitly specify CC BY.
 Field dictionaries and methodology documents are included. Retain provider
 citations and attribution when using or redistributing these data.
+
+Vision-guided crop-yield dataset (Nigeria 2022 and Zimbabwe 2024):
+https://doi.org/10.5281/zenodo.17626117
+CC BY 4.0. The CSV has plot yields, coordinates, field-photo links and crop-cut
+box details. The 4.9 GB q_field_photo.zip file is downloaded separately and
+excluded from Git. Approximate observation dates parsed from photo filenames
+are not verified planting or harvest dates.
 
 INTERPRETING THE OUTPUTS
 *_maize_audit.csv retains every maize observation, including unusable and
