@@ -33,7 +33,7 @@ The **21 October 2026 data snapshot contains 38,241 screened candidate observati
 
 *The curated OAF release overlaps the full release and mixes field, town, and district coordinates without an explicit location-source flag for each row. Its screening count does not establish how many records have accurate field locations. Do not add these records to the total without resolving overlap and location provenance. Counts across other sources are observations and may still include cross-dataset overlap.*
 
-The counts come from [`data/audit/summary.json`](data/audit/summary.json), specifically `maize_records`, `screened_candidates`, and `screened_candidates_since_2019`. The new photo dataset contributes 5,729 maize rows, including 4,712 candidates (4,332 Zimbabwe and 380 Nigeria). A compact [summary CSV](data/audit/summary.csv) and a detailed [HTML report](data/audit/report.html) are also included. Open the HTML file locally in a browser to view the formatted report.
+The counts come from [`data/audit/summary.json`](data/audit/summary.json), specifically `maize_records`, `screened_candidates`, and `screened_candidates_since_2019`. The new photo dataset contributes 5,729 maize rows with field-photo links, including 4,712 yield/location candidates (4,332 Zimbabwe and 380 Nigeria). A compact [summary CSV](data/audit/summary.csv) and a detailed [HTML report](data/audit/report.html) are also included. Open the HTML file locally in a browser to view the formatted report.
 
 ### What “screened” means
 

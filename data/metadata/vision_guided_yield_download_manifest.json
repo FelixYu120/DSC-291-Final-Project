@@ -9,6 +9,12 @@
       "bytes": 6040484,
       "zenodo_md5": "md5:7ae7344db993049896be9fba3cfebc84",
       "sha256": "bbd1451564a24f0e2a7f7c6966cb13b5f9ae7948bd0608068310ef7c4867e003"
+    },
+    "q_field_photo.zip": {
+      "path": "data/raw/vision_guided_yield_estimation/q_field_photo.zip",
+      "bytes": 4904281772,
+      "zenodo_md5": "md5:b5ef74a8608f72f034f35e3bb7462395",
+      "sha256": "1325bab205c9a95a66447b9c801760352a5b1f0d48cb37846de07d29bbb34176"
     }
   }
 }

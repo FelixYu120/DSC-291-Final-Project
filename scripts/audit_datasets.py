@@ -81,6 +81,7 @@ NOTES = {
     "vision_guided_yield_estimation": [
         "Zenodo record 17626117 contains field photographs and metadata for maize and rice in Nigeria (2022) and Zimbabwe (2024), under CC BY 4.0. The photos were manually screened by the provider to remove identifiable individuals.",
         "Maize yield uses Avg_yield_mt_ha (metric tonnes/ha); the file also carries two-box yield calculations, weight confirmations, field-photo links, and point coordinates. Keep the original per-box fields for protocol review.",
+        "An approximate observation date is parsed from each q_field_photo filename because the CSV has no planting/harvest dates. Treat it as a photo/crop-cut timing proxy and verify before selecting satellite windows.",
         "The candidate count requires nonnegative numeric yield, valid WGS84 coordinates within the project's broad country envelopes, and no exact duplicate row. It does not establish that each point falls inside the measured field or that photo-derived predictions match satellite observations.",
         "Zero yields are retained as possible crop failures. Repeated coordinates are flagged but not removed automatically.",
         "The q_field_photo.zip archive is about 4.9 GB and is excluded from Git. It is downloaded with scripts/download_vision_guided_yield_data.py; metadata.csv is sufficient to reproduce the row audit.",
@@ -301,6 +302,8 @@ def vision_guided_yield_estimation():
     result = []
     source_rows = 0
     crop_counts = Counter()
+    maize_photo_urls = 0
+    maize_photo_dates = 0
     with path.open(encoding="utf-8-sig", newline="") as file:
         for row_num, d in enumerate(csv.DictReader(file), 2):
             source_rows += 1
@@ -312,6 +315,8 @@ def vision_guided_yield_estimation():
             year = int(raw_year) if raw_year is not None else ""
             field_photo_url = serial(d.get("q_field_photo"))
             photo_date = photo_capture_date(field_photo_url)
+            maize_photo_urls += bool(field_photo_url.strip())
+            maize_photo_dates += bool(photo_date)
             r = base(
                 "vision_guided_yield_estimation", row_num, d.get("cce_id"), d.get("country"),
                 year, "", d.get("Avg_yield_mt_ha"), "Avg_yield_mt_ha", "t/ha",
@@ -320,6 +325,10 @@ def vision_guided_yield_estimation():
             r.update(
                 field_photo_url=field_photo_url,
                 field_photo_available=bool(field_photo_url.strip()),
+                field_photo_archive_member=(
+                    f"q_field_photo/q_field_photo_{d.get('cce_id')}.jpg"
+                    if field_photo_url.strip() and d.get("cce_id") else ""
+                ),
                 observation_time=photo_date,
                 observation_time_source="q_field_photo filename" if photo_date else "",
                 box1_wet_weight_confirmation=serial(d.get("box1_wet_weight_confirmation")),
@@ -342,6 +351,8 @@ def vision_guided_yield_estimation():
         "source_record": "https://zenodo.org/records/17626117",
         "source_license": "CC BY 4.0",
         "source_yield_units": "metric tonnes per hectare",
+        "maize_field_photo_urls": maize_photo_urls,
+        "maize_photo_filename_dates": maize_photo_dates,
     }
 
 
