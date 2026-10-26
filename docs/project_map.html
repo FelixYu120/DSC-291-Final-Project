@@ -1,0 +1,594 @@
+<title>Crop-Yield Project Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: one-column engineering notebook, 1080px max; three hand-drawn SVG mechanisms, a numbered step ladder as the spine, a seven-week track at the end. */
+  :root {
+    --bg: #f5f7f2;
+    --fg: #1b2420;
+    --muted: #5b6761;
+    --line: #cdd5cc;
+    --card: #ffffff;
+    --y: #3c7a39;
+    --y-soft: #e2efdd;
+    --x: #2d5f92;
+    --x-soft: #dfe9f5;
+    --gate: #b06f14;
+    --gate-soft: #f7e9d2;
+    --stop: #a43b3b;
+    --stop-soft: #f4e0e0;
+    --font-display: "Archivo Narrow", "Arial Narrow", "Helvetica Neue", sans-serif;
+    --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #131915; --fg: #e6eae4; --muted: #99a39c; --line: #2d3731; --card: #1b221e;
+      --y: #83c377; --y-soft: #1e3320; --x: #82abd9; --x-soft: #1a2a3b;
+      --gate: #e2a24a; --gate-soft: #3a2c15; --stop: #e07e7e; --stop-soft: #3b2020;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #131915; --fg: #e6eae4; --muted: #99a39c; --line: #2d3731; --card: #1b221e;
+    --y: #83c377; --y-soft: #1e3320; --x: #82abd9; --x-soft: #1a2a3b;
+    --gate: #e2a24a; --gate-soft: #3a2c15; --stop: #e07e7e; --stop-soft: #3b2020;
+    color-scheme: dark;
+  }
+
+  body {
+    background: var(--bg); color: var(--fg);
+    font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 28px 72px;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.2rem, 5vw, 3.4rem); line-height: 1; letter-spacing: -0.01em; margin: 6px 0 12px; text-wrap: balance; }
+  h2 { font-family: var(--font-display); font-weight: 700; font-size: 1.7rem; line-height: 1.1; margin: 0 0 6px; text-wrap: balance; }
+  h3 { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; margin: 0 0 4px; }
+  h4 { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 6px; color: var(--muted); }
+  p { margin: 0 0 10px; }
+  .eyebrow { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .lead { max-width: 68ch; font-size: 1.05rem; }
+  .muted { color: var(--muted); }
+  .mono { font-family: var(--font-mono); font-size: 0.85em; }
+  section { margin-top: 60px; }
+  .section-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px; border-bottom: 2px solid var(--fg); padding-bottom: 6px; }
+  .section-head .eyebrow { white-space: nowrap; }
+
+  figure { margin: 16px 0 0; }
+  figure svg { max-width: 100%; height: auto; display: block; }
+  figcaption { font-size: 0.85rem; color: var(--muted); margin-top: 8px; max-width: 72ch; }
+  svg text { fill: currentColor; font-family: var(--font-body); }
+  svg text.mono { font-family: var(--font-mono); }
+  svg text.muted { fill: var(--muted); }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; font-size: 0.82rem; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 14px; height: 14px; border: 1px solid; display: inline-block; }
+  .sw.x { background: var(--x-soft); border-color: var(--x); }
+  .sw.y { background: var(--y-soft); border-color: var(--y); }
+  .sw.g { background: var(--gate-soft); border-color: var(--gate); }
+  .sw.s { background: var(--stop-soft); border-color: var(--stop); }
+
+  .cohorts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 14px; }
+  .cohort { background: var(--card); border: 1px solid var(--line); padding: 14px 16px 16px; min-width: 0; display: grid; gap: 10px; align-content: start; }
+  .cohort header { display: grid; gap: 2px; }
+  .cohort .count { font-family: var(--font-display); font-size: 1.6rem; line-height: 1; font-variant-numeric: tabular-nums; }
+  .cohort dl { margin: 0; display: grid; grid-template-columns: 64px 1fr; gap: 4px 10px; font-size: 0.86rem; }
+  .cohort dt { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
+  .cohort dd { margin: 0; min-width: 0; }
+  .cohort dt.x { color: var(--x); } .cohort dt.y { color: var(--y); }
+  .badge { display: inline-block; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.04em; padding: 2px 7px; border: 1px solid currentColor; border-radius: 3px; white-space: nowrap; }
+  .badge.poly { color: var(--y); } .badge.point { color: var(--gate); }
+  .role { font-size: 0.86rem; border-top: 1px solid var(--line); padding-top: 8px; }
+  .flag { color: var(--stop); font-size: 0.84rem; }
+
+  .steps-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px 18px; margin: 14px 0 0; padding: 0; list-style: none; counter-reset: s; }
+  .steps-list li { display: grid; grid-template-columns: 26px 1fr; gap: 8px; font-size: 0.9rem; min-width: 0; }
+  .steps-list li::before { counter-increment: s; content: counter(s); font-family: var(--font-display); font-size: 1.2rem; color: var(--x); line-height: 1.2; }
+  .traps { margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
+  .trap { border-left: 3px solid var(--stop); padding: 4px 0 4px 12px; font-size: 0.88rem; min-width: 0; }
+  .trap b { display: block; }
+
+  .ladder { margin-top: 10px; }
+  .step { display: grid; grid-template-columns: 64px 1fr; gap: 14px; padding-block: 20px 22px; border-top: 1px solid var(--line); }
+  .step:first-child { border-top: 0; }
+  .step-no { font-family: var(--font-display); font-weight: 700; font-size: 2.4rem; line-height: 1; color: var(--muted); }
+  .step-no small { display: block; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; margin-top: 6px; }
+  .step-main { min-width: 0; display: grid; gap: 12px; }
+  .step-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
+  .step-title .when { font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  @media (max-width: 820px) { .cols { grid-template-columns: 1fr; } }
+  .col { min-width: 0; font-size: 0.9rem; }
+  .col ul { margin: 0; padding-left: 18px; }
+  .col li { margin-bottom: 3px; }
+  .col.x h4 { color: var(--x); } .col.y h4 { color: var(--y); } .col.g h4 { color: var(--gate); }
+  .col.g { background: var(--gate-soft); padding: 10px 12px; }
+  .verdict { display: grid; grid-template-columns: 52px 1fr; gap: 8px; margin-top: 6px; font-size: 0.86rem; }
+  .verdict b { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.06em; padding-top: 2px; }
+  .verdict b.pass { color: var(--y); } .verdict b.fail { color: var(--stop); }
+  .fallback { border: 1px solid var(--stop); background: var(--stop-soft); padding: 14px 16px; margin-top: 8px; display: grid; grid-template-columns: 64px 1fr; gap: 14px; }
+  .fallback .step-no { color: var(--stop); }
+
+  .numbers { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 14px; }
+  .num { border-top: 3px solid var(--line); padding-top: 8px; min-width: 0; }
+  .num b { display: block; font-family: var(--font-display); font-size: 1.8rem; line-height: 1; font-variant-numeric: tabular-nums; }
+  .num span { font-size: 0.84rem; color: var(--muted); }
+
+  .scroll { overflow-x: auto; margin-top: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  td.m { font-family: var(--font-mono); font-size: 0.82rem; white-space: nowrap; }
+
+  .roadmap { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 14px; }
+  @media (max-width: 960px) { .roadmap { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); } }
+  .week { border-top: 4px solid var(--x); padding-top: 8px; min-width: 0; font-size: 0.84rem; display: grid; gap: 6px; align-content: start; }
+  .week.hot { border-top-color: var(--gate); }
+  .week .w { font-family: var(--font-display); font-size: 1.3rem; line-height: 1; }
+  .week .d { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); }
+  .week ul { margin: 0; padding-left: 16px; }
+  .week li { margin-bottom: 3px; }
+  .due { display: inline-block; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.04em; color: var(--gate); border: 1px solid var(--gate); padding: 1px 6px; border-radius: 3px; }
+  .due.stop { color: var(--stop); border-color: var(--stop); }
+
+  .check { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px; }
+  .check li { display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: start; background: var(--card); border: 1px solid var(--line); padding: 10px 12px; font-size: 0.9rem; }
+  .check .box { width: 18px; height: 18px; border: 2px solid var(--fg); margin-top: 2px; }
+  .check .who { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); white-space: nowrap; }
+  @media (max-width: 560px) { .check li { grid-template-columns: 30px 1fr; } .check .who { grid-column: 2; } }
+
+  .roles { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .roles span { font-size: 0.82rem; border: 1px solid var(--line); background: var(--card); padding: 4px 10px; }
+  a { color: var(--x); }
+  footer { margin-top: 56px; font-size: 0.8rem; color: var(--muted); max-width: 72ch; }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">DSC 291 · Felix, Florian, Liuan, Pamely, Zida · 25 October 2026</div>
+  <h1>Crop-Yield Project Map</h1>
+  <p class="lead">One page that shows where to start, what goes in (X) and what comes out (Y) at every step, which gate decides whether we go on, and when each piece is due. Read top to bottom once; then use it as the wall chart.</p>
+  <div class="legend">
+    <span><i class="sw x"></i> X · satellite input</span>
+    <span><i class="sw y"></i> Y · yield label</span>
+    <span><i class="sw g"></i> gate · a decision we make on evidence</span>
+    <span><i class="sw s"></i> stop or fallback</span>
+  </div>
+
+  <!-- 1. THE ONE IDEA -->
+  <section>
+    <div class="section-head"><span class="eyebrow">Part 1</span><h2>The one idea</h2></div>
+    <p class="lead">A field record gives us two things: where and when the maize grew, and how much grain came out of it. From the where-and-when we fetch a season of free Sentinel-2 images (that is X). From the harvest we get one number in tonnes per hectare (that is Y). A model learns X&rarr;Y on some zones and is scored on zones it never saw.</p>
+    <figure>
+      <svg viewBox="0 0 980 250" role="img" aria-label="A field record splits into a Sentinel-2 season (X) and a crop-cut yield (Y); a model is fitted on training zones and scored on zones it never saw, against a noise ceiling.">
+        <defs>
+          <marker id="ar1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+        </defs>
+        <!-- field record -->
+        <rect x="16" y="70" width="210" height="110" rx="3" fill="var(--card)" stroke="currentColor" stroke-width="1.5"/>
+        <text x="121" y="96" text-anchor="middle" font-size="13" font-weight="600">One field record</text>
+        <text x="121" y="118" text-anchor="middle" font-size="11" class="muted">GPS point or walked polygon</text>
+        <text x="121" y="136" text-anchor="middle" font-size="11" class="muted">season = fixed zone window</text>
+        <text x="121" y="154" text-anchor="middle" font-size="11" class="muted">crop-cut weights from 1&ndash;2 boxes</text>
+        <!-- X box -->
+        <rect x="320" y="18" width="230" height="84" rx="3" fill="var(--x-soft)" stroke="var(--x)" stroke-width="1.5"/>
+        <text x="435" y="44" text-anchor="middle" font-size="13" font-weight="600" fill="var(--x)">X &middot; Sentinel-2 season</text>
+        <text x="435" y="64" text-anchor="middle" font-size="11">8&ndash;9 monthly composites &middot; 10 bands</text>
+        <text x="435" y="82" text-anchor="middle" font-size="11">10 m pixels &middot; clouds masked</text>
+        <!-- Y box -->
+        <rect x="320" y="148" width="230" height="84" rx="3" fill="var(--y-soft)" stroke="var(--y)" stroke-width="1.5"/>
+        <text x="435" y="174" text-anchor="middle" font-size="13" font-weight="600" fill="var(--y)">Y &middot; yield in t/ha</text>
+        <text x="435" y="194" text-anchor="middle" font-size="11">one number per field</text>
+        <text x="435" y="212" text-anchor="middle" font-size="11">mean of two cuts where we have two</text>
+        <!-- arrows record -> X, Y -->
+        <path d="M226 110 C 270 110 275 60 320 60" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar1)"/>
+        <text x="272" y="50" text-anchor="middle" font-size="10" class="muted">fetch imagery</text>
+        <path d="M226 140 C 270 140 275 190 320 190" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar1)"/>
+        <text x="272" y="208" text-anchor="middle" font-size="10" class="muted">weigh the grain</text>
+        <!-- model box -->
+        <rect x="630" y="70" width="190" height="110" rx="3" fill="var(--card)" stroke="currentColor" stroke-width="1.5"/>
+        <text x="725" y="96" text-anchor="middle" font-size="13" font-weight="600">Model</text>
+        <text x="725" y="118" text-anchor="middle" font-size="11" class="muted">index regression &rarr; trees</text>
+        <text x="725" y="136" text-anchor="middle" font-size="11" class="muted">&rarr; frozen Presto</text>
+        <text x="725" y="154" text-anchor="middle" font-size="11" class="muted">&rarr; fine-tuned Presto</text>
+        <path d="M550 60 C 590 60 590 110 630 110" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar1)"/>
+        <path d="M550 190 C 590 190 590 140 630 140" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar1)"/>
+        <text x="590" y="130" text-anchor="middle" font-size="10" class="muted">fit on</text>
+        <text x="590" y="142" text-anchor="middle" font-size="10" class="muted">training zones</text>
+        <!-- score box -->
+        <rect x="856" y="70" width="110" height="110" rx="3" fill="var(--gate-soft)" stroke="var(--gate)" stroke-width="1.5"/>
+        <text x="911" y="96" text-anchor="middle" font-size="13" font-weight="600" fill="var(--gate)">Score</text>
+        <text x="911" y="118" text-anchor="middle" font-size="11">RMSE on zones</text>
+        <text x="911" y="134" text-anchor="middle" font-size="11">never seen,</text>
+        <text x="911" y="152" text-anchor="middle" font-size="11">against the</text>
+        <text x="911" y="168" text-anchor="middle" font-size="11">noise ceiling</text>
+        <path d="M820 125 L856 125" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar1)"/>
+        <text x="838" y="115" text-anchor="middle" font-size="10" class="muted">predict</text>
+      </svg>
+      <figcaption>Every experiment in this project is this picture with a different model in the middle box or a different rule for which zones are held out.</figcaption>
+    </figure>
+    <div class="numbers">
+      <div class="num"><b>0.15&ndash;0.30</b><span>realistic field-level R&sup2; at 10 m (Burke &amp; Lobell's resolution test)</span></div>
+      <div class="num"><b>0.40&ndash;0.55</b><span>district-level R&sup2; from Sentinel-2 (Jin et al. 2019)</span></div>
+      <div class="num"><b>0.261</b><span>within-zone R&sup2; of the photo model on Zimbabwe 2024 (Li et al. 2026)</span></div>
+      <div class="num"><b>402,240</b><span>trainable Presto parameters: the whole experiment grid runs in minutes on one GPU</span></div>
+    </div>
+  </section>
+
+  <!-- 2. WHAT WE HAVE -->
+  <section>
+    <div class="section-head"><span class="eyebrow">Part 2</span><h2>What we have: four label cohorts, one imagery source</h2></div>
+    <p class="lead">All four are already downloaded and screened in the team repo. Sentinel-2 is the only imagery (Planet is gone and charges 100 km&sup2; per clip; Landsat and MODIS are too coarse for sub-acre fields). The cards show, per cohort, exactly what Y is and how well we know where the field is.</p>
+    <div class="cohorts">
+      <article class="cohort">
+        <header><span class="eyebrow">Headline &middot; RQ1 + RQ2</span><h3>Zimbabwe 2024 (Li et al.)</h3><span class="count">4,173 <span class="muted" style="font-size:0.9rem">fields &middot; 87 zones</span></span></header>
+        <dl>
+          <dt class="y">Y</dt><dd>mean of two 40 m&sup2; cuts, dry weight, t/ha</dd>
+          <dt>where</dt><dd><span class="badge point">GPS point</span> meaning not documented</dd>
+          <dt>when</dt><dd>no dates in the table; window Oct 2023 &rarr; Jun 2024</dd>
+          <dt class="x">X</dt><dd>Sentinel-2 months + 4,159 harvest-time ground photos</dd>
+          <dt>extra</dt><dd>two cuts per field &rarr; noise ceiling; 87 zones &rarr; leave-zone-out</dd>
+        </dl>
+        <p class="flag">42 % zero yields (El Ni&ntilde;o drought). Some zero rows say "have average yields" and may be missing, not zero. Audit first.</p>
+        <p class="role">Role: main cohort for frozen vs fine-tuned, the only cohort with photos, and the PPI fallback.</p>
+      </article>
+      <article class="cohort">
+        <header><span class="eyebrow">Replication &middot; RQ1 + RQ3 time</span><h3>One Acre Fund Kenya 2019&ndash;2020</h3><span class="count">3,977 <span class="muted" style="font-size:0.9rem">pure-stand &middot; 52 districts</span></span></header>
+        <dl>
+          <dt class="y">Y</dt><dd>crop-cut kg/ha from two boxes, one value per row; moisture not documented</dd>
+          <dt>where</dt><dd><span class="badge point">GPS point</span> "occasionally homestead or near the field"</dd>
+          <dt>when</dt><dd>planting + cut dates on 3,852; window Feb &rarr; Sep</dd>
+          <dt class="x">X</dt><dd>Sentinel-2 months (43 dates per season, 14&ndash;24 clear)</dd>
+          <dt>extra</dt><dd>two seasons &rarr; train 2019, test 2020</dd>
+        </dl>
+        <p class="flag">983 rows share a ~100 m cell: cluster before splitting.</p>
+        <p class="role">Role: a normal season in Burke &amp; Lobell's own region; leave-district-out and the time test.</p>
+      </article>
+      <article class="cohort">
+        <header><span class="eyebrow">Time transfer &middot; RQ3</span><h3>Zimbabwe Lacuna 2022&ndash;2023</h3><span class="count">2,269 <span class="muted" style="font-size:0.9rem">fields &middot; 23 districts</span></span></header>
+        <dl>
+          <dt class="y">Y</dt><dd>one 40 m&sup2; cut, dry weight, t/ha</dd>
+          <dt>where</dt><dd><span class="badge point">GPS point</span> meaning not documented</dd>
+          <dt>when</dt><dd>planting + harvest on every row; window Oct &rarr; Jun</dd>
+          <dt class="x">X</dt><dd>Sentinel-2 months; Jan&ndash;Mar has 0&ndash;3 clear dates per month</dd>
+          <dt>extra</dt><dd>earlier season in the same country as the headline</dd>
+        </dl>
+        <p class="role">Role: train on 2022&ndash;23, test on 2024 (a drought year), the hardest time test we have.</p>
+      </article>
+      <article class="cohort">
+        <header><span class="eyebrow">Pilot &middot; location calibration</span><h3>Malawi 2022 (+2023)</h3><span class="count">529 <span class="muted" style="font-size:0.9rem">(+267) fields &middot; 3 districts</span></span></header>
+        <dl>
+          <dt class="y">Y</dt><dd>2022: mean of two 5&times;5 m cuts at 13 % moisture; 2023: one 10&times;10 m cut</dd>
+          <dt>where</dt><dd><span class="badge poly">walked polygon</span> the only cohort where we know the field</dd>
+          <dt>when</dt><dd>planting + cut dates; window Oct &rarr; Jun</dd>
+          <dt class="x">X</dt><dd>Sentinel-2 months over the interior pixels</dd>
+          <dt>extra</dt><dd>field areas known; per-cut weights in 2022</dd>
+        </dl>
+        <p class="flag">2022 shapefile is EPSG:20936, not 4326. Jan&ndash;Feb 2023 had no clear scene.</p>
+        <p class="role">Role: prove the pipeline here first; measure what a 30 m location error costs; small third country.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- 3. HOW ONE FIELD BECOMES X AND Y -->
+  <section>
+    <div class="section-head"><span class="eyebrow">Part 3</span><h2>How one field becomes X and Y</h2></div>
+    <p class="lead">This is the matching step, drawn on a real Malawi 2023 field from the decision report. The same seven steps run for every record in every cohort; only the pixel rule changes between polygons and points.</p>
+    <figure>
+      <svg viewBox="0 0 980 330" role="img" aria-label="A walked field polygon over a 10 m pixel grid on the left; nine monthly columns of ten bands in the middle, with January and February masked for cloud and an NDVI curve below; on the right the X tensor of 9 months by 17 slots with a mask, and Y equal to 2.95 t/ha.">
+        <defs>
+          <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+          <pattern id="grid10" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0 L0 0 0 20" fill="none" stroke="currentColor" stroke-opacity="0.28" stroke-width="1"/></pattern>
+          <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="var(--stop)" stroke-width="1.2"/></pattern>
+        </defs>
+
+        <!-- LEFT: field over pixel grid -->
+        <text x="20" y="20" font-size="12" font-weight="600">Field polygon over 10 m pixels</text>
+        <polygon points="70,72 236,56 254,162 182,242 72,232 42,150" fill="var(--x-soft)" stroke="var(--y)" stroke-width="2.5"/>
+        <rect x="20" y="32" width="250" height="230" fill="url(#grid10)"/>
+        <rect x="128" y="150" width="20" height="20" fill="var(--y)" fill-opacity="0.75"/>
+        <text x="156" y="166" font-size="10" class="muted">crop cut 10&times;10 m</text>
+        <circle cx="150" cy="140" r="3" fill="currentColor"/>
+        <line x1="20" y1="280" x2="40" y2="280" stroke="currentColor" stroke-width="2"/>
+        <text x="46" y="284" font-size="10" class="muted">10 m</text>
+        <text x="20" y="306" font-size="11" class="mono">0.79 ha &middot; 53 pixels inside</text>
+        <!-- point inset -->
+        <rect x="240" y="268" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1"/>
+        <line x1="252" y1="268" x2="252" y2="304" stroke="currentColor" stroke-opacity="0.4"/>
+        <line x1="264" y1="268" x2="264" y2="304" stroke="currentColor" stroke-opacity="0.4"/>
+        <line x1="240" y1="280" x2="276" y2="280" stroke="currentColor" stroke-opacity="0.4"/>
+        <line x1="240" y1="292" x2="276" y2="292" stroke="currentColor" stroke-opacity="0.4"/>
+        <circle cx="258" cy="286" r="2.5" fill="var(--gate)"/>
+        <text x="282" y="282" font-size="9" class="muted">point cohorts:</text>
+        <text x="282" y="294" font-size="9" class="muted">3&times;3 pixels</text>
+
+        <!-- arrow to months -->
+        <path d="M274 150 L336 150" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar2)"/>
+        <text x="305" y="134" text-anchor="middle" font-size="9" class="muted">median of</text>
+        <text x="305" y="145" text-anchor="middle" font-size="9" class="muted">clear pixels</text>
+
+        <!-- MIDDLE: month strip -->
+        <text x="348" y="20" font-size="12" font-weight="600">Fixed window Oct &rarr; Jun, one column per month, ten bands each</text>
+        <!-- month labels -->
+        <text x="365" y="40" text-anchor="middle" font-size="10" class="mono">Oct</text>
+        <text x="413" y="40" text-anchor="middle" font-size="10" class="mono">Nov</text>
+        <text x="461" y="40" text-anchor="middle" font-size="10" class="mono">Dec</text>
+        <text x="509" y="40" text-anchor="middle" font-size="10" class="mono">Jan</text>
+        <text x="557" y="40" text-anchor="middle" font-size="10" class="mono">Feb</text>
+        <text x="605" y="40" text-anchor="middle" font-size="10" class="mono">Mar</text>
+        <text x="653" y="40" text-anchor="middle" font-size="10" class="mono">Apr</text>
+        <text x="701" y="40" text-anchor="middle" font-size="10" class="mono">May</text>
+        <text x="749" y="40" text-anchor="middle" font-size="10" class="mono">Jun</text>
+        <!-- columns: 10 band cells each, 11px tall from y=48 -->
+        <g fill="var(--x-soft)" stroke="var(--x)" stroke-width="1">
+          <rect x="348" y="48" width="34" height="110"/><rect x="396" y="48" width="34" height="110"/><rect x="444" y="48" width="34" height="110"/>
+          <rect x="588" y="48" width="34" height="110"/><rect x="636" y="48" width="34" height="110"/><rect x="684" y="48" width="34" height="110"/><rect x="732" y="48" width="34" height="110"/>
+        </g>
+        <g stroke="var(--x)" stroke-opacity="0.45" stroke-width="1">
+          <line x1="348" y1="59" x2="382" y2="59"/><line x1="348" y1="70" x2="382" y2="70"/><line x1="348" y1="81" x2="382" y2="81"/><line x1="348" y1="92" x2="382" y2="92"/><line x1="348" y1="103" x2="382" y2="103"/><line x1="348" y1="114" x2="382" y2="114"/><line x1="348" y1="125" x2="382" y2="125"/><line x1="348" y1="136" x2="382" y2="136"/><line x1="348" y1="147" x2="382" y2="147"/>
+          <line x1="396" y1="59" x2="430" y2="59"/><line x1="396" y1="70" x2="430" y2="70"/><line x1="396" y1="81" x2="430" y2="81"/><line x1="396" y1="92" x2="430" y2="92"/><line x1="396" y1="103" x2="430" y2="103"/><line x1="396" y1="114" x2="430" y2="114"/><line x1="396" y1="125" x2="430" y2="125"/><line x1="396" y1="136" x2="430" y2="136"/><line x1="396" y1="147" x2="430" y2="147"/>
+          <line x1="444" y1="59" x2="478" y2="59"/><line x1="444" y1="70" x2="478" y2="70"/><line x1="444" y1="81" x2="478" y2="81"/><line x1="444" y1="92" x2="478" y2="92"/><line x1="444" y1="103" x2="478" y2="103"/><line x1="444" y1="114" x2="478" y2="114"/><line x1="444" y1="125" x2="478" y2="125"/><line x1="444" y1="136" x2="478" y2="136"/><line x1="444" y1="147" x2="478" y2="147"/>
+          <line x1="588" y1="59" x2="622" y2="59"/><line x1="588" y1="70" x2="622" y2="70"/><line x1="588" y1="81" x2="622" y2="81"/><line x1="588" y1="92" x2="622" y2="92"/><line x1="588" y1="103" x2="622" y2="103"/><line x1="588" y1="114" x2="622" y2="114"/><line x1="588" y1="125" x2="622" y2="125"/><line x1="588" y1="136" x2="622" y2="136"/><line x1="588" y1="147" x2="622" y2="147"/>
+          <line x1="636" y1="59" x2="670" y2="59"/><line x1="636" y1="70" x2="670" y2="70"/><line x1="636" y1="81" x2="670" y2="81"/><line x1="636" y1="92" x2="670" y2="92"/><line x1="636" y1="103" x2="670" y2="103"/><line x1="636" y1="114" x2="670" y2="114"/><line x1="636" y1="125" x2="670" y2="125"/><line x1="636" y1="136" x2="670" y2="136"/><line x1="636" y1="147" x2="670" y2="147"/>
+          <line x1="684" y1="59" x2="718" y2="59"/><line x1="684" y1="70" x2="718" y2="70"/><line x1="684" y1="81" x2="718" y2="81"/><line x1="684" y1="92" x2="718" y2="92"/><line x1="684" y1="103" x2="718" y2="103"/><line x1="684" y1="114" x2="718" y2="114"/><line x1="684" y1="125" x2="718" y2="125"/><line x1="684" y1="136" x2="718" y2="136"/><line x1="684" y1="147" x2="718" y2="147"/>
+          <line x1="732" y1="59" x2="766" y2="59"/><line x1="732" y1="70" x2="766" y2="70"/><line x1="732" y1="81" x2="766" y2="81"/><line x1="732" y1="92" x2="766" y2="92"/><line x1="732" y1="103" x2="766" y2="103"/><line x1="732" y1="114" x2="766" y2="114"/><line x1="732" y1="125" x2="766" y2="125"/><line x1="732" y1="136" x2="766" y2="136"/><line x1="732" y1="147" x2="766" y2="147"/>
+        </g>
+        <!-- masked months -->
+        <rect x="492" y="48" width="34" height="110" fill="url(#hatch)" stroke="var(--stop)" stroke-width="1"/>
+        <rect x="540" y="48" width="34" height="110" fill="url(#hatch)" stroke="var(--stop)" stroke-width="1"/>
+        <text x="533" y="172" text-anchor="middle" font-size="9" fill="var(--stop)">no clear scene &rarr; mask = 1</text>
+        <text x="340" y="104" text-anchor="end" font-size="9" class="muted">B2 &hellip; B12</text>
+        <!-- NDVI mini chart -->
+        <line x1="348" y1="250" x2="766" y2="250" stroke="currentColor" stroke-opacity="0.5"/>
+        <text x="348" y="264" font-size="9" class="muted">NDVI from the same composites (offset removed)</text>
+        <polyline points="413,233 653,184 701,183" fill="none" stroke="var(--y)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <circle cx="413" cy="233" r="3.5" fill="var(--y)"/><text x="413" y="225" text-anchor="middle" font-size="9" class="mono">0.12</text>
+        <circle cx="653" cy="184" r="3.5" fill="var(--y)"/><text x="653" y="176" text-anchor="middle" font-size="9" class="mono">0.47</text>
+        <circle cx="701" cy="183" r="3.5" fill="var(--y)"/><text x="701" y="175" text-anchor="middle" font-size="9" class="mono">0.48</text>
+        <text x="413" y="283" text-anchor="middle" font-size="9" class="muted">bare soil</text>
+        <text x="677" y="283" text-anchor="middle" font-size="9" class="muted">full canopy</text>
+
+        <!-- arrow to X tensor -->
+        <path d="M770 100 L806 100" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar2)"/>
+
+        <!-- RIGHT: X tensor and Y -->
+        <rect x="810" y="48" width="156" height="104" rx="3" fill="var(--x-soft)" stroke="var(--x)" stroke-width="1.5"/>
+        <text x="888" y="70" text-anchor="middle" font-size="12" font-weight="600" fill="var(--x)">X tensor</text>
+        <text x="888" y="90" text-anchor="middle" font-size="10" class="mono">9 months &times; 17 slots</text>
+        <text x="888" y="106" text-anchor="middle" font-size="10">+ mask (Jan, Feb = 1)</text>
+        <text x="888" y="122" text-anchor="middle" font-size="10">+ lat/lon, start = Oct</text>
+        <text x="888" y="140" text-anchor="middle" font-size="9" class="muted">also: monthly GCVI &middot; peak chip</text>
+        <rect x="810" y="196" width="156" height="72" rx="3" fill="var(--y-soft)" stroke="var(--y)" stroke-width="1.5"/>
+        <text x="888" y="220" text-anchor="middle" font-size="12" font-weight="600" fill="var(--y)">Y = 2.95 t/ha</text>
+        <text x="888" y="238" text-anchor="middle" font-size="10">from the crop-cut square,</text>
+        <text x="888" y="254" text-anchor="middle" font-size="10">13 % moisture, verified formula</text>
+      </svg>
+      <figcaption>Field 506ae8b2 in Kasungu, Malawi, 2022/23 season. The three NDVI values are read from real Planetary Computer scenes (7 Nov 2022, 26 Apr and 6 May 2023). Forgetting the &minus;1000 offset would show 0.31 instead of 0.48 at peak.</figcaption>
+    </figure>
+
+    <h3 style="margin-top:22px">The seven steps, per record</h3>
+    <ol class="steps-list">
+      <li><div><b>Fix the window</b> by agro-zone: Kenya Feb&ndash;Sep, Malawi and Zimbabwe Oct&ndash;Jun. Never anchor on the crop-cut date.</div></li>
+      <li><div><b>Search the catalogue</b> (Earth Search or Planetary Computer) for the Sentinel-2 tile and window; keep one scene per date.</div></li>
+      <li><div><b>Read the pixels</b>: polygon interior for Malawi, 3&times;3 around the point elsewhere. Record how many.</div></li>
+      <li><div><b>Fix the radiometry</b>: reflectance = (DN + offset) / 10 000, offset &minus;1000 where the scene is baseline 04.00 or later and still raw.</div></li>
+      <li><div><b>Mask clouds</b> with SCL classes 0, 1, 3, 8, 9, 10 and dilate one pixel. Count clear pixels per month.</div></li>
+      <li><div><b>Composite per month</b>: median of clear observations. An empty month gets mask = 1 for every band and for NDVI.</div></li>
+      <li><div><b>Write three features</b>: the Presto tensor, monthly GCVI/NDVI for the baselines, a peak-season chip for MOSAIKS. One row in the manifest.</div></li>
+    </ol>
+    <div class="traps">
+      <div class="trap"><b>The &minus;1000 offset</b>Providers disagree on whether it is applied. Verify on one 2019 Kenya scene and one 2023 Malawi scene before bulk extraction.</div>
+      <div class="trap"><b>Tile cloud cover lies</b>It describes a 110 km granule, not a 0.5 ha field. Use per-pixel SCL, never the tile percentage alone.</div>
+      <div class="trap"><b>Point &ne; field</b>A GPS point may be the homestead. Treat point cohorts as "location context" until providers answer; Malawi measures what 30 m of error costs.</div>
+      <div class="trap"><b>Mid-season gaps</b>Jan&ndash;Feb in Malawi and Jan&ndash;Mar in Zimbabwe may have no clear scene. Presto masks them; baselines need an explicit rule.</div>
+    </div>
+  </section>
+
+  <!-- 4. THE LADDER -->
+  <section>
+    <div class="section-head"><span class="eyebrow">Part 4</span><h2>The experiment ladder: X, Y and the gate at every step</h2></div>
+    <p class="lead">Steps run in this order. Every step uses the same split files and the same radiometry, so results are comparable. The gate column says what we decide and what happens on fail.</p>
+
+    <figure>
+      <svg viewBox="0 0 980 230" role="img" aria-label="Gate flow: the pilot leads to gate H1 (does the satellite beat a location-only baseline?). Yes leads to the primary comparison and gate H2 (does fine-tuning gain at least 5 percent?), which ends in result A, fine-tuning helps, or result B, frozen is enough. No at H1 leads to result C, signal too weak, and the zone-level PPI fallback.">
+        <defs><marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+        <rect x="14" y="52" width="120" height="60" rx="3" fill="var(--card)" stroke="currentColor" stroke-width="1.5"/>
+        <text x="74" y="78" text-anchor="middle" font-size="12" font-weight="600">Pilot</text>
+        <text x="74" y="95" text-anchor="middle" font-size="10" class="muted">48 records, 4 checks</text>
+        <path d="M134 82 L184 82" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar3)"/>
+        <text x="159" y="74" text-anchor="middle" font-size="9" class="muted">pass</text>
+        <rect x="188" y="46" width="180" height="72" rx="3" fill="var(--gate-soft)" stroke="var(--gate)" stroke-width="1.5"/>
+        <text x="278" y="68" text-anchor="middle" font-size="12" font-weight="600" fill="var(--gate)">Gate H1 &middot; signal</text>
+        <text x="278" y="86" text-anchor="middle" font-size="10">best satellite model beats</text>
+        <text x="278" y="101" text-anchor="middle" font-size="10">a location-only baseline?</text>
+        <path d="M368 82 L418 82" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar3)"/>
+        <text x="393" y="74" text-anchor="middle" font-size="9" class="muted">yes</text>
+        <rect x="422" y="46" width="200" height="72" rx="3" fill="var(--card)" stroke="currentColor" stroke-width="1.5"/>
+        <text x="522" y="68" text-anchor="middle" font-size="12" font-weight="600">Primary comparison</text>
+        <text x="522" y="86" text-anchor="middle" font-size="10" class="muted">frozen vs fine-tuned Presto,</text>
+        <text x="522" y="101" text-anchor="middle" font-size="10" class="muted">label budgets, transfer, photos</text>
+        <path d="M622 82 L672 82" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar3)"/>
+        <rect x="676" y="46" width="140" height="72" rx="3" fill="var(--gate-soft)" stroke="var(--gate)" stroke-width="1.5"/>
+        <text x="746" y="68" text-anchor="middle" font-size="12" font-weight="600" fill="var(--gate)">Gate H2 &middot; gain</text>
+        <text x="746" y="86" text-anchor="middle" font-size="10">fine-tuned beats frozen</text>
+        <text x="746" y="101" text-anchor="middle" font-size="10">by &ge; 5 % RMSE?</text>
+        <path d="M816 66 L866 44" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar3)"/>
+        <text x="836" y="46" text-anchor="middle" font-size="9" class="muted">yes</text>
+        <rect x="870" y="20" width="100" height="48" rx="3" fill="var(--y-soft)" stroke="var(--y)" stroke-width="1.5"/>
+        <text x="920" y="40" text-anchor="middle" font-size="11" font-weight="600" fill="var(--y)">Result A</text>
+        <text x="920" y="56" text-anchor="middle" font-size="10">fine-tuning helps</text>
+        <path d="M816 98 L866 120" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar3)"/>
+        <text x="836" y="131" text-anchor="middle" font-size="9" class="muted">no</text>
+        <rect x="870" y="96" width="100" height="48" rx="3" fill="var(--card)" stroke="currentColor" stroke-width="1.5"/>
+        <text x="920" y="116" text-anchor="middle" font-size="11" font-weight="600">Result B</text>
+        <text x="920" y="132" text-anchor="middle" font-size="10">frozen is enough</text>
+        <path d="M278 118 L278 160" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar3)"/>
+        <text x="292" y="144" font-size="9" class="muted">no</text>
+        <rect x="188" y="164" width="340" height="52" rx="3" fill="var(--stop-soft)" stroke="var(--stop)" stroke-width="1.5"/>
+        <text x="358" y="184" text-anchor="middle" font-size="11" font-weight="600" fill="var(--stop)">Result C &middot; 10 m signal too weak for fields</text>
+        <text x="358" y="202" text-anchor="middle" font-size="10">report it with the noise ceiling; zone-level PPI becomes the main result</text>
+      </svg>
+      <figcaption>Three outcomes, all publishable. The H1 decision is due on 8 November, four days before the midterm report.</figcaption>
+    </figure>
+
+    <div class="ladder">
+      <div class="step">
+        <div class="step-no">0<small>week 0</small></div>
+        <div class="step-main">
+          <div class="step-title"><h3>Pilot: prove the pairing on 48 records</h3><span class="when">25 Oct &ndash; 1 Nov</span></div>
+          <div class="cols">
+            <div class="col x"><h4>X in</h4><ul><li>Chips and monthly composites for 12 Malawi, 12 Kenya, 16 Zimbabwe 2024, 8 Lacuna records</li><li>One Presto tensor per record</li><li>An inspection card each: label, scene ids, true-colour overlay, clear counts per month, NDVI curve</li></ul></div>
+            <div class="col y"><h4>Y and what we measure</h4><ul><li>Y: the label with its unit and provenance stated</li><li>Pairing: label, unit, season and location all unambiguous</li><li>Coverage: clear pixels per field and month counted</li><li>Tensor: band order, offset, masks match known inputs</li><li>Trainability: Presto runs, loss finite, encoder gets gradients, 48 records can be overfit</li></ul></div>
+            <div class="col g"><h4>Gate</h4><div class="verdict"><b class="pass">PASS</b><span>cohort goes to full extraction; window and coverage rule frozen</span></div><div class="verdict"><b class="fail">FAIL</b><span>repair within the week or drop that cohort; never slip the schedule</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-no">1<small>week 1</small></div>
+        <div class="step-main">
+          <div class="step-title"><h3>Freeze the splits, run the baselines</h3><span class="when">2 &ndash; 8 Nov</span></div>
+          <div class="cols">
+            <div class="col x"><h4>X in</h4><ul><li>Per field: monthly GCVI and NDVI (peak, harmonic peak, mean of peak months, integral)</li><li>Monthly band medians and clear-count flags</li><li>Lat/lon, zone or district, planting month (for the location-only baseline)</li></ul></div>
+            <div class="col y"><h4>Y and what we measure</h4><ul><li>Y: yield in t/ha, within cohort</li><li>RMSE (primary), MAE, R&sup2; against the training mean</li><li>Spatial group k-fold: clusters &le; 1 km, at least 30 test groups, hyperparameters tuned inside training folds only</li><li>Models: mean, location-only, index ridge, XGBoost (later MOSAIKS, GRU)</li></ul></div>
+            <div class="col g"><h4>Gate H1 &middot; signal</h4><div class="verdict"><b class="pass">PASS</b><span>the best satellite model beats the location-only baseline within zone; the group interval excludes zero</span></div><div class="verdict"><b class="fail">FAIL</b><span>field-level signal is the bottleneck: report it with the ceiling, switch the headline to zone-level PPI (Z)</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-no">2<small>week 1&ndash;2</small></div>
+        <div class="step-main">
+          <div class="step-title"><h3>Frozen Presto: the pretrained features as they are</h3><span class="when">by 12 Nov</span></div>
+          <div class="cols">
+            <div class="col x"><h4>X in</h4><ul><li>Presto tensor: months &times; 17 slots (10 S2 bands, NDVI, S1, ERA5, elevation, slope) with mask; lat/lon; start month</li><li>S1 masked; ERA5 masked or monthly means; Dynamic World = missing</li><li>Encoder frozen &rarr; pooled 128-d embedding, cached once</li></ul></div>
+            <div class="col y"><h4>Y and what we measure</h4><ul><li>Y: t/ha via a linear head (ridge or CatBoost as secondary heads)</li><li>Same folds, same metrics as step 1</li><li>Compared with the index ridge and XGBoost rows</li></ul></div>
+            <div class="col g"><h4>No gate</h4><p style="margin:0;font-size:0.88rem">This is arm M1, the reference every later arm is paired against. It goes into the midterm report.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-no">3<small>week 3</small></div>
+        <div class="step-main">
+          <div class="step-title"><h3>Fine-tune Presto (LP-FT) and the label-budget curve</h3><span class="when">13 &ndash; 19 Nov</span></div>
+          <div class="cols">
+            <div class="col x"><h4>X in</h4><ul><li>Same tensor as step 2</li><li>Head fitted on frozen embeddings first, then encoder + head trained with a smaller encoder learning rate; same tuning budget as M1</li><li>Budgets: 10 / 25 / 50 / 100 % of training fields, nested, &times; seeds</li></ul></div>
+            <div class="col y"><h4>Y and what we measure</h4><ul><li>Y: t/ha, same folds</li><li>Paired RMSE difference M2 &minus; M1, averaged within each test group, t-interval over groups</li><li>Gain as a function of label budget</li><li>Ablations: full fine-tune, from scratch, lat/lon token masked</li></ul></div>
+            <div class="col g"><h4>Gate H2 &middot; gain &middot; H3 &middot; budget</h4><div class="verdict"><b class="pass">PASS</b><span>gain &ge; 5 % of M1's RMSE at one budget or more, same sign across replicates</span></div><div class="verdict"><b class="fail">FAIL</b><span>interval inside &plusmn;5 %: "frozen features suffice at 10 m" is the finding; still a result</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-no">4<small>week 3&ndash;4</small></div>
+        <div class="step-main">
+          <div class="step-title"><h3>Transfer: time, region, unseen country</h3><span class="when">17 &ndash; 24 Nov</span></div>
+          <div class="cols">
+            <div class="col x"><h4>X in</h4><ul><li>Unchanged. Only the split rule changes</li><li>Leave-zone-out (87 Zimbabwe zones), leave-district-out (52 Kenya)</li><li>Kenya 2019 &rarr; 2020; Lacuna 2022&ndash;23 &rarr; Zimbabwe 2024</li><li>Train on two countries, test on the third</li></ul></div>
+            <div class="col y"><h4>Y and what we measure</h4><ul><li>RMSE per split family, within cohort</li><li>The M2 &minus; M1 gain per split family</li><li>Within-zone versus between-zone error split</li></ul></div>
+            <div class="col g"><h4>Gate H4 &middot; transfer</h4><div class="verdict"><b class="pass">EXPECT</b><span>the gain shrinks with transfer distance; a negative R&sup2; in the unseen country is a legitimate finding (Adjei 2026 saw it)</span></div><div class="verdict"><b class="fail">NOTE</b><span>no fail state: report either way, with the ceiling</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-no">5<small>week 4</small></div>
+        <div class="step-main">
+          <div class="step-title"><h3>Photos: Zimbabwe 2024 only (RQ2)</h3><span class="when">20 &ndash; 24 Nov</span></div>
+          <div class="cols">
+            <div class="col x"><h4>X in</h4><ul><li>Harvest-time ground photo (not UAV) &rarr; ResNet-50 yield prediction, retrained inside our spatial folds (P1)</li><li>P2: satellite features + out-of-fold photo prediction &rarr; ridge or XGBoost</li><li>Z: satellite and/or photo prediction inside the PPI++ control function</li></ul></div>
+            <div class="col y"><h4>Y and what we measure</h4><ul><li>Field level: RMSE and within-zone R&sup2; (theirs: 0.261, photo only)</li><li>Zone level: effective-sample-size gain and 95 % coverage over 87 zones (theirs: +23 %, photo only)</li><li>Satellite-only vs photo-only vs combined, side by side with Li et al.'s Table 2</li></ul></div>
+            <div class="col g"><h4>Gate &middot; RQ2</h4><div class="verdict"><b class="pass">PASS</b><span>P2 beats the best satellite-only arm under the same folds, or combined PPI beats photo-only</span></div><div class="verdict"><b class="fail">FAIL</b><span>photos add nothing at test time; drop the teacher idea, keep the comparison table</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-no">6<small>week 4&ndash;6</small></div>
+        <div class="step-main">
+          <div class="step-title"><h3>Targeting metrics, then the paper</h3><span class="when">results frozen 24 Nov</span></div>
+          <div class="cols">
+            <div class="col x"><h4>X in</h4><ul><li>Out-of-fold predictions from the best arm</li><li>Feasible baselines: previous-season admin-unit mean, a peak-NDVI rule, random ranking</li></ul></div>
+            <div class="col y"><h4>Y and what we measure</h4><ul><li>Y: "is this field in the lowest-yield 20 %?"</li><li>Spearman rank correlation, AUC, precision and recall at 20 % coverage, exclusion error at a stated budget</li><li>Subgroup audit by country, zone, field-size class</li></ul></div>
+            <div class="col g"><h4>Gate &middot; freeze</h4><div class="verdict"><b class="pass">24 NOV</b><span>no new numbers after this date; the remaining two weeks are figures, slides and the paper</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fallback">
+        <div class="step-no">Z<small>fallback</small></div>
+        <div class="step-main">
+          <div class="step-title"><h3>If H1 fails: zone-mean yields with prediction-powered inference</h3></div>
+          <div class="cols">
+            <div class="col x"><h4>X in</h4><ul><li>The same cross-fitted satellite predictor, never trained on the calibration zone</li><li>Per zone: n labelled fields resampled, N = 4n treated as unlabelled</li></ul></div>
+            <div class="col y"><h4>Y and what we measure</h4><ul><li>Y: the zone mean yield</li><li>95 % interval coverage of the full-sample zone mean; interval width; effective-sample-size gain</li><li>Expected: +9 / +19 / +32 % at within-zone R&sup2; 0.1 / 0.2 / 0.3</li></ul></div>
+            <div class="col g"><h4>Why it is still a paper</h4><p style="margin:0;font-size:0.88rem">It answers how many crop cuts an insurer or ministry can save per zone. A null here still tells them something.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. WHAT WE MEASURE -->
+  <section>
+    <div class="section-head"><span class="eyebrow">Part 5</span><h2>What we measure, exactly</h2></div>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Quantity</th><th>Formula or rule</th><th>Why it is here</th></tr></thead>
+        <tbody>
+          <tr><td>RMSE (t/ha)</td><td class="m">sqrt(mean((pred &minus; y)&sup2;))</td><td>Primary. Targets the mean, so it aggregates to zone means.</td></tr>
+          <tr><td>MAE, bias</td><td class="m">mean|pred &minus; y| ; mean(pred &minus; y)</td><td>Bias overall and per zone shows systematic over- or under-prediction.</td></tr>
+          <tr><td>Out-of-sample R&sup2;</td><td class="m">1 &minus; MSE / MSE(training mean)</td><td>Against the training mean, never the test mean. Within-zone R&sup2; reported next to pooled.</td></tr>
+          <tr><td>Noise floor</td><td class="m">MSE_floor = mean((cut1 &minus; cut2)&sup2;) / 4</td><td>The best any model can do against a two-cut label. Zimbabwe 2024 and Malawi 2022 have two cuts.</td></tr>
+          <tr><td>Two-cut reliability</td><td class="m">&rho;&#8322; = 2r / (1 + r)</td><td>Highest squared correlation any predictor can reach; r is the correlation between the two cuts.</td></tr>
+          <tr><td>Corrected r&sup2;</td><td class="m">r(f,c1) &middot; r(f,c2) / r(c1,c2)</td><td>Twice-Is-Nice correction, with out-of-fold predictions f.</td></tr>
+          <tr><td>Zero detection</td><td class="m">AUROC, Brier score</td><td>42 % of Zimbabwe 2024 is zero; RMSE on positive-yield fields reported separately.</td></tr>
+          <tr><td>Paired difference</td><td class="m">mean over groups of mean(L_A &minus; L_B), t(G&minus;1)</td><td>Per-field loss differences averaged within test groups; cluster bootstrap for RMSE and R&sup2; differences.</td></tr>
+          <tr><td>Targeting</td><td class="m">Spearman &rho; ; AUC(bottom 20 %) ; exclusion error</td><td>Aid uses only the order. Judged against admin-mean, peak-NDVI and random ranking.</td></tr>
+          <tr><td>PPI gain</td><td class="m">ESS &times; 1 / (1 &minus; R&sup2; &middot; N/(n+N))</td><td>Effective-sample-size multiplier; comparable with Li et al.'s +23 %.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 6. ROADMAP -->
+  <section>
+    <div class="section-head"><span class="eyebrow">Part 6</span><h2>Roadmap: seven weeks to 7 December</h2></div>
+    <p class="lead">Homework deadlines sit inside the first two project weeks, so plan 8&ndash;10 project hours per person per week. Amber weeks carry a course deadline.</p>
+    <div class="roadmap">
+      <div class="week hot"><div class="w">W0</div><div class="d">25 Oct &ndash; 1 Nov</div><ul><li>Kickoff meeting; names on roles</li><li>Repo restructure; env on cluster</li><li>48-record pilot + cards</li><li>Offset check; zero audit</li><li>Provider emails sent</li><li>Windows and split rules frozen</li></ul><span class="due">HW2 due 27 Oct</span></div>
+      <div class="week"><div class="w">W1</div><div class="d">2 &ndash; 8 Nov</div><ul><li>Full extraction, all cohorts, on the cluster</li><li>Split files committed</li><li>Baselines on Malawi + Kenya</li><li>Frozen embeddings cached</li><li><b>H1 decision, 8 Nov</b></li></ul><span class="due">HW2 oral</span></div>
+      <div class="week hot"><div class="w">W2</div><div class="d">9 &ndash; 12 Nov</div><ul><li>Midterm report: data table, pipeline figure, pilot cards, baselines + frozen Presto, ceiling, plan</li></ul><span class="due">HW3 due 10 Nov</span> <span class="due stop">Midterm 12 Nov</span></div>
+      <div class="week"><div class="w">W3</div><div class="d">13 &ndash; 19 Nov</div><ul><li>LP-FT + ablations</li><li>Label-budget curve</li><li>MOSAIKS, GRU</li><li>Leave-zone/district-out; 2019&rarr;2020</li><li>Photo model training starts</li></ul><span class="due">Midterm oral</span></div>
+      <div class="week hot"><div class="w">W4</div><div class="d">20 &ndash; 26 Nov</div><ul><li>Photo fusion; PPI on 87 zones</li><li>Unseen-country transfer</li><li>Targeting metrics</li><li>Robustness: lat/lon mask, window shift, buffer</li><li><b>Results frozen 24 Nov</b></li></ul><span class="due">Last lecture 24 Nov</span></div>
+      <div class="week hot"><div class="w">W5</div><div class="d">27 Nov &ndash; 3 Dec</div><ul><li>Final figures and tables</li><li>10-minute talk; every member presents one result</li><li>Paper draft complete in Overleaf</li></ul><span class="due stop">Presentation 1 or 3 Dec</span></div>
+      <div class="week hot"><div class="w">W6</div><div class="d">4 &ndash; 7 Dec</div><ul><li>Paper polish, limitations, reproducibility appendix</li><li>Code release tag</li><li>Oral prep: each member explains their own code</li></ul><span class="due stop">Paper + oral 7 Dec</span></div>
+    </div>
+  </section>
+
+  <!-- 7. START HERE -->
+  <section>
+    <div class="section-head"><span class="eyebrow">Part 7</span><h2>Start here on Monday</h2></div>
+    <div class="roles">
+      <span>Data &amp; labels lead</span><span>Satellite pipeline lead</span><span>Baselines lead</span><span>Foundation-model lead</span><span>Evaluation &amp; writing lead</span>
+    </div>
+    <ul class="check">
+      <li><span class="box"></span><span>Kickoff meeting: confirm Sentinel-2 only, the four cohorts, and put a name next to each role.</span><span class="who">everyone</span></li>
+      <li><span class="box"></span><span>Restructure the repo (src package, configs, tests, results CSV) and get one job running on the cluster.</span><span class="who">satellite + FM leads</span></li>
+      <li><span class="box"></span><span>Pick the 48 pilot records and write their inspection cards.</span><span class="who">data lead</span></li>
+      <li><span class="box"></span><span>Verify the &minus;1000 offset on one 2019 Kenya scene and one 2023 Malawi scene against Planetary Computer.</span><span class="who">satellite lead</span></li>
+      <li><span class="box"></span><span>Run a Presto forward pass and one gradient step on real pilot tensors with per-sample masks.</span><span class="who">FM lead</span></li>
+      <li><span class="box"></span><span>Write the season windows and split rules, generate the split files, commit them.</span><span class="who">evaluation lead</span></li>
+      <li><span class="box"></span><span>Audit the Zimbabwe 2024 zero rows against the Comments column.</span><span class="who">data lead</span></li>
+      <li><span class="box"></span><span>Send three emails: Pula / Li et al. (what the point marks, suspect zeros), One Acre Fund (GPS capture), FAO/NASA Harvest (Malawi cob factor).</span><span class="who">data lead</span></li>
+      <li><span class="box"></span><span>Open the Overleaf skeleton with a section owner per role and a decision log in the repo.</span><span class="who">evaluation lead</span></li>
+    </ul>
+  </section>
+
+  <footer>Companion to the kickoff strategy document (25 Oct 2026). Numbers come from the 22 Oct decision report, the team repository, Amy Work's email of 24 Oct, and the papers by Burke &amp; Lobell 2017, Jin et al. 2019, Li et al. 2026 and Aiken et al. 2022. Course dates from the syllabus; the midterm date may be 17 Nov instead of 12 Nov.</footer>
+</div>

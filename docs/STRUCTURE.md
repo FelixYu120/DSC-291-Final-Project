@@ -10,7 +10,7 @@ configs/         one YAML per experiment
 tests/           pytest
 results/         metrics.csv, append-only
 notebooks/       exploration only; nothing in the report comes from a notebook
-docs/            STRUCTURE.md (this file), DECISIONS.md, RESEARCH_PLAN.md, DATA_SOURCES.md
+docs/            STRUCTURE.md (this file), ROADMAP.md, project_map.html, DECISIONS.md, RESEARCH_PLAN.md, DATA_SOURCES.md
 ```
 
 ## Rules
