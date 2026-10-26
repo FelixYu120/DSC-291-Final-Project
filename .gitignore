@@ -6,3 +6,10 @@ venv/
 *.part
 data/imagery/
 data/raw/vision_guided_yield_estimation/q_field_photo.zip
+
+# Added 2026-10-26 with the project structure.
+data/features/
+data/runs/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
