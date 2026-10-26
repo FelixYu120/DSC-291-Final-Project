@@ -176,3 +176,7 @@ scripts/
   download_usda_nass.py
 Notes/          Project notes
 ```
+
+## Project structure (added 26 October 2026)
+
+The data layer above is unchanged. The modelling work lives in the `cropyield` package under `src/`, with `configs/`, `tests/`, `data/splits/` and `results/` beside it. See [`docs/STRUCTURE.md`](docs/STRUCTURE.md) for the layout and rules and [`docs/DECISIONS.md`](docs/DECISIONS.md) for the decision log.
