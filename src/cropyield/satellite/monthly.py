@@ -44,7 +44,14 @@ def month_range(start: date, end: date) -> list[str]:
 
 
 def monthly_series(chip: Chip, start: date, end: date, min_pixels: int = 1) -> MonthlySeries:
-    """Median reflectance over valid AOI pixels for each month of [start, end]."""
+    """Median reflectance over valid AOI pixels for each month of [start, end].
+
+    The chip must have been downloaded for a window covering [start, end]; otherwise months
+    the downloader never searched would look like cloudy months.
+    """
+    if chip.start_date is None or chip.end_date is None or chip.start_date > start or chip.end_date < end:
+        raise ValueError(f"{chip.obs_id}: chip window {chip.start_date}..{chip.end_date} "
+                         f"does not cover the requested {start}..{end}")
     months = month_range(start, end)
     chosen: list[Scene | None] = [None] * len(months)
     for scene in chip.scenes:

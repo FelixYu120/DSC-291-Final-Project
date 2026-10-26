@@ -17,11 +17,10 @@ dependencies = [
   "rasterio",
   "requests",
   "scikit-learn",
-  "torch>=2.5",
-  "einops>=0.8",
 ]
 
 [project.optional-dependencies]
+presto = ["torch>=2.5", "einops>=0.8"]
 dev = ["pytest", "ruff", "ipykernel"]
 
 [tool.setuptools.packages.find]

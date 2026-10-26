@@ -23,7 +23,7 @@ from cropyield.data.cohorts import obs_id as make_obs_id
 class Scene:
     item_id: str
     date: date                      # acquisition date (UTC)
-    tile_cloud_cover: float | None  # STAC eo:cloud_cover of the whole tile, percent
+    tile_cloud_cover: float         # STAC eo:cloud_cover of the whole tile, percent; NaN if absent
     clear_fraction_aoi: float       # clear, valid fraction over the AOI (downloader check)
     reflectance: np.ndarray         # (n_bands, rows, cols) float32, NaN where not valid
     scl: np.ndarray                 # (rows, cols) uint8 scene classification
@@ -85,7 +85,7 @@ def read_chip(record_dir: Path) -> Chip:
             raise ValueError(f"{scene_dir}: raster shape differs from aoi_mask.tif")
         properties = scene_meta["item"]["properties"]
         scenes.append(Scene(item_id=item_id, date=date.fromisoformat(properties["datetime"][:10]),
-                            tile_cloud_cover=properties.get("eo:cloud_cover"),
+                            tile_cloud_cover=float(properties.get("eo:cloud_cover", float("nan"))),
                             clear_fraction_aoi=float(scene_meta["clear_fraction_aoi"]),
                             reflectance=reflectance, scl=scl, valid=valid))
     scenes.sort(key=lambda s: (s.date, s.item_id))

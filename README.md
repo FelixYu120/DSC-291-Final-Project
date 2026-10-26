@@ -181,10 +181,10 @@ Notes/          Project notes
 
 `notebooks/01_presto_first_run.ipynb` loads the pinned pretrained [Presto](https://github.com/nasaharvest/presto) model and runs its encoder on real project inputs: ten Malawi 2023 field polygons, their Sentinel-2 chips, and a monthly reflectance series per field. It proves that the model runs on our data; it does not show that Presto predicts yield.
 
-One install command (Python 3.10 or newer, from the repository root, inside a virtual environment):
+One install command (Python 3.10 or newer, from the repository root, inside a virtual environment; the `presto` extra adds torch and einops, which only the model needs):
 
 ```bash
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev,presto]"
 ```
 
 Then, in order:

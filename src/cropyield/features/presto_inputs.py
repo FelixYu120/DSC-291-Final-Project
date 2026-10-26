@@ -5,9 +5,9 @@ Mirrors ``presto.dataops.utils.construct_single_presto_input`` at the pinned com
 
 * ``x`` holds Presto's 17 normalised bands in NORMED_BANDS order. Only the ten Sentinel-2
   bands and NDVI are filled; Sentinel-1, ERA5 and SRTM are zero and masked.
-* Presto normalises Sentinel-2 by dividing digital numbers by 10 000. Our reflectance.tif
-  already equals DN/10 000 with the Collection 1 offset (-0.1) applied by the downloader,
-  so the value Presto sees is the reflectance itself: (reflectance * 10 000) / 10 000.
+* Presto normalises Sentinel-2 by dividing digital numbers by 10 000 (S2_DIVIDE_BY). Our
+  reflectance.tif already equals DN / 10 000 with the Collection 1 offset (-0.1) applied by
+  the downloader, so the value Presto sees is the reflectance itself and is copied unchanged.
   The -1000 / -0.1 offset must not be applied a second time.
 * NDVI is computed from the normalised B8 and B4 exactly as Presto does, 0 where B8 + B4 <= 0.
 * A month without a value (NaN in the series) is masked for every band, so Presto drops all
@@ -24,11 +24,11 @@ from cropyield.satellite.monthly import MonthlySeries
 # presto/dataops/pipelines/s1_s2_era5_srtm.py NORMED_BANDS (B1, B9, B10 removed).
 NORMED_BANDS = ["VV", "VH", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B8A", "B11", "B12",
                 "temperature_2m", "total_precipitation", "elevation", "slope", "NDVI"]
-# Same file: S2_DIV_VALUES. Sentinel-2 digital numbers are divided by this.
+# Same file: S2_DIV_VALUES. Presto divides Sentinel-2 digital numbers by this; reflectance.tif
+# is DN / S2_DIVIDE_BY already (offset applied), so it enters ``x`` unchanged.
 S2_DIVIDE_BY = 10_000.0
-# reflectance.tif is unitless reflectance = DN / 10 000 (offset already applied), so this
-# is the factor that maps it back to the digital-number scale Presto was trained on.
-REFLECTANCE_TO_DN = 10_000.0
+# Presto's Encoder default max_sequence_length: the positional table has this many rows.
+PRESTO_MAX_TIMESTEPS = 24
 # Downloader band codes -> Presto band names.
 SENTINEL2_TO_PRESTO = {"B02": "B2", "B03": "B3", "B04": "B4", "B05": "B5", "B06": "B6",
                        "B07": "B7", "B08": "B8", "B8A": "B8A", "B11": "B11", "B12": "B12"}
@@ -51,6 +51,10 @@ class PrestoInputs:
 def presto_inputs(series: MonthlySeries, latitude: float, longitude: float) -> PrestoInputs:
     """Build one record's Presto inputs (batch of one) from its monthly series."""
     timesteps = len(series.months)
+    if not 1 <= timesteps <= PRESTO_MAX_TIMESTEPS:
+        raise ValueError(f"{series.obs_id}: {timesteps} months; Presto takes 1 to {PRESTO_MAX_TIMESTEPS}")
+    if series.missing.all():
+        raise ValueError(f"{series.obs_id}: no month has a value, so there is no Presto input")
     x = np.zeros((timesteps, len(NORMED_BANDS)), dtype="float32")
     mask = np.ones((timesteps, len(NORMED_BANDS)), dtype="float32")
     for code, name in SENTINEL2_TO_PRESTO.items():
@@ -59,7 +63,7 @@ def presto_inputs(series: MonthlySeries, latitude: float, longitude: float) -> P
         column = NORMED_BANDS.index(name)
         reflectance = series.band(code).astype("float32")
         present = np.isfinite(reflectance)
-        x[present, column] = reflectance[present] * (REFLECTANCE_TO_DN / S2_DIVIDE_BY)
+        x[present, column] = reflectance[present]  # already DN / S2_DIVIDE_BY
         mask[present, column] = 0.0
     nir, red = x[:, NORMED_BANDS.index("B8")], x[:, NORMED_BANDS.index("B4")]
     both = (mask[:, NORMED_BANDS.index("B8")] == 0) & (mask[:, NORMED_BANDS.index("B4")] == 0)

@@ -2,7 +2,8 @@ from datetime import date
 
 import numpy as np
 import pytest
-import torch
+
+torch = pytest.importorskip("torch")  # the "presto" extra
 
 from cropyield.features.presto_inputs import presto_inputs
 from cropyield.models import presto_weights as w

@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from conftest import AOI_REFLECTANCE, BANDS
 
-from cropyield.features.presto_inputs import MISSING_DYNAMIC_WORLD, NORMED_BANDS, presto_inputs
+from cropyield.features.presto_inputs import MISSING_DYNAMIC_WORLD, NORMED_BANDS, PRESTO_MAX_TIMESTEPS, presto_inputs
 from cropyield.satellite.chips import read_chip
 from cropyield.satellite.monthly import month_range, monthly_series
 
@@ -30,6 +30,12 @@ def test_monthly_series_uses_only_valid_aoi_pixels_and_nan_for_missing_months(ch
     assert series.item_ids[0].startswith("S2A") and series.item_ids[1] is None
 
 
+def test_monthly_series_refuses_a_window_the_chip_was_not_downloaded_for(chip_dir):
+    chip = read_chip(chip_dir)  # downloaded for 2023-03-01 .. 2023-06-30
+    with pytest.raises(ValueError, match="does not cover"):
+        monthly_series(chip, date(2022, 10, 1), date(2023, 6, 30))
+
+
 def test_presto_inputs_scaling_masks_and_shapes(chip_dir):
     series = monthly_series(read_chip(chip_dir), *WINDOW)
     inputs = presto_inputs(series, latitude=-13.3171, longitude=33.3837)
@@ -50,3 +56,16 @@ def test_presto_inputs_scaling_masks_and_shapes(chip_dir):
     s2_and_ndvi = [NORMED_BANDS.index(b) for b in ("B2", "B3", "B4", "B5", "B6", "B7", "B8", "B8A", "B11", "B12", "NDVI")]
     assert (mask[[0, 2]][:, s2_and_ndvi] == 0).all()
     assert np.isfinite(x).all()
+
+
+def test_presto_inputs_refuse_empty_or_too_long_series(chip_dir):
+    chip = read_chip(chip_dir)
+    empty = monthly_series(chip, date(2023, 4, 1), date(2023, 4, 30))  # April has no scene
+    assert empty.missing.all()
+    with pytest.raises(ValueError, match="no month has a value"):
+        presto_inputs(empty, latitude=-13.3, longitude=33.4)
+    chip.end_date = date(2025, 12, 31)
+    too_long = monthly_series(chip, date(2023, 3, 1), date(2025, 12, 31))
+    assert len(too_long.months) > PRESTO_MAX_TIMESTEPS
+    with pytest.raises(ValueError, match="Presto takes 1 to"):
+        presto_inputs(too_long, latitude=-13.3, longitude=33.4)

@@ -1,8 +1,10 @@
 """Download the pretrained Presto weights pinned in cropyield.models.presto and verify them.
 
 Writes data/models/presto/default_model.pt (git-ignored) plus a provenance JSON beside it.
-A file that already matches the pinned size and SHA-256 is reused. A partial or altered file
-is reported, removed and downloaded again; nothing is accepted until size and hash match.
+A file that already matches the pinned size and SHA-256 is reused. Downloads go to a .part
+file and are renamed only after size and hash match, so a partial download never sits at the
+final path. A file at the final path that does not match is reported and left alone unless
+--replace is given.
 """
 from __future__ import annotations
 
@@ -48,14 +50,18 @@ def download(path: Path) -> None:
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--path", type=Path, default=PRESTO_WEIGHTS_PATH)
+    parser.add_argument("--replace", action="store_true", help="overwrite a file at --path that does not match the pin")
     args = parser.parse_args(argv)
     path = args.path
     if weights_verified(path):
         print(f"OK  {path} already present and verified (sha256 {PRESTO_WEIGHTS_SHA256[:16]}...)")
     else:
         if path.exists():
-            print(f"!!  {path} is partial or altered ({path.stat().st_size} bytes); downloading again")
-            path.unlink()
+            if not args.replace:
+                raise ValueError(f"{path} exists but is not the pinned Presto checkpoint "
+                                 f"({path.stat().st_size} bytes, expected {PRESTO_WEIGHTS_BYTES}); "
+                                 "rerun with --replace to overwrite it")
+            print(f"!!  {path} does not match the pin ({path.stat().st_size} bytes); replacing it")
         print(f"..  downloading {PRESTO_WEIGHTS_URL}")
         download(path)
         print(f"OK  {path} downloaded and verified ({PRESTO_WEIGHTS_BYTES} bytes)")
