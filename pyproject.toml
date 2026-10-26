@@ -26,5 +26,8 @@ dev = ["pytest", "ruff", "ipykernel"]
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+"cropyield.models" = ["PRESTO_LICENSE"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]

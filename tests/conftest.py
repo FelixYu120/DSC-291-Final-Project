@@ -24,15 +24,17 @@ GRID = {"crs": "EPSG:32736", "transform": from_origin(553_000, 8_527_000, 10, 10
 FIELD_UTM = box(553_018, 8_526_962, 553_038, 8_526_982)
 _to_wgs84 = Transformer.from_crs("EPSG:32736", "EPSG:4326", always_xy=True).transform
 FIELD_WGS84 = mapping(shapely_transform(FIELD_UTM, lambda xy: np.column_stack(_to_wgs84(xy[:, 0], xy[:, 1]))))
+FIELD_LON, FIELD_LAT = _to_wgs84(FIELD_UTM.centroid.x, FIELD_UTM.centroid.y)
 # Reflectance per band inside the field; boundary (touched-only) pixels are 0.5 and the rest of
 # the chip 0.9, so any leak of non-field pixels into a monthly value shows up.
 FIELD_REFLECTANCE = {"B02": 0.03, "B03": 0.06, "B04": 0.05, "B05": 0.09, "B06": 0.18, "B07": 0.22,
                      "B08": 0.25, "B8A": 0.27, "B11": 0.15, "B12": 0.08}
 AOI_REFLECTANCE = FIELD_REFLECTANCE
 BOUNDARY_REFLECTANCE = 0.5
-# First pilot record of the Malawi 2023 cohort (data/audit/malawi_2023_screened_candidates.csv row 1).
+# Identity of the first pilot record of the Malawi 2023 cohort (audit CSV row 1); the synthetic
+# polygon sits at the fixture grid, so its coordinates are the polygon centroid, not the real field.
 RECORD = {"dataset": "malawi_2023", "source_id": "506ae8b2-d085-4eeb-b807-765e03925c71", "source_row": "1",
-          "year": 2023, "country": "malawi", "longitude": 33.3837, "latitude": -13.3171,
+          "year": 2023, "country": "malawi", "longitude": float(FIELD_LON), "latitude": float(FIELD_LAT),
           "yield_kg_ha": 2950.0, "geometry": FIELD_WGS84, "start_date": "2023-03-01", "end_date": "2023-06-30",
           "window_basis": "user_override"}
 

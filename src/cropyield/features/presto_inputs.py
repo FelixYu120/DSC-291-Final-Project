@@ -28,6 +28,7 @@ NORMED_BANDS = ["VV", "VH", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B8A", "B1
 # is DN / S2_DIVIDE_BY already (offset applied), so it enters ``x`` unchanged.
 S2_DIVIDE_BY = 10_000.0
 # Presto's Encoder default max_sequence_length: the positional table has this many rows.
+# Pretraining used 12-step sequences; upstream evaluates on up to 24, our seasons use 8 or 9.
 PRESTO_MAX_TIMESTEPS = 24
 # Downloader band codes -> Presto band names.
 SENTINEL2_TO_PRESTO = {"B02": "B2", "B03": "B3", "B04": "B4", "B05": "B5", "B06": "B6",

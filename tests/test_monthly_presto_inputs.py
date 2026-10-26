@@ -44,6 +44,15 @@ def test_monthly_series_uses_only_valid_aoi_pixels_and_nan_for_missing_months(ch
     assert series.item_ids[0].startswith("S2A") and series.item_ids[1] is None
 
 
+def test_monthly_series_refuses_a_failed_download(chip_dir):
+    import json
+    meta = json.loads((chip_dir / "record.json").read_text())
+    meta["status"] = "partial_error"
+    (chip_dir / "record.json").write_text(json.dumps(meta))
+    with pytest.raises(ValueError, match="partial_error"):
+        monthly_series(read_chip(chip_dir), *WINDOW)
+
+
 def test_monthly_series_refuses_a_window_the_chip_was_not_downloaded_for(chip_dir):
     chip = read_chip(chip_dir)  # downloaded for 2023-03-01 .. 2023-06-30
     with pytest.raises(ValueError, match="does not cover"):

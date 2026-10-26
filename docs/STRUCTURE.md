@@ -38,5 +38,5 @@ Windows are fixed per zone and season, never anchored on a row's crop-cut date. 
 ```
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1        # macOS/Linux: source .venv/bin/activate
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev,presto]"   # presto: torch and einops, only the model needs them
 ```
