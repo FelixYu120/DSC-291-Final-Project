@@ -34,12 +34,16 @@ def download(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     part = path.with_name(path.name + ".part")
     digest = hashlib.sha256()
-    with requests.get(PRESTO_WEIGHTS_URL, stream=True, timeout=(15, 120)) as response:
-        response.raise_for_status()
-        with part.open("wb") as handle:
-            for block in response.iter_content(1 << 20):
-                handle.write(block)
-                digest.update(block)
+    try:
+        with requests.get(PRESTO_WEIGHTS_URL, stream=True, timeout=(15, 120)) as response:
+            response.raise_for_status()
+            with part.open("wb") as handle:
+                for block in response.iter_content(1 << 20):
+                    handle.write(block)
+                    digest.update(block)
+    except BaseException:
+        part.unlink(missing_ok=True)  # an interrupted stream leaves no stray file behind
+        raise
     size = part.stat().st_size
     if size != PRESTO_WEIGHTS_BYTES or digest.hexdigest() != PRESTO_WEIGHTS_SHA256:
         part.unlink()

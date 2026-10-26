@@ -1,9 +1,11 @@
 """One value per band per calendar month over the field or point AOI.
 
 The downloader keeps at most one clear scene per month. For each month of the season window
-the series holds the median reflectance of the pixels that are inside the AOI mask *and* valid
-(clear SCL class, all bands finite) in that month's scene. Months without an accepted scene,
-or without a single valid AOI pixel, are NaN. Bands keep their Sentinel-2 codes so the same
+the series holds the median reflectance of the field pixels that are valid (clear SCL class,
+all bands finite) in that month's scene. Field pixels are those whose centres fall inside the
+polygon (``Chip.aoi_interior``); only a polygon too thin to contain a pixel centre falls back
+to the downloader's all-touched mask. A point record has its single pixel. Months without an
+accepted scene, or without a single valid field pixel, are NaN. Bands keep their Sentinel-2 codes so the same
 series feeds Presto and the NDVI/GCVI ridge baseline (B03 green, B04 red, B08 nir).
 """
 from __future__ import annotations
@@ -22,8 +24,9 @@ class MonthlySeries:
     months: list[str]           # "YYYY-MM", consecutive from the window start to its end
     bands: tuple[str, ...]      # Sentinel-2 band codes, same order as ``values`` columns
     values: np.ndarray          # (n_months, n_bands) float32 reflectance, NaN when missing
-    n_pixels: np.ndarray        # (n_months,) valid AOI pixels behind each row (0 when NaN)
+    n_pixels: np.ndarray        # (n_months,) valid field pixels behind each row (0 when NaN)
     item_ids: list[str | None]  # scene used for each month
+    pixel_rule: str             # "interior" (pixel centres inside the field) or "touched" (fallback)
 
     def band(self, code: str) -> np.ndarray:
         return self.values[:, self.bands.index(code)]
@@ -44,7 +47,7 @@ def month_range(start: date, end: date) -> list[str]:
 
 
 def monthly_series(chip: Chip, start: date, end: date, min_pixels: int = 1) -> MonthlySeries:
-    """Median reflectance over valid AOI pixels for each month of [start, end].
+    """Median reflectance over valid field pixels for each month of [start, end].
 
     The chip must have been downloaded for a window covering [start, end]; otherwise months
     the downloader never searched would look like cloudy months.
@@ -53,6 +56,7 @@ def monthly_series(chip: Chip, start: date, end: date, min_pixels: int = 1) -> M
         raise ValueError(f"{chip.obs_id}: chip window {chip.start_date}..{chip.end_date} "
                          f"does not cover the requested {start}..{end}")
     months = month_range(start, end)
+    field, pixel_rule = (chip.aoi_interior, "interior") if chip.aoi_interior.any() else (chip.aoi, "touched")
     chosen: list[Scene | None] = [None] * len(months)
     for scene in chip.scenes:
         key = scene.date.strftime("%Y-%m")
@@ -69,10 +73,10 @@ def monthly_series(chip: Chip, start: date, end: date, min_pixels: int = 1) -> M
     for i, scene in enumerate(chosen):
         if scene is None:
             continue
-        pixels = chip.aoi & scene.valid
+        pixels = field & scene.valid
         if pixels.sum() < min_pixels:
             continue  # month stays NaN: no usable pixel over the field or point
         values[i] = np.nanmedian(scene.reflectance[:, pixels], axis=1)
         n_pixels[i] = int(pixels.sum())
         item_ids[i] = scene.item_id
-    return MonthlySeries(chip.obs_id, months, chip.bands, values, n_pixels, item_ids)
+    return MonthlySeries(chip.obs_id, months, chip.bands, values, n_pixels, item_ids, pixel_rule)

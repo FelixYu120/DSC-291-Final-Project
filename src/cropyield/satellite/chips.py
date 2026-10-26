@@ -5,6 +5,11 @@ scene with ``scene.json``, ``reflectance.tif``, ``scl.tif`` and ``valid_mask.tif
 is unitless bottom-of-atmosphere reflectance: the downloader applied the STAC scale (0.0001)
 and offset (-0.1) once, so the Collection 1 "-1000" offset is already removed. Pixels the
 downloader rejected are stored as -9999 and come back here as NaN.
+
+Two field masks are kept: ``aoi`` is the downloader's mask, rasterised with ``all_touched`` so
+it includes every pixel the polygon boundary touches; ``aoi_interior`` holds only pixels whose
+centres fall inside the polygon, rasterised here from the record's geometry on the chip grid.
+For a point record both hold the single marked pixel.
 """
 from __future__ import annotations
 
@@ -15,6 +20,8 @@ from pathlib import Path
 
 import numpy as np
 import rasterio
+from rasterio.features import rasterize
+from rasterio.warp import transform_geom
 
 from cropyield.data.cohorts import obs_id as make_obs_id
 
@@ -49,7 +56,8 @@ class Chip:
     bands: tuple[str, ...]          # band codes in reflectance order, e.g. ("B02", ..., "B12")
     crs: str
     transform: tuple[float, ...]
-    aoi: np.ndarray                 # (rows, cols) bool field or point mask
+    aoi: np.ndarray                 # (rows, cols) bool: pixels touched by the field, or the point pixel
+    aoi_interior: np.ndarray        # (rows, cols) bool: pixels whose centres are inside the field
     scenes: list[Scene] = field(default_factory=list)
 
 
@@ -61,6 +69,12 @@ def read_chip(record_dir: Path) -> Chip:
     with rasterio.open(record_dir / "aoi_mask.tif") as src:
         aoi = src.read(1).astype(bool)
         crs, transform = str(src.crs), tuple(src.transform)[:6]
+        if record["geometry"]["type"] == "Point":
+            interior = aoi.copy()
+        else:
+            geometry = transform_geom("EPSG:4326", src.crs, record["geometry"])
+            interior = rasterize([(geometry, 1)], out_shape=aoi.shape, transform=src.transform,
+                                 all_touched=False, dtype="uint8").astype(bool) & aoi
     scenes: list[Scene] = []
     bands: tuple[str, ...] | None = None
     for item_id in meta["accepted_item_ids"]:
@@ -99,5 +113,5 @@ def read_chip(record_dir: Path) -> Chip:
         start_date=date.fromisoformat(record["start_date"]) if record.get("start_date") else None,
         end_date=date.fromisoformat(record["end_date"]) if record.get("end_date") else None,
         window_basis=record["window_basis"], bands=bands or (), crs=crs, transform=transform,
-        aoi=aoi, scenes=scenes,
+        aoi=aoi, aoi_interior=interior, scenes=scenes,
     )

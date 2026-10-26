@@ -196,16 +196,16 @@ python scripts/download_sentinel2.py download --datasets malawi_2023 --limit 10 
 python -m pytest                                              # small checks, no imagery needed
 ```
 
-Open the notebook with the `.venv` kernel and run all cells. What the pieces are:
+Open the notebook in VS Code (or any Jupyter front-end; the install command adds the kernel, not a front-end) with the `.venv` kernel and run all cells. What the pieces are:
 
 | Piece | Purpose |
 |---|---|
 | `cropyield.data.cohorts.load_cohort` | One cohort from its screened audit CSV with a stable `obs_id` (`dataset:source_id`) and every source column kept. `date_overrides` writes the fixed season window per record for the downloader. |
 | `cropyield.satellite.chips.read_chip` | One record folder from the downloader: `record.json`, `aoi_mask.tif`, and each accepted scene's `scene.json`, `reflectance.tif`, `scl.tif`, `valid_mask.tif`. |
-| `cropyield.satellite.monthly.monthly_series` | One row per calendar month of the season window: median reflectance over valid field pixels, NaN for missing months. Bands keep their Sentinel-2 codes so the same series serves the NDVI/GCVI baselines. |
+| `cropyield.satellite.monthly.monthly_series` | One row per calendar month of the season window: median reflectance over the valid pixels whose centres lie inside the field, NaN for missing months. Bands keep their Sentinel-2 codes so the same series serves the NDVI/GCVI baselines. |
 | `cropyield.features.presto_inputs.presto_inputs` | Presto's `x`, `mask`, `dynamic_world`, `latlons` and start month from that series, with the Sentinel-1, ERA5, SRTM and missing-month slots masked. |
 | `cropyield.models.presto.load_presto` / `encode` | Strict load of the verified checkpoint into the vendored, pinned model code; one 128-dimensional frozen-encoder embedding per record. |
-| `scripts/get_presto.py` | Downloads `data/default_model.pt` from nasaharvest/presto at commit `11e207a668a34336ced1d8e492a1bd5849b96c4a` into `data/models/presto/`, reuses a verified file and replaces a partial one. |
+| `scripts/get_presto.py` | Downloads `data/default_model.pt` from nasaharvest/presto at commit `11e207a668a34336ced1d8e492a1bd5849b96c4a` into `data/models/presto/`, writing to a `.part` file that is renamed only once size and SHA-256 match. A verified file is reused; a file that does not match is refused unless `--replace` is given. |
 
 Scale and mask choices are recorded in [`docs/DECISIONS.md`](docs/DECISIONS.md) (26 October 2026 entries). The Presto model code is MIT-licensed (`src/cropyield/models/PRESTO_LICENSE`).
 
