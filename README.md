@@ -177,6 +177,38 @@ scripts/
 Notes/          Project notes
 ```
 
+## Presto first run (added 26 October 2026)
+
+`notebooks/01_presto_first_run.ipynb` loads the pinned pretrained [Presto](https://github.com/nasaharvest/presto) model and runs its encoder on real project inputs: ten Malawi 2023 field polygons, their Sentinel-2 chips, and a monthly reflectance series per field. It proves that the model runs on our data; it does not show that Presto predicts yield.
+
+One install command (Python 3.10 or newer, from the repository root, inside a virtual environment):
+
+```bash
+python -m pip install -e ".[dev]"
+```
+
+Then, in order:
+
+```bash
+python scripts/get_presto.py                                  # pretrained weights, verified by SHA-256
+python scripts/download_sentinel2.py download --datasets malawi_2023 --limit 10 \
+    --date-overrides configs/sentinel2_windows_malawi_2023_pilot.csv   # ten pilot chips, git-ignored
+python -m pytest                                              # small checks, no imagery needed
+```
+
+Open the notebook with the `.venv` kernel and run all cells. What the pieces are:
+
+| Piece | Purpose |
+|---|---|
+| `cropyield.data.cohorts.load_cohort` | One cohort from its screened audit CSV with a stable `obs_id` (`dataset:source_id`) and every source column kept. `date_overrides` writes the fixed season window per record for the downloader. |
+| `cropyield.satellite.chips.read_chip` | One record folder from the downloader: `record.json`, `aoi_mask.tif`, and each accepted scene's `scene.json`, `reflectance.tif`, `scl.tif`, `valid_mask.tif`. |
+| `cropyield.satellite.monthly.monthly_series` | One row per calendar month of the season window: median reflectance over valid field pixels, NaN for missing months. Bands keep their Sentinel-2 codes so the same series serves the NDVI/GCVI baselines. |
+| `cropyield.features.presto_inputs.presto_inputs` | Presto's `x`, `mask`, `dynamic_world`, `latlons` and start month from that series, with the Sentinel-1, ERA5, SRTM and missing-month slots masked. |
+| `cropyield.models.presto.load_presto` / `encode` | Strict load of the verified checkpoint into the vendored, pinned model code; one 128-dimensional frozen-encoder embedding per record. |
+| `scripts/get_presto.py` | Downloads `data/default_model.pt` from nasaharvest/presto at commit `11e207a668a34336ced1d8e492a1bd5849b96c4a` into `data/models/presto/`, reuses a verified file and replaces a partial one. |
+
+Scale and mask choices are recorded in [`docs/DECISIONS.md`](docs/DECISIONS.md) (26 October 2026 entries). The Presto model code is MIT-licensed (`src/cropyield/models/PRESTO_LICENSE`).
+
 ## Project structure (added 26 October 2026)
 
 The data layer above is unchanged. The modelling work lives in the `cropyield` package under `src/`, with `configs/`, `tests/`, `data/splits/` and `results/` beside it. See [`docs/STRUCTURE.md`](docs/STRUCTURE.md) for the layout and rules and [`docs/DECISIONS.md`](docs/DECISIONS.md) for the decision log.

@@ -13,3 +13,6 @@ data/runs/
 .pytest_cache/
 .ruff_cache/
 *.egg-info/
+
+# Added 2026-10-26: downloaded model checkpoints (scripts/get_presto.py).
+data/models/
