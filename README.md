@@ -13,7 +13,7 @@ The target is harmonized maize yield in kg/ha. The main evaluation should ask ho
 - **AlphaEarth downstream regression:** extract the 64-dimensional, 10 m annual embedding vector for each eligible field from Google's Earth Engine collection [`GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL`](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_SATELLITE_EMBEDDING_V1_ANNUAL), then fit downstream Ridge and tree-based regressors. AlphaEarth is supplied here as an embedding dataset; it is not the encoder being fine-tuned. Same-year annual embeddings are suitable for retrospective completed-season estimation, not a causal pre-harvest forecast because they summarize the annual observation period. For a pre-harvest task, use prior-year embeddings only.
 - **Presto transfer and fine-tuning:** load the [pretrained Presto model](https://github.com/nasaharvest/presto), represent each field as a dated and masked remote-sensing time series, and attach the official one-output regression head (`construct_finetuning_model(num_outputs=1, regression=True)`). Compare a frozen encoder with a Ridge/tree head, head-only training, and full or partial encoder fine-tuning. The released Presto architecture defaults and a proposed student-project hyperparameter search are documented in the [research plan](docs/RESEARCH_PLAN.md); the learning rate and regularization values are search candidates, not guaranteed best settings.
 - **Baselines:** training-fold mean/median, Ridge on seasonal band/index summaries, Random Forest, and HistGradientBoosting, all using the same eligible fields, date window, and spatial folds as far as each input allows.
-- **Optional United States comparison:** USDA NASS Quick Stats supplies county-level corn-yield estimates, not individual farm yields or field locations. Use it only as a separate county-scale benchmark, joined to county boundaries with FIPS and compared to county-aggregated predictions. The optional downloader is [`scripts/download_usda_nass.py`](scripts/download_usda_nass.py); instructions are in [`data/raw/USA/USDA_NASS/README.md`](data/raw/USA/USDA_NASS/README.md).
+- **Optional United States comparison:** USDA NASS Quick Stats supplies county-level corn-yield estimates, not individual farm yields or field locations. Use it only as a separate county-scale benchmark, joined to county boundaries with FIPS and compared to county-aggregated predictions. The optional downloader is [`scripts/optional/download_usda_nass.py`](scripts/optional/download_usda_nass.py); instructions are in [`data/raw/USA/USDA_NASS/README.md`](data/raw/USA/USDA_NASS/README.md).
 
 The central citation is Burke and Lobell (2017), “Satellite-based assessment of yield variation and its determinants in smallholder African systems” ([PNAS](https://doi.org/10.1073/pnas.1616919114)). The project also builds on Tseng et al.'s [Presto paper](https://arxiv.org/abs/2304.14065) and Brown et al.'s [AlphaEarth Foundations paper](https://arxiv.org/abs/2507.22291). Full references, hypotheses, model settings, data checks, and evaluation design are in the research plan.
 
@@ -39,7 +39,7 @@ The counts come from [`data/audit/summary.json`](data/audit/summary.json), speci
 
 Each candidate must have a maize label, a finite nonnegative yield, and a valid point or nonempty valid polygon with plausible coordinates inside a broad envelope of its reported country. The audit excludes exact duplicate source rows after the first and flags repeated coordinates. Country envelopes detect gross errors; they do not verify field boundaries or national borders.
 
-Additional screening excludes documented site coordinates and yield consistency flags: values above 30 tonnes/ha, disagreement between per-acre and per-hectare yields beyond the implemented tolerance, Zimbabwe crop-cut conversion discrepancies, and dry weights exceeding wet weights. The 30 tonnes/ha threshold is a review heuristic. These rules are implemented in [`scripts/audit_datasets.py`](scripts/audit_datasets.py).
+Additional screening excludes documented site coordinates and yield consistency flags: values above 30 tonnes/ha, disagreement between per-acre and per-hectare yields beyond the implemented tolerance, Zimbabwe crop-cut conversion discrepancies, and dry weights exceeding wet weights. The 30 tonnes/ha threshold is a review heuristic. These rules are implemented in [`scripts/labels/audit_datasets.py`](scripts/labels/audit_datasets.py).
 
 Zero yields are retained because they may represent crop failure. The total includes **2,261 zero-yield observations**; restricting it to positive yields would leave **35,980**. Repeated coordinates are not automatically removed because they can represent repeated observations or distinct fields. Keep observations from the same field or spatial cluster in the same evaluation split.
 
@@ -76,27 +76,27 @@ git clone https://github.com/FelixYu120/DSC-291-Final-Project.git
 cd DSC-291-Final-Project
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r scripts/requirements-audit.txt
-python scripts/download_datasets.py
-python scripts/download_vision_guided_yield_data.py --metadata-only
-python scripts/audit_datasets.py
+python -m pip install -r scripts/labels/requirements.txt
+python scripts/labels/download_datasets.py
+python scripts/labels/download_vision_guided_yield_data.py --metadata-only
+python scripts/labels/audit_datasets.py
 ```
 
 If you already have the repository, start with the environment setup from its root directory. On Windows PowerShell, create the environment with `py -3 -m venv .venv` and activate it with `.\.venv\Scripts\Activate.ps1`; the remaining `python` commands are the same.
 
 ### Download behaviour
 
-[`download_datasets.py`](scripts/download_datasets.py) uses Python's standard library. It downloads missing files into `data/raw/`, caches provider catalogue responses in `data/metadata/`, checks available provider sizes and Zenodo MD5 checksums, and records SHA-256 hashes in `download_manifest.json`.
+[`download_datasets.py`](scripts/labels/download_datasets.py) uses Python's standard library. It downloads missing files into `data/raw/`, caches provider catalogue responses in `data/metadata/`, checks available provider sizes and Zenodo MD5 checksums, and records SHA-256 hashes in `download_manifest.json`.
 
 The repository already includes the data snapshot, so a normal rerun reuses existing files and cached metadata. Network access is needed for missing downloads or metadata. The script does not automatically refresh the snapshot to newer provider releases.
 
 Check that the final download summary reports **13 files** and **`"errors": []`** for this snapshot. Individual failures are recorded in the manifest; the script currently catches them rather than exiting with a failure status. Its recorded snapshot date is fixed, not the date of each rerun.
 
-[`download_vision_guided_yield_data.py`](scripts/download_vision_guided_yield_data.py) downloads the Zenodo metadata and, by default, the 4.9 GB `q_field_photo.zip`. It resumes partial files and verifies the Zenodo MD5 checksum; the archive is ignored by Git because of GitHub's per-file limit. `--metadata-only` downloads the small CSV without the images. The metadata CSV is needed to reproduce the added audit rows and is included in the project.
+[`download_vision_guided_yield_data.py`](scripts/labels/download_vision_guided_yield_data.py) downloads the Zenodo metadata and, by default, the 4.9 GB `q_field_photo.zip`. It resumes partial files and verifies the Zenodo MD5 checksum; the archive is ignored by Git because of GitHub's per-file limit. `--metadata-only` downloads the small CSV without the images. The metadata CSV is needed to reproduce the added audit rows and is included in the project.
 
 ### Audit behaviour and outputs
 
-[`audit_datasets.py`](scripts/audit_datasets.py) reads local files without network access and regenerates `data/audit/` plus the country-partitioned outputs in `data/processed/by_country/`. It uses `openpyxl`, `pyshp`, `shapely`, and `pyproj`, installed by the requirements command above. Originals in `data/raw/` are preserved, and downloaded provider Python code is not executed. To rebuild the country partitions alone from existing audit CSVs, run `python scripts/organize_country_data.py`.
+[`audit_datasets.py`](scripts/labels/audit_datasets.py) reads local files without network access and regenerates `data/audit/` plus the country-partitioned outputs in `data/processed/by_country/`. It uses `openpyxl`, `pyshp`, `shapely`, and `pyproj`, installed by the requirements command above. Originals in `data/raw/` are preserved, and downloaded provider Python code is not executed. To rebuild the country partitions alone from existing audit CSVs, run `python scripts/labels/organize_country_data.py`.
 
 | Output | Purpose |
 |---|---|
@@ -115,7 +115,7 @@ Running the audit also writes harmonized candidates to [`data/processed/by_count
 
 ## Sentinel-2 imagery
 
-[`scripts/download_sentinel2.py`](scripts/download_sentinel2.py) searches the free Sentinel-2 Level-2A Cloud-Optimized GeoTIFF archive through the [Earth Search STAC API](https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a). The [AWS Open Data Registry](https://registry.opendata.aws/sentinel-2-l2a-cogs/) documents public, no-account-required access and the archive’s open data terms. Earth Search is a public, best-effort catalogue without a guaranteed service level. Credit ESA/Copernicus and cite the AWS Sentinel-2 COG archive as described by its registry page in research outputs.
+[`scripts/imagery/download_sentinel2.py`](scripts/imagery/download_sentinel2.py) searches the free Sentinel-2 Level-2A Cloud-Optimized GeoTIFF archive through the [Earth Search STAC API](https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a). The [AWS Open Data Registry](https://registry.opendata.aws/sentinel-2-l2a-cogs/) documents public, no-account-required access and the archive’s open data terms. Earth Search is a public, best-effort catalogue without a guaranteed service level. Credit ESA/Copernicus and cite the AWS Sentinel-2 COG archive as described by its registry page in research outputs.
 
 The default selection uses the same **23,651 screened OAF, Zimbabwe, Malawi, and vision-guided records from 2019 onward** counted above. The overlapping OAF curated release is excluded because its field, town, or district location is not identified per row. The script uses recorded planting-to-harvest dates when available. For missing or inconsistent dates, its default policy infers a 180-day window before harvest or crop-cut observation; for the vision-guided records, the crop-cut date is approximated from the field-photo filename. These inferred windows are flagged for review. Use `--date-policy observed-only` to skip records without a planting/harvest date pair, or pass a CSV of reviewed date overrides.
 
@@ -124,17 +124,17 @@ For each selected record, the downloader searches for Sentinel-2 scenes intersec
 Install the imagery dependencies and make a small offline plan first:
 
 ```bash
-python -m pip install -r scripts/requirements-sentinel2.txt
-python scripts/download_sentinel2.py plan --limit 5
+python -m pip install -r scripts/imagery/requirements.txt
+python scripts/imagery/download_sentinel2.py plan --limit 5
 ```
 
 `plan` estimates timing and output size without contacting the imagery catalogue or confirming that scenes exist. Try a small download batch next:
 
 ```bash
-python scripts/download_sentinel2.py download --limit 5
+python scripts/imagery/download_sentinel2.py download --limit 5
 ```
 
-For later batches, change `--offset` and `--limit`, for example `--offset 5 --limit 5`. The downloader caches STAC searches, writes progress files, and verifies existing scene files by SHA-256 when rerun. Common options include `--datasets`, `--date-policy observed-only`, `--max-cloud-cover`, `--min-clear-fraction`, `--bands`, and `--date-overrides`; use `python scripts/download_sentinel2.py --help` for the complete list.
+For later batches, change `--offset` and `--limit`, for example `--offset 5 --limit 5`. The downloader caches STAC searches, writes progress files, and verifies existing scene files by SHA-256 when rerun. Common options include `--datasets`, `--date-policy observed-only`, `--max-cloud-cover`, `--min-clear-fraction`, `--bands`, and `--date-overrides`; use `python scripts/imagery/download_sentinel2.py --help` for the complete list.
 
 A complete default run can generate **about 50 GB of uncompressed chips** at the maximum of 12 scenes per record. Actual output is usually smaller because only clear scenes that pass the field-pixel check are retained and the GeoTIFFs are compressed. Review the plan and run in batches. Imagery outputs are stored under `data/imagery/sentinel2/`, which is ignored by Git; the repository contains the script and instructions, not the generated image files.
 
@@ -146,7 +146,7 @@ USDA NASS Quick Stats is free to query after requesting an API key. The project 
 
 ```bash
 export USDA_NASS_API_KEY="your-key"
-python scripts/download_usda_nass.py
+python scripts/optional/download_usda_nass.py
 ```
 
 This requests county-level annual corn yield rows for 2019–2024 and writes the CSV plus query provenance under `data/raw/USA/USDA_NASS/county_yield/`. The raw output may contain multiple published yield definitions or unavailable/suppressed values. Inspect its `short_desc`, `unit_desc`, and `Value` columns, retain NASS disclosure statuses, and select the corn-grain definition before analysis. These are county estimates; they do not increase the field-level maize candidate count above and should not be pooled with African field rows. See the [U.S. data notes](data/raw/USA/USDA_NASS/README.md).
@@ -165,17 +165,38 @@ data/
   imagery/      Local Sentinel-2 search caches and image chips (Git-ignored)
   README.txt    Additional data-use and reproduction notes
 docs/           Research plan and model/evaluation protocol
-scripts/
-  download_datasets.py
-  download_vision_guided_yield_data.py
-  audit_datasets.py
-  requirements-audit.txt
-  download_sentinel2.py
-  requirements-sentinel2.txt
-  organize_country_data.py
-  download_usda_nass.py
+scripts/        see scripts/README.md
+  get_data.py         step 1: labels check, Presto weights, Sentinel-2 chips
+  features/           step 2: MOSAIKS features from the chips
+  build_database.py   step 3: data/cropyield.duckdb (SQL in sql/)
+  labels/             provider downloads and the label audit (outputs are committed)
+  imagery/            Sentinel-2 downloader and the pilot selection
+  models/             pretrained Presto weights
+  optional/           USDA county yields (not in the main pipeline)
+sql/            database schema, views and example queries (see sql/README.md)
 Notes/          Project notes
 ```
+
+## Quick start: get the data and the database (added 29 October 2026)
+
+Clone the repository **outside OneDrive** (for example `C:\Dev\`): inside OneDrive, chip paths pass the 260-character Windows limit and OneDrive locks files while the downloader writes them. Then, from the repository root:
+
+```bash
+python -m pip install -e ".[dev,presto]"   # once
+python scripts/get_data.py                       # 1. labels check, Presto weights, Sentinel-2 chips (48-record pilot)
+python scripts/features/mosaiks_features.py      # 2. MOSAIKS features from the chips
+python scripts/build_database.py                 # 3. data/cropyield.duckdb: every table, the views `master` and `monthly`
+```
+
+`get_data.py` reuses everything already on disk, so it is safe to run again. Other scopes: `--scope cohorts --cohorts kenya_oaf_2019_2020`, `--scope all` (about 11,400 records, 25 GB, days on a laptop: use the cluster, see [`scripts/cluster/README.md`](scripts/cluster/README.md)), `--plan` for an offline estimate and `--status` for the progress. Rebuild the database after every download; close notebook connections first, because an open DuckDB connection locks the file on Windows.
+
+| Notebook | What it shows |
+|---|---|
+| `00_data_tour.ipynb` | one field from its label row to the input of every model |
+| `01_presto_first_run.ipynb` | the pinned Presto model runs on our chips |
+| `02_pilot48.ipynb` | the week-0 pilot gate and one inspection card per record |
+| `03_how_the_data_works.ipynb` | bands, the data cube, and how Presto, CNN/MOSAIKS and AlphaEarth read it |
+| `04_database.ipynb` | every database table with `SELECT *`, and the joins you need |
 
 ## Presto first run (added 26 October 2026)
 
@@ -190,8 +211,8 @@ python -m pip install -e ".[dev,presto]"
 Then, in order:
 
 ```bash
-python scripts/get_presto.py                                  # pretrained weights, verified by SHA-256
-python scripts/download_sentinel2.py download --datasets malawi_2023 --limit 10 \
+python scripts/models/get_presto.py                                  # pretrained weights, verified by SHA-256
+python scripts/imagery/download_sentinel2.py download --datasets malawi_2023 --limit 10 \
     --date-overrides configs/sentinel2_windows_malawi_2023_pilot.csv   # ten pilot chips, git-ignored
 python -m pytest                                              # small checks, no imagery needed
 ```
@@ -205,9 +226,21 @@ Open the notebook in VS Code (or any Jupyter front-end; the install command adds
 | `cropyield.satellite.monthly.monthly_series` | One row per calendar month of the season window: median reflectance over the valid pixels whose centres lie inside the field, NaN for missing months. Bands keep their Sentinel-2 codes so the same series serves the NDVI/GCVI baselines. |
 | `cropyield.features.presto_inputs.presto_inputs` | Presto's `x`, `mask`, `dynamic_world`, `latlons` and start month from that series, with the Sentinel-1, ERA5, SRTM and missing-month slots masked. |
 | `cropyield.models.presto.load_presto` / `encode` | Strict load of the verified checkpoint into the vendored, pinned model code; one 128-dimensional frozen-encoder embedding per record. |
-| `scripts/get_presto.py` | Downloads `data/default_model.pt` from nasaharvest/presto at commit `11e207a668a34336ced1d8e492a1bd5849b96c4a` into `data/models/presto/`, writing to a `.part` file that is renamed only once size and SHA-256 match. A verified file is reused; a file that does not match is refused unless `--replace` is given. |
+| `scripts/models/get_presto.py` | Downloads `data/default_model.pt` from nasaharvest/presto at commit `11e207a668a34336ced1d8e492a1bd5849b96c4a` into `data/models/presto/`, writing to a `.part` file that is renamed only once size and SHA-256 match. A verified file is reused; a file that does not match is refused unless `--replace` is given. |
 
 Scale and mask choices are recorded in [`docs/DECISIONS.md`](docs/DECISIONS.md) (26 October 2026 entries). The Presto model code is MIT-licensed (`src/cropyield/models/PRESTO_LICENSE`).
+
+## Week-0 pilot: 48 records (added 28 October 2026)
+
+`notebooks/00_data_tour.ipynb` follows one field from its label row to the input of every model. `notebooks/02_pilot48.ipynb` runs the week-0 pilot gate (Y, pairing, coverage, tensor, trainability) on 48 records from the four cohorts and writes one inspection card per record to `data/runs/pilot48/cards/` (git-ignored). Inputs, from the repository root:
+
+```bash
+python scripts/imagery/select_pilot.py      # configs/sentinel2_windows_pilot48.csv: the 48 records and their fixed windows
+python scripts/imagery/download_sentinel2.py download --datasets malawi_2023 one_acre_fund_full vision_guided_yield_estimation zimbabwe \
+    --date-overrides configs/sentinel2_windows_pilot48.csv --only-listed
+```
+
+`--only-listed` downloads exactly the records in the window file; without it, `--date-overrides` only changes the windows of records that `--offset`/`--limit` select. The selection rule is in `docs/DECISIONS.md` (28 October 2026).
 
 ## Project structure (added 26 October 2026)
 

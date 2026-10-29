@@ -4,7 +4,8 @@
 
 ```
 data/            raw/ audit/ processed/ (Felix's data layer, unchanged)   splits/ (frozen)   imagery/ features/ (git-ignored)
-scripts/         command-line entry points (download, audit, later: build labels, make splits, run experiment)
+scripts/         command-line entry points by stage: get_data.py, build_database.py, labels/ imagery/ models/ features/ optional/ (scripts/README.md)
+sql/             DuckDB schema, views and example queries (sql/README.md)
 src/cropyield/   data/  satellite/  features/  models/  eval/   one subpackage per pipeline stage
 configs/         one YAML per experiment
 tests/           pytest

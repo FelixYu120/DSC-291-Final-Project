@@ -30,3 +30,5 @@ Seven weeks from 26 October to 7 December 2026. Course deadlines in bold. Plan a
 | RQ2 photos | fusion beats satellite-only under the same folds | photos add nothing at test time |
 
 The visual version of this page is `docs/project_map.html`. A detailed week-0 task list with acceptance criteria exists at git tag `backup/full-skeleton` (`docs/WEEK0.md`) if the team wants it.
+
+
