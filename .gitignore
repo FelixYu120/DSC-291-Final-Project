@@ -16,3 +16,7 @@ data/runs/
 
 # Added 2026-10-26: downloaded model checkpoints (scripts/get_presto.py).
 data/models/
+
+# Added 2026-10-29: the project database, rebuilt by scripts/build_database.py.
+data/*.duckdb
+data/*.duckdb.wal
