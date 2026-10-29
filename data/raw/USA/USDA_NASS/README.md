@@ -10,7 +10,7 @@ that overlaps the currently listed AlphaEarth annual collection) with:
 
 ```bash
 export USDA_NASS_API_KEY="your-key"
-python scripts/download_usda_nass.py
+python scripts/optional/download_usda_nass.py
 ```
 
 Request an API key on the [USDA NASS Quick Stats API page](https://quickstats.nass.usda.gov/api).

@@ -1,6 +1,6 @@
 # Harmonized maize candidates by country
 
-Run `python scripts/audit_datasets.py` to regenerate this folder. ISO 3166-1
+Run `python scripts/labels/audit_datasets.py` to regenerate this folder. ISO 3166-1
 alpha-3 subfolders contain a merged `screened_maize_yield_candidates.csv`
 from each eligible source release. The CSV retains `dataset`, `source_id`,
 `source_row`, original yield fields, dates, location, quality flags, and the

@@ -84,14 +84,14 @@ alternate measurements on the same field, not additional independent records.
 REPRODUCING
 From the project directory, using a Python 3.10+ environment:
 
-  python -m pip install -r scripts/requirements-audit.txt
-  python scripts/download_datasets.py
-  python scripts/audit_datasets.py
+  python -m pip install -r scripts/labels/requirements.txt
+  python scripts/labels/download_datasets.py
+  python scripts/labels/audit_datasets.py
 
 The audit also writes data/processed/by_country/. To rebuild only those
 partitions from existing audit outputs, run:
 
-  python scripts/organize_country_data.py
+  python scripts/labels/organize_country_data.py
 
 For the separate U.S. county-yield dataset, request a Quick Stats API key and
 follow raw/USA/USDA_NASS/README.md. Do not combine county estimates with

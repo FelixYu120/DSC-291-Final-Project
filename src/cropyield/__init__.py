@@ -8,3 +8,8 @@ One subpackage per pipeline stage:
     eval       splits, metrics, noise ceilings, targeting metrics, PPI
 See docs/STRUCTURE.md.
 """
+from pathlib import Path
+
+# Repository root. The package is installed in editable mode from src/, so the
+# data, configs and scripts folders are two levels above this file.
+ROOT = Path(__file__).resolve().parents[2]

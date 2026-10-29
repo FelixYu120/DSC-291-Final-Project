@@ -26,7 +26,7 @@ from shapely.geometry import Point, mapping, shape
 from shapely.ops import transform
 from shapely.validation import explain_validity
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 RAW = ROOT / "data/raw"
 OUT = ROOT / "data/audit"
 ACRE_HA = 0.40468564224
@@ -84,7 +84,7 @@ NOTES = {
         "An approximate observation date is parsed from each q_field_photo filename because the CSV has no planting/harvest dates. Treat it as a photo/crop-cut timing proxy and verify before selecting satellite windows.",
         "The candidate count requires nonnegative numeric yield, valid WGS84 coordinates within the project's broad country envelopes, and no exact duplicate row. It does not establish that each point falls inside the measured field or that photo-derived predictions match satellite observations.",
         "Zero yields are retained as possible crop failures. Repeated coordinates are flagged but not removed automatically.",
-        "The q_field_photo.zip archive is about 4.9 GB and is excluded from Git. It is downloaded with scripts/download_vision_guided_yield_data.py; metadata.csv is sufficient to reproduce the row audit.",
+        "The q_field_photo.zip archive is about 4.9 GB and is excluded from Git. It is downloaded with scripts/labels/download_vision_guided_yield_data.py; metadata.csv is sufficient to reproduce the row audit.",
     ],
 }
 

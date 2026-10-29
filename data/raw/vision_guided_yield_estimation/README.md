@@ -7,13 +7,13 @@ The record covers maize and rice fields in Nigeria (2022) and Zimbabwe (2024). I
 The metadata CSV is retained in this repository. The photo archive is local-only because GitHub cannot store a file of this size; download or resume it with:
 
 ```bash
-python scripts/download_vision_guided_yield_data.py
+python scripts/labels/download_vision_guided_yield_data.py
 ```
 
 To fetch only the metadata CSV, run:
 
 ```bash
-python scripts/download_vision_guided_yield_data.py --metadata-only
+python scripts/labels/download_vision_guided_yield_data.py --metadata-only
 ```
 
 The script writes Zenodo's record JSON to `data/metadata/zenodo_17626117_record.json` and file sizes/checksums to `data/metadata/vision_guided_yield_download_manifest.json`. It verifies the publisher's MD5 and stores SHA-256 values. Interrupted photo downloads can be resumed by rerunning the command.
