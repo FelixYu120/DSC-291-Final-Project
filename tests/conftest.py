@@ -1,10 +1,11 @@
-"""Synthetic record folder in the exact layout scripts/download_sentinel2.py writes.
+"""Synthetic record folder in the exact layout scripts/imagery/download_sentinel2.py writes.
 
 No imagery is committed, so tests build a tiny 6 x 6 pixel chip with two accepted scenes. The
 field polygon touches a 3 x 3 block of pixels (the downloader's all_touched mask) but only a
 2 x 2 block of pixel centres lies inside it.
 """
 import json
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -14,6 +15,8 @@ from rasterio.features import rasterize
 from rasterio.transform import from_origin
 from shapely import transform as shapely_transform
 from shapely.geometry import box, mapping
+
+from cropyield.longpath import filesystem_path
 
 BANDS = ["B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B11", "B12"]
 NODATA = -9999.0
@@ -42,8 +45,8 @@ RECORD = {"dataset": "malawi_2023", "source_id": "506ae8b2-d085-4eeb-b807-765e03
 def write_tif(path, array, nodata, descriptions):
     if array.ndim == 2:
         array = array[np.newaxis]
-    with rasterio.open(path, "w", driver="GTiff", **GRID, count=len(array), dtype=array.dtype,
-                       nodata=nodata, compress="deflate") as out:
+    with rasterio.open(filesystem_path(path), "w", driver="GTiff", **GRID, count=len(array),
+                       dtype=array.dtype, nodata=nodata, compress="deflate") as out:
         out.write(array)
         out.descriptions = tuple(descriptions)
 
@@ -51,7 +54,7 @@ def write_tif(path, array, nodata, descriptions):
 def write_scene(record_dir, item_id, acquired, touched, interior, invalid=(), cloud_cover=12.5):
     """One scene: interior pixels hold FIELD_REFLECTANCE, boundary pixels 0.5, the rest 0.9."""
     scene_dir = record_dir / item_id
-    scene_dir.mkdir()
+    Path(filesystem_path(scene_dir)).mkdir(parents=True, exist_ok=True)
     reflectance = np.full((len(BANDS), SIZE, SIZE), 0.9, dtype="float32")
     reflectance[:, touched & ~interior] = BOUNDARY_REFLECTANCE
     for i, band in enumerate(BANDS):
@@ -64,7 +67,7 @@ def write_scene(record_dir, item_id, acquired, touched, interior, invalid=(), cl
     write_tif(scene_dir / "reflectance.tif", reflectance, NODATA, BANDS)
     write_tif(scene_dir / "scl.tif", scl, 0, ["SCL"])
     write_tif(scene_dir / "valid_mask.tif", valid.astype("uint8"), None, ["valid_clear_pixel"])
-    (scene_dir / "scene.json").write_text(json.dumps({
+    Path(filesystem_path(scene_dir / "scene.json")).write_text(json.dumps({
         "item": {"id": item_id, "properties": {"datetime": f"{acquired}T08:02:07.000000Z",
                                                 "eo:cloud_cover": cloud_cover}},
         "record_key": record_dir.name, "bands": BANDS, "nodata": NODATA,
@@ -74,7 +77,7 @@ def write_scene(record_dir, item_id, acquired, touched, interior, invalid=(), cl
 def make_record_dir(tmp_path, record, aoi_type="field_polygon"):
     """Record folder with the downloader's all_touched mask and record.json; no scenes yet."""
     record_dir = tmp_path / f"{record['dataset']}__{record['source_id'][:8]}__synthetic"
-    record_dir.mkdir()
+    Path(filesystem_path(record_dir)).mkdir(parents=True, exist_ok=True)
     geometry = record["geometry"]
     if geometry["type"] == "Point":
         touched = np.zeros((SIZE, SIZE), dtype=bool)
@@ -83,16 +86,17 @@ def make_record_dir(tmp_path, record, aoi_type="field_polygon"):
         touched = rasterize([(FIELD_UTM, 1)], out_shape=(SIZE, SIZE), transform=GRID["transform"],
                             all_touched=True, dtype="uint8").astype(bool)
     write_tif(record_dir / "aoi_mask.tif", touched.astype("uint8"), None, ["field_or_point_mask"])
-    (record_dir / "record.json").write_text(json.dumps({
+    Path(filesystem_path(record_dir / "record.json")).write_text(json.dumps({
         "record": record, "status": "complete", "accepted_item_ids": [],
         "aoi_type": aoi_type, "entire_aoi_inside_chip": True}))
     return record_dir, touched
 
 
 def add_scenes(record_dir, item_ids):
-    meta = json.loads((record_dir / "record.json").read_text())
+    record_json = record_dir / "record.json"
+    meta = json.loads(Path(filesystem_path(record_json)).read_text())
     meta["accepted_item_ids"] = list(item_ids)
-    (record_dir / "record.json").write_text(json.dumps(meta))
+    Path(filesystem_path(record_json)).write_text(json.dumps(meta))
 
 
 @pytest.fixture

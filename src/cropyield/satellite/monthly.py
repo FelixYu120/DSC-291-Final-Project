@@ -15,7 +15,7 @@ from datetime import date
 
 import numpy as np
 
-from cropyield.satellite.chips import Chip, Scene
+from cropyield.satellite.chips import FAILED_DOWNLOAD, Chip, Scene
 
 
 @dataclass
@@ -52,7 +52,7 @@ def monthly_series(chip: Chip, start: date, end: date, min_pixels: int = 1) -> M
     The chip must have been downloaded for a window covering [start, end]; otherwise months
     the downloader never searched would look like cloudy months.
     """
-    if chip.status in ("error", "partial_error"):
+    if chip.status in FAILED_DOWNLOAD:
         raise ValueError(f"{chip.obs_id}: downloader status {chip.status!r}; months that failed to "
                          "download would be indistinguishable from cloudy months")
     if chip.start_date is None or chip.end_date is None or chip.start_date > start or chip.end_date < end:

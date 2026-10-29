@@ -1,4 +1,4 @@
-"""Read one record folder written by scripts/download_sentinel2.py.
+"""Read one record folder written by scripts/imagery/download_sentinel2.py.
 
 A record folder holds ``record.json`` and ``aoi_mask.tif`` plus one sub-folder per accepted
 scene with ``scene.json``, ``reflectance.tif``, ``scl.tif`` and ``valid_mask.tif``. Reflectance
@@ -24,6 +24,11 @@ from rasterio.features import rasterize
 from rasterio.warp import transform_geom
 
 from cropyield.data.cohorts import obs_id as make_obs_id
+from cropyield.longpath import filesystem_path
+
+# Downloader statuses of a download that failed part-way: such a folder cannot tell a cloudy month
+# from a month that never arrived, so no band values, indices or features are read from it.
+FAILED_DOWNLOAD = ("error", "partial_error")
 
 
 @dataclass
@@ -64,9 +69,9 @@ class Chip:
 def read_chip(record_dir: Path) -> Chip:
     """Read record.json, the AOI mask and every accepted scene of one record folder."""
     record_dir = Path(record_dir)
-    meta = json.loads((record_dir / "record.json").read_text())
+    meta = json.loads(Path(filesystem_path(record_dir / "record.json")).read_text())
     record = meta["record"]
-    with rasterio.open(record_dir / "aoi_mask.tif") as src:
+    with rasterio.open(filesystem_path(record_dir / "aoi_mask.tif")) as src:
         aoi = src.read(1).astype(bool)
         crs, transform = str(src.crs), tuple(src.transform)[:6]
         if record["geometry"]["type"] == "Point":
@@ -79,15 +84,15 @@ def read_chip(record_dir: Path) -> Chip:
     bands: tuple[str, ...] | None = None
     for item_id in meta["accepted_item_ids"]:
         scene_dir = record_dir / item_id
-        scene_meta = json.loads((scene_dir / "scene.json").read_text())
-        with rasterio.open(scene_dir / "reflectance.tif") as src:
+        scene_meta = json.loads(Path(filesystem_path(scene_dir / "scene.json")).read_text())
+        with rasterio.open(filesystem_path(scene_dir / "reflectance.tif")) as src:
             reflectance = src.read().astype("float32")
             scene_bands = tuple(src.descriptions)
             if src.nodata is not None:
                 reflectance[reflectance == src.nodata] = np.nan
-        with rasterio.open(scene_dir / "scl.tif") as src:
+        with rasterio.open(filesystem_path(scene_dir / "scl.tif")) as src:
             scl = src.read(1)
-        with rasterio.open(scene_dir / "valid_mask.tif") as src:
+        with rasterio.open(filesystem_path(scene_dir / "valid_mask.tif")) as src:
             valid = src.read(1).astype(bool)
         if scene_bands != tuple(scene_meta["bands"]):
             raise ValueError(f"{scene_dir}: band order differs between reflectance.tif and scene.json")
