@@ -14,7 +14,7 @@ import time
 import urllib.error
 import urllib.request
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 RECORD_ID = "17626117"
 RECORD_URL = f"https://zenodo.org/api/records/{RECORD_ID}"
 OUT = ROOT / "data" / "raw" / "vision_guided_yield_estimation"

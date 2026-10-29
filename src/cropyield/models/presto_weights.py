@@ -1,6 +1,6 @@
 """Where the pretrained Presto weights come from, and how to recognise the right file.
 
-Kept free of torch so scripts/get_presto.py can run before the model dependencies exist.
+Kept free of torch so scripts/models/get_presto.py can run before the model dependencies exist.
 """
 from __future__ import annotations
 

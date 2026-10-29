@@ -29,7 +29,10 @@ from requests.adapters import HTTPAdapter
 from shapely.geometry import Point, shape
 from urllib3.util.retry import Retry
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
+# The downloader is runnable from a source checkout, before an editable install.
+sys.path.insert(0, str(ROOT / "src"))
+from cropyield.longpath import filesystem_path, path_exists, replace_file  # noqa: E402
 DATASETS = ("one_acre_fund_full", "zimbabwe", "malawi_2022", "malawi_2023",
             "vision_guided_yield_estimation")
 API = "https://earth-search.aws.element84.com/v1"
@@ -47,7 +50,7 @@ def digest(value):
 
 def sha256(path):
     h = hashlib.sha256()
-    with Path(path).open("rb") as f:
+    with open(filesystem_path(path), "rb") as f:
         for block in iter(lambda: f.read(1024 * 1024), b""):
             h.update(block)
     return h.hexdigest()
@@ -55,10 +58,10 @@ def sha256(path):
 
 def atomic_json(path, value):
     path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
+    Path(filesystem_path(path.parent)).mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(path.name + ".part")
-    temporary.write_text(json.dumps(value, indent=2, allow_nan=False) + "\n")
-    temporary.replace(path)
+    Path(filesystem_path(temporary)).write_text(json.dumps(value, indent=2, allow_nan=False) + "\n")
+    replace_file(temporary, path)
 
 
 def parse_date(value):
@@ -297,26 +300,34 @@ def read_asset(asset, grid, categorical=False):
 def write_tif(path, array, grid, nodata, descriptions):
     if array.ndim == 2:
         array = array[np.newaxis, ...]
-    path.parent.mkdir(parents=True, exist_ok=True)
+    Path(filesystem_path(path.parent)).mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(path.name + ".part")
-    with rasterio.open(temporary, "w", driver="GTiff", **grid, count=len(array),
+    with rasterio.open(filesystem_path(temporary), "w", driver="GTiff", **grid, count=len(array),
                        dtype=array.dtype, nodata=nodata, compress="deflate") as out:
         out.write(array)
         out.descriptions = tuple(descriptions)
-    temporary.replace(path)
+    readable_tif(temporary)  # GDAL once left a GeoTIFF without its directory and raised nothing (28 Oct 2026)
+    replace_file(temporary, path)
+
+
+def readable_tif(path):
+    """Open the file and read its first band; raises when GDAL cannot (cheap enough for every rerun)."""
+    with rasterio.open(filesystem_path(path)) as src:
+        src.read(1)
 
 
 def verified_scene(directory):
     path = directory / "scene.json"
-    if not path.exists():
+    if not path_exists(path):
         return None
     try:
-        metadata = json.loads(path.read_text())
+        metadata = json.loads(Path(filesystem_path(path)).read_text())
         for name, checksum in metadata["files_sha256"].items():
             if sha256(directory / name) != checksum:
                 return None
+            readable_tif(directory / name)  # a matching hash does not prove the file was written whole
         return metadata
-    except (OSError, ValueError, KeyError):
+    except (OSError, ValueError, KeyError, rasterio.errors.RasterioError):
         return None
 
 
@@ -355,10 +366,10 @@ def process_record(record, run_dir, catalog, args):
     if not record["start_date"]:
         return {"record_key": record["record_key"], "status": "skipped_dates", "scenes": 0}
     previous = directory / "record.json"
-    if previous.exists() and not args.refresh_catalog:
-        old = json.loads(previous.read_text())
+    if path_exists(previous) and not args.refresh_catalog:
+        old = json.loads(Path(filesystem_path(previous)).read_text())
         if (old["status"] == "complete" and
-                (directory / "aoi_mask.tif").exists() and
+                path_exists(directory / "aoi_mask.tif") and
                 sha256(directory / "aoi_mask.tif") == old.get("aoi_sha256") and
                 all(verified_scene(directory / item_id) for item_id in old["accepted_item_ids"])):
             return {"record_key": record["record_key"], "status": "complete", "scenes": len(old["accepted_item_ids"]), "reused": True}
@@ -413,8 +424,12 @@ def arguments(argv=None):
     parser.add_argument("--date-policy", choices=("fallback", "observed-only"), default="fallback")
     parser.add_argument("--fallback-days", type=int, default=180)
     parser.add_argument("--date-overrides", type=Path, help="CSV: dataset,source_id,start_date,end_date (ISO dates)")
+    parser.add_argument("--only-listed", action="store_true",
+                        help="select exactly the records in --date-overrides (e.g. a pilot); --offset/--limit apply to that list")
     parser.add_argument("--refresh-catalog", action="store_true", help="refresh cached searches and reconsider completed records")
     args = parser.parse_args(argv)
+    if args.only_listed and not args.date_overrides:
+        parser.error("--only-listed needs --date-overrides")
     if (args.min_year < 2019 or args.offset < 0 or (args.limit is not None and args.limit < 1)
             or not 8 <= args.chip_size <= 1024 or not 1 <= args.resolution <= 60
             or not 1 <= args.max_scenes <= 24 or not 1 <= args.candidates_per_month <= 100
@@ -433,13 +448,18 @@ def main(argv=None):
     config.update(pipeline_version=PIPELINE_VERSION, api=API, collection=COLLECTION)
     records, input_hashes = load_records(args)
     eligible = len(records)
+    if args.only_listed:
+        # Window-file order, so --offset/--limit slice the file as written. load_records already
+        # refuses an override row that matches no eligible record, so every key is found.
+        by_key = {(r["dataset"], r["source_id"]): r for r in records}
+        records = [by_key[key] for key in read_overrides(args.date_overrides)]
     records = records[args.offset:args.offset + args.limit if args.limit else None]
     if not records:
         raise ValueError("No records selected; check min-year, datasets, offset and audit inputs")
     run_dir = args.output_dir / f"run-{digest(config)[:16]}"
     run_dir.mkdir(parents=True, exist_ok=True)
     batch = {"config": config, "input_sha256": input_hashes, "selected_datasets": args.datasets,
-             "min_year": args.min_year, "offset": args.offset, "limit": args.limit}
+             "min_year": args.min_year, "offset": args.offset, "limit": args.limit, "only_listed": args.only_listed}
     # Separate invocation manifests so disjoint batches do not overwrite one another.
     batch_id = digest({**batch, "record_fingerprints": [r["fingerprint"] for r in records]})[:16]
     plan_path = run_dir / f"plan-{batch_id}.jsonl"

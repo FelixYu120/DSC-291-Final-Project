@@ -16,7 +16,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 API = "https://quickstats.nass.usda.gov/api"
 DEFAULT_OUTPUT_DIR = ROOT / "data/raw/USA/USDA_NASS/county_yield"
 

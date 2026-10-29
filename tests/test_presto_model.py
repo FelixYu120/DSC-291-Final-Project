@@ -11,7 +11,7 @@ from cropyield.models.presto import EMBEDDING_SIZE, encode, load_presto, model_d
 from cropyield.satellite.chips import read_chip
 from cropyield.satellite.monthly import monthly_series
 
-needs_weights = pytest.mark.skipif(not w.weights_verified(), reason="run scripts/get_presto.py first")
+needs_weights = pytest.mark.skipif(not w.weights_verified(), reason="run scripts/models/get_presto.py first")
 
 
 def test_vendored_presto_source_is_the_pinned_commit():

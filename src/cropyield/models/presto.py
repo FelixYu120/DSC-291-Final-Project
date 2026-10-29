@@ -3,7 +3,7 @@
 The model code is ``presto_single_file.py`` next to this module, a byte-identical copy of
 ``single_file_presto.py`` from github.com/nasaharvest/presto at the commit recorded in
 ``presto_weights.py`` (MIT licence, see PRESTO_LICENSE). The weights are ``data/default_model.pt``
-from the same commit, fetched by ``scripts/get_presto.py`` and verified by SHA-256 before every
+from the same commit, fetched by ``scripts/models/get_presto.py`` and verified by SHA-256 before every
 load.
 """
 from __future__ import annotations
@@ -28,9 +28,9 @@ def load_presto(path: Path = PRESTO_WEIGHTS_PATH, device: str | torch.device = "
     """
     path = Path(path)
     if not path.exists():
-        raise FileNotFoundError(f"{path} is missing; run: python scripts/get_presto.py")
+        raise FileNotFoundError(f"{path} is missing; run: python scripts/models/get_presto.py")
     if not weights_verified(path):
-        raise ValueError(f"{path} does not match the pinned Presto weights; rerun scripts/get_presto.py")
+        raise ValueError(f"{path} does not match the pinned Presto weights; rerun scripts/models/get_presto.py")
     model = Presto.construct().to(device)
     state = torch.load(path, map_location=device, weights_only=True)
     model.load_state_dict(state, strict=True)
