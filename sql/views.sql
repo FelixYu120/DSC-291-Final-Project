@@ -1,4 +1,4 @@
--- Views of data/cropyield.duckdb. scripts/build_database.py runs this file after the tables are
+-- Views of data/cropyield.duckdb. scripts/step6_build_database.py runs this file after the tables are
 -- filled (schema.sql). A view is a saved SELECT: it stores no data and is always up to date.
 --
 --   season_indices   one row per observation with data: season max and mean of each index

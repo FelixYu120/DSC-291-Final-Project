@@ -1,4 +1,4 @@
-"""scripts/get_data.py: batch slices, the window file it writes, and an offline --plan run."""
+"""scripts/get_all_data.py: batch slices, the window file it writes, and an offline --plan run."""
 import argparse
 import importlib.util
 import json
@@ -10,12 +10,21 @@ import pytest
 from cropyield import ROOT
 from cropyield.data.cohorts import load_cohort
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "get_data.py"
-spec = importlib.util.spec_from_file_location("get_data", SCRIPT)
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "get_all_data.py"
+spec = importlib.util.spec_from_file_location("get_all_data", SCRIPT)
 get_data = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(get_data)
 
 COLUMNS = ["cohort", "dataset", "source_id", "start_date", "end_date"]
+
+
+@pytest.mark.parametrize("name", ["step1_download_labels", "step1b_download_zimbabwe2024_labels", "step2_audit_labels",
+                                  "step3_build_labels", "step5_download_imagery"])
+def test_step_scripts_that_moved_up_a_folder_find_the_repository_root(name):
+    step_spec = importlib.util.spec_from_file_location(name, SCRIPT.parent / f"{name}.py")
+    module = importlib.util.module_from_spec(step_spec)
+    step_spec.loader.exec_module(module)
+    assert module.ROOT == ROOT
 
 
 @pytest.mark.parametrize("total, count", [(10, 3), (48, 1), (7, 7), (3, 10), (0, 2)])
@@ -61,8 +70,7 @@ def test_a_later_slice_does_not_rename_onto_a_finished_window_file(tmp_path, mon
     assert [item.name for item in tmp_path.iterdir()] == ["pilot.csv"]
 
 
-def test_plan_runs_offline_and_slices_match_the_window_file(tmp_path, monkeypatch):
-    monkeypatch.setattr(get_data.get_presto, "main", lambda argv: pytest.fail("--plan must not fetch Presto"))
+def test_plan_runs_offline_and_slices_match_the_window_file(tmp_path):
     code = get_data.main(["--scope", "cohorts", "--cohorts", "malawi_2023", "malawi_2022", "--plan",
                           "--batch", "2/2", "--output-dir", str(tmp_path)])
     assert code == 0
@@ -76,9 +84,8 @@ def test_plan_runs_offline_and_slices_match_the_window_file(tmp_path, monkeypatc
     assert [r["start_date"] for r in planned] == second_half["start_date"].tolist()
 
 
-def test_pilot_plan_slices_follow_the_window_file_order(tmp_path, monkeypatch):
-    # The pilot file is ordered by cohort as select_pilot lists them, not as the downloader lists datasets.
-    monkeypatch.setattr(get_data.get_presto, "main", lambda argv: pytest.fail("--plan must not fetch Presto"))
+def test_pilot_plan_slices_follow_the_window_file_order(tmp_path):
+    # The pilot file is ordered by cohort as PILOT_SIZES lists them, not as the downloader lists datasets.
     assert get_data.main(["--plan", "--batch", "2/3", "--output-dir", str(tmp_path)]) == 0
     windows = pd.read_csv(ROOT / "configs" / "sentinel2_windows_pilot48.csv", dtype=str)
     (plan_file,) = tmp_path.glob("run-*/plan-*.jsonl")
@@ -87,8 +94,7 @@ def test_pilot_plan_slices_follow_the_window_file_order(tmp_path, monkeypatch):
 
 
 def test_status_reads_the_disk_and_downloads_nothing(tmp_path, monkeypatch, capsys):
-    monkeypatch.setattr(get_data.download_sentinel2, "main", lambda argv: pytest.fail("--status must not download"))
-    monkeypatch.setattr(get_data.get_presto, "main", lambda argv: pytest.fail("--status must not fetch Presto"))
+    monkeypatch.setattr(get_data.step5_download_imagery, "main", lambda argv: pytest.fail("--status must not download"))
     assert get_data.main(["--status", "--output-dir", str(tmp_path)]) == 0
     out = capsys.readouterr().out
     assert "malawi_2023                      12 records: 12 not_on_disk" in out
@@ -96,7 +102,7 @@ def test_status_reads_the_disk_and_downloads_nothing(tmp_path, monkeypatch, caps
 
 
 def test_empty_batch_does_nothing(tmp_path, monkeypatch, capsys):
-    monkeypatch.setattr(get_data.download_sentinel2, "main", lambda argv: pytest.fail("no records, no downloader"))
+    monkeypatch.setattr(get_data.step5_download_imagery, "main", lambda argv: pytest.fail("no records, no downloader"))
     code = get_data.main(["--scope", "cohorts", "--cohorts", "malawi_2023", "--plan",
                           "--batch", "1/1000", "--output-dir", str(tmp_path)])
     assert code == 0

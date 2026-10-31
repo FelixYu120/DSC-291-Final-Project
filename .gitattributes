@@ -3,5 +3,8 @@
 *.sh text eol=lf
 *.sbatch text eol=lf
 *.sql text eol=lf
+configs/*.csv text eol=lf
 # Keep downloaded data and audit outputs byte-for-byte identical to the snapshot.
 data/** -text
+# Keep parked files byte-for-byte identical to _parked/MANIFEST.csv.
+_parked/** -text

@@ -92,6 +92,6 @@ def load_cohort(name: str, audit_dir: Path = AUDIT_DIR) -> pd.DataFrame:
 
 
 def date_overrides(cohort_rows: pd.DataFrame) -> pd.DataFrame:
-    """Rows for ``download_sentinel2.py --date-overrides``: the fixed cohort window per record."""
+    """Rows for ``step5_download_imagery.py --date-overrides``: the fixed cohort window per record."""
     out = cohort_rows[["dataset", "source_id", "season_start", "season_end"]].copy()
     return out.rename(columns={"season_start": "start_date", "season_end": "end_date"}).reset_index(drop=True)

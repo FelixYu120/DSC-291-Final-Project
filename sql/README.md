@@ -1,7 +1,7 @@
 # The project database (`data/cropyield.duckdb`)
 
 All project data lives in one [DuckDB](https://duckdb.org) file: `data/cropyield.duckdb`. It is git-ignored and
-built on your machine by `scripts/build_database.py`, from scratch, every time. DuckDB is a database in a single
+built on your machine by `scripts/step6_build_database.py`, from scratch, every time. DuckDB is a database in a single
 file: no server, only `pip install duckdb` (part of the project install).
 
 The SQL that defines it lives here, so a teammate can read what every table and column means without opening
@@ -13,7 +13,7 @@ Python:
 | `views.sql` | the views `season_indices`, `master` and `monthly` (a view is a saved `SELECT`, no copied data) |
 | `queries/*.sql` | short, named queries you can run from Python or the DuckDB shell (list below) |
 
-`scripts/build_database.py` runs `schema.sql`, fills the tables from Python, then runs `views.sql`. Nothing here
+`scripts/step6_build_database.py` runs `schema.sql`, fills the tables from Python, then runs `views.sql`. Nothing here
 is run by hand.
 
 ## The key: `obs_id`
@@ -33,7 +33,7 @@ it: `... JOIN downloads USING (obs_id)`. The monthly tables (`coverage`, `monthl
 | `coverage` | downloaded field-season x month | `state`: `clear`, `cloudy`, `no_scene` or `download_error` |
 | `monthly_bands` | field-season x month (with at least one scene) | median field reflectance of the 10 bands `b02 ... b12`, `missing` flag |
 | `vegetation_indices` | field-season x month (with at least one scene) | `ndvi`, `gcvi`, `mtci`, `ndvi705`, `ndvi740` |
-| `presto_embeddings` | field-season with at least one clear month | `embedding FLOAT[128]`: the frozen Presto encoder output |
+| `presto_embeddings` | field-season with an embedding; a new build leaves it empty | `embedding FLOAT[128]`: a Presto embedding |
 | `mosaiks_monthly` | field-season x month with a scene | `chip FLOAT[K]`, `field FLOAT[K]`: MOSAIKS features of the chip and of the field pixels |
 | `mosaiks_season` | field-season with MOSAIKS features | season mean of the monthly MOSAIKS vectors; `months_used` counts the months in the chip mean (the field mean can use fewer) |
 | `build_info` | build (exactly one row) | when, which commit, which folders, Presto and MOSAIKS settings (`mosaiks_features` = K) |
@@ -69,17 +69,17 @@ con.close()
 
 ## Build order
 
-From the repository root, after `python -m pip install -e ".[dev,presto]"`:
+From the repository root, after `python -m pip install -e ".[dev]"`:
 
 ```bash
-python scripts/get_data.py                    # 1. labels check, Presto weights, Sentinel-2 chips (48-record pilot)
-python scripts/features/mosaiks_features.py   # 2. MOSAIKS features -> data/features/mosaiks/*.parquet
-python scripts/build_database.py              # 3. data/cropyield.duckdb from 1 and 2
+python scripts/get_all_data.py           # 1. labels check, Sentinel-2 chips (48-record pilot)
+python scripts/step6_build_database.py   # 2. data/cropyield.duckdb from step 1
 ```
 
-Step 3 works without step 2: it then prints one line and leaves `mosaiks_monthly` and `mosaiks_season` empty
-(`build_info.mosaiks_features` is `NULL`). Options: `--no-presto` (skip the embeddings, no torch),
-`--imagery-dir`, `--mosaiks-dir`, `--db`. Rebuild after every download or feature run. On Windows an open
+Step 2 leaves `presto_embeddings` empty. It fills `mosaiks_monthly` and `mosaiks_season` only when
+`data/features/mosaiks/` holds the feature files; otherwise it prints one line and leaves them empty
+(`build_info.mosaiks_features` is `NULL`). Options: `--imagery-dir`, `--mosaiks-dir`, `--db`, `--workers`.
+Rebuild after every download. On Windows an open
 connection locks the file: close notebooks (`con.close()`) before you rebuild.
 
 ## Run a query file

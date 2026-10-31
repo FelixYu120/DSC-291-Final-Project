@@ -1,6 +1,6 @@
 """What the database holds for the labels_v1 model rows: the numbers behind the imagery section of docs/DATA.md.
 
-    python scripts/check_data.py [--db data/cropyield.duckdb] [--min-clear-months 4]
+    python scripts/step7_check_data.py [--db data/cropyield.duckdb] [--min-clear-months 4]
 
 Reads the database only. Run it after every rebuild. It prints the coverage, the clear share per
 calendar month, the range of each index, how much haze is left in the "clear" months, which month is
@@ -13,12 +13,13 @@ from pathlib import Path
 import sys
 
 import duckdb
+import numpy as np
 import pandas as pd
+from scipy.stats import rankdata
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from cropyield.data.labels import LABELS_PATH  # noqa: E402
-from cropyield.eval.metrics import spearman  # noqa: E402
 
 COHORT_ORDER = ["malawi_2023", "kenya_oaf_2019_2020", "zimbabwe_lacuna_2022_2023", "zimbabwe_2024", "malawi_2022"]
 INDICES = ["ndvi", "gcvi", "mtci", "ndvi705", "ndvi740"]
@@ -30,6 +31,13 @@ MODEL_ROWS = f"""
            m.download_status, coalesce(m.months_with_data, 0) AS months_with_data, {", ".join(SEASON_FEATURES)}
     FROM read_parquet('{{labels}}') v LEFT JOIN master m USING (obs_id) WHERE v.include_primary
 """
+
+
+def spearman(y: np.ndarray, p: np.ndarray) -> float:
+    """Rank correlation; NaN when one side is constant."""
+    if np.ptp(y) == 0 or np.ptp(p) == 0:
+        return float("nan")
+    return float(np.corrcoef(rankdata(y), rankdata(p))[0, 1])
 
 
 def coverage_table(con: duckdb.DuckDBPyConnection, min_clear: int) -> pd.DataFrame:

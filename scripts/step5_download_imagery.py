@@ -29,7 +29,7 @@ from requests.adapters import HTTPAdapter
 from shapely.geometry import Point, shape
 from urllib3.util.retry import Retry
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 # The downloader is runnable from a source checkout, before an editable install.
 sys.path.insert(0, str(ROOT / "src"))
 from cropyield.longpath import filesystem_path, path_exists, replace_file  # noqa: E402

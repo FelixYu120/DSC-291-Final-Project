@@ -1,18 +1,14 @@
-"""Get every file a teammate needs to work locally: labels, Presto weights and Sentinel-2 chips.
+"""Get every file a teammate needs to work locally: labels and Sentinel-2 chips.
 
-One command instead of the manual steps in README.md (Sentinel-2 imagery, Presto first run,
-Week-0 pilot). It calls the existing scripts and reuses what is already on disk, so running
-it again is cheap.
+One command for the data steps. It calls the existing scripts and reuses what is already on
+disk, so running it again is cheap.
 
-    python scripts/get_data.py                                  # the 48-record pilot (default)
-    python scripts/get_data.py --scope cohorts --cohorts kenya_oaf_2019_2020 malawi_2023
-    python scripts/get_data.py --scope all                      # 5 cohorts: ~11,400 records, ~25 GB, ~10 days serial
-    python scripts/get_data.py --scope all --batch 3/10         # slice 3 of 10, for parallel cluster jobs
-    python scripts/get_data.py --scope all --plan               # offline: counts and a size/time estimate
-    python scripts/get_data.py --scope all --status             # offline: complete / failed / not on disk so far
-    python scripts/get_data.py --skip-presto                    # do not fetch the Presto weights
-
-For the full download on a cluster, see scripts/cluster/README.md.
+    python scripts/get_all_data.py                                  # the 48-record pilot (default)
+    python scripts/get_all_data.py --scope cohorts --cohorts kenya_oaf_2019_2020 malawi_2023
+    python scripts/get_all_data.py --scope all                      # 5 cohorts: ~11,400 records, ~25 GB, ~10 days serial
+    python scripts/get_all_data.py --scope all --batch 3/10         # slice 3 of 10, for parallel jobs
+    python scripts/get_all_data.py --scope all --plan               # offline: counts and a size/time estimate
+    python scripts/get_all_data.py --scope all --status             # offline: complete / failed / not on disk so far
 
 Labels (data/audit) are committed to git, so they are only checked. The exit code is the
 downloader's: non-zero when any record failed.
@@ -29,20 +25,21 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-for stage in ("imagery", "models"):  # the stage scripts are plain files, not a package
-    sys.path.insert(0, str(ROOT / "scripts" / stage))
-import download_sentinel2  # noqa: E402  scripts/imagery/download_sentinel2.py
-import get_presto  # noqa: E402  scripts/models/get_presto.py
-import select_pilot  # noqa: E402  scripts/imagery/select_pilot.py
-from cropyield.data.cohorts import AUDIT_DIR, COHORTS, load_cohort  # noqa: E402
+sys.path.insert(0, str(ROOT / "scripts"))  # the step scripts are plain files, not a package
+import step5_download_imagery  # noqa: E402  scripts/step5_download_imagery.py
+from cropyield.data.cohorts import AUDIT_DIR, COHORTS, date_overrides, load_cohort  # noqa: E402
 from cropyield.longpath import replace_file  # noqa: E402
 from cropyield.satellite.records import record_folders  # noqa: E402
 
 IMAGERY_DIR = ROOT / "data" / "imagery" / "sentinel2"  # the downloader's default output folder
-STEPS = 5
+STEPS = 4
 # Measured on the 48-record pilot on a laptop (28 Oct 2026). Real values vary with cloud cover.
 MB_PER_RECORD = 2
 MINUTES_PER_RECORD = 1
+# The week-0 pilot (docs/DECISIONS.md, 28 Oct 2026): per cohort, the first rows of its screened audit
+# file in file order, split evenly over the harvest years. The sizes are in docs/ROADMAP.md.
+PILOT_SIZES = {"malawi_2023": 12, "kenya_oaf_2019_2020": 12, "zimbabwe_2024": 16, "zimbabwe_lacuna_2022_2023": 8}
+PILOT_PATH = ROOT / "configs" / "sentinel2_windows_pilot48.csv"
 
 
 def parse_batch(text: str) -> tuple[int, int]:
@@ -73,7 +70,7 @@ def warn_if_onedrive() -> None:
 def scope_cohorts(scope: str, cohorts: list[str] | None) -> list[str]:
     """Cohort names of the scope, in COHORTS order (the order the downloader processes them)."""
     if scope == "pilot":
-        chosen = list(select_pilot.PILOT_SIZES)
+        chosen = list(PILOT_SIZES)
     elif scope == "all":
         chosen = list(COHORTS)
     else:
@@ -99,17 +96,40 @@ def check_labels(cohort_names: list[str]) -> None:
         print(f"  {name:<28} {len(load_cohort(name)):>6} labelled records")
 
 
+def pilot_rows(sizes: dict[str, int] = PILOT_SIZES) -> pd.DataFrame:
+    """Cohort rows of the pilot: per cohort and harvest year, the first rows in audit-file order."""
+    parts = []
+    for name, size in sizes.items():
+        cohort = load_cohort(name)
+        years = sorted(cohort["year"].unique())
+        if size % len(years):
+            raise ValueError(f"{name}: {size} records do not split evenly over the years {years}")
+        for year in years:
+            rows = cohort[cohort["year"] == year].head(size // len(years))
+            if len(rows) < size // len(years):
+                raise ValueError(f"{name} {year}: only {len(rows)} rows")
+            parts.append(rows)
+    return pd.concat(parts, ignore_index=True)
+
+
+def window_table(rows: pd.DataFrame) -> pd.DataFrame:
+    """Window-file rows for the downloader: cohort, dataset, source_id and the fixed season window."""
+    table = date_overrides(rows)
+    table.insert(0, "cohort", rows["cohort"].to_numpy())
+    return table
+
+
 def window_rows(scope: str, cohort_names: list[str]) -> pd.DataFrame:
-    """Cohort rows to download. For the pilot, exactly the rows scripts/imagery/select_pilot.py picks."""
+    """Cohort rows to download. For the pilot, exactly the rows pilot_rows picks."""
     if scope == "pilot":
-        return select_pilot.pilot_rows()
+        return pilot_rows()
     return pd.concat([load_cohort(name) for name in cohort_names], ignore_index=True)
 
 
 def window_path(scope: str, cohort_names: list[str], output_dir: Path) -> Path:
     """Where the window file goes."""
     if scope == "pilot":
-        return select_pilot.PILOT_PATH  # 48 rows, committed in configs/
+        return PILOT_PATH  # 48 rows, committed in configs/
     # Other window files have thousands of rows. They are inputs of one download, so they live
     # beside its output (git-ignored, and moved along with --output-dir) instead of in configs/.
     name = "all" if scope == "all" else "_".join(cohort_names)
@@ -117,8 +137,8 @@ def window_path(scope: str, cohort_names: list[str], output_dir: Path) -> Path:
 
 
 def write_windows(rows: pd.DataFrame, path: Path) -> pd.DataFrame:
-    """Step 3: write cohort,dataset,source_id,start_date,end_date for the downloader, as select_pilot does."""
-    table = select_pilot.window_table(rows)
+    """Step 2: write cohort,dataset,source_id,start_date,end_date for the downloader."""
+    table = window_table(rows)
     path.parent.mkdir(parents=True, exist_ok=True)
     # Parallel --batch jobs write this same file at the same time. Their renames can collide (one of
     # 32 slices failed that way on 30 Oct), so skip the write when an earlier slice already made the file.
@@ -133,7 +153,7 @@ def write_windows(rows: pd.DataFrame, path: Path) -> pd.DataFrame:
 
 def downloader_argv(command: str, cohort_names: list[str], window_file: Path, output_dir: Path,
                     offset: int, size: int) -> list[str]:
-    """Command line for scripts/imagery/download_sentinel2.py: exactly the listed records, one slice of them."""
+    """Command line for scripts/step5_download_imagery.py: exactly the listed records, one slice of them."""
     datasets = [COHORTS[name].dataset for name in cohort_names]
     return [command, "--datasets", *datasets, "--date-overrides", str(window_file), "--only-listed",
             "--output-dir", str(output_dir), "--offset", str(offset), "--limit", str(size)]
@@ -152,7 +172,7 @@ def record_status(output_dir: Path) -> dict[tuple[str, str, str, str], str]:
 
 
 def print_summary(selected: pd.DataFrame, output_dir: Path) -> None:
-    """Step 5: per cohort, how many of this job's records are complete, failed, or not on disk."""
+    """Step 4: per cohort, how many of this job's records are complete, failed, or not on disk."""
     status = record_status(output_dir)
     for cohort, rows in selected.groupby("cohort", sort=False):
         keys = zip(rows["dataset"], rows["source_id"], rows["start_date"], rows["end_date"])
@@ -162,7 +182,7 @@ def print_summary(selected: pd.DataFrame, output_dir: Path) -> None:
 
 
 def print_plan(selected: pd.DataFrame) -> None:
-    """Step 5 for --plan: records per cohort and a rough size and time estimate."""
+    """Step 4 for --plan: records per cohort and a rough size and time estimate."""
     for cohort, rows in selected.groupby("cohort", sort=False):
         print(f"  {cohort:<28} {len(rows):>6} records")
     n = len(selected)
@@ -182,7 +202,6 @@ def arguments(argv=None) -> argparse.Namespace:
     parser.add_argument("--plan", action="store_true", help="offline: count records, estimate size and time, download nothing")
     parser.add_argument("--status", action="store_true",
                         help="offline: how many records of the scope are complete, failed or not on disk; download nothing")
-    parser.add_argument("--skip-presto", action="store_true", help="do not fetch the Presto weights")
     parser.add_argument("--output-dir", type=Path, default=IMAGERY_DIR, help="where the chips and window file go")
     args = parser.parse_args(argv)
     if args.scope == "cohorts" and not args.cohorts:
@@ -198,19 +217,13 @@ def main(argv=None) -> int:
     cohort_names = scope_cohorts(args.scope, args.cohorts)
     if args.status:  # safe while download jobs run: it only reads record.json files
         print(f"Status of --scope {args.scope} under {args.output_dir}")
-        print_summary(select_pilot.window_table(window_rows(args.scope, cohort_names)), args.output_dir)
+        print_summary(window_table(window_rows(args.scope, cohort_names)), args.output_dir)
         return 0
 
     print(f"[1/{STEPS}] Labels")
     check_labels(cohort_names)
 
-    print(f"[2/{STEPS}] Presto weights")
-    if args.plan or args.skip_presto:
-        print("  skipped (" + ("--plan" if args.plan else "--skip-presto") + ")")
-    else:
-        get_presto.main([])
-
-    print(f"[3/{STEPS}] Window file")
+    print(f"[2/{STEPS}] Window file")
     path = window_path(args.scope, cohort_names, args.output_dir)
     table = write_windows(window_rows(args.scope, cohort_names), path)
     offset, size = batch_slice(len(table), *args.batch)
@@ -221,11 +234,11 @@ def main(argv=None) -> int:
         print("  nothing to do: more batches than records")
         return 0
 
-    print(f"[4/{STEPS}] Sentinel-2 chips" + (" (plan only, offline)" if args.plan else ""))
+    print(f"[3/{STEPS}] Sentinel-2 chips" + (" (plan only, offline)" if args.plan else ""))
     command = "plan" if args.plan else "download"
-    code = download_sentinel2.main(downloader_argv(command, cohort_names, path, args.output_dir, offset, size))
+    code = step5_download_imagery.main(downloader_argv(command, cohort_names, path, args.output_dir, offset, size))
 
-    print(f"[5/{STEPS}] Summary")
+    print(f"[4/{STEPS}] Summary")
     if args.plan:
         print_plan(selected)
     else:

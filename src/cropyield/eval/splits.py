@@ -1,7 +1,7 @@
 """Frozen train/test splits: new village, new region, new season, and a random diagnostic.
 
 Rules and evidence: docs/EVALUATION.md. A split is a table with one row per observation, per
-repeat; it is written once by scripts/build_splits.py and never edited. Everything is seeded,
+repeat; it is written once by scripts/step4_build_splits.py and never edited. Everything is seeded,
 so the same labels give byte-identical split files.
 """
 from __future__ import annotations

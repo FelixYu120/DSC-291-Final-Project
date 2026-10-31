@@ -1,6 +1,6 @@
 """Build data/processed/labels_v1.parquet, the one table every model reads (docs/DATA.md).
 
-    python scripts/labels/build_labels.py
+    python scripts/step3_build_labels.py
 
 Offline: reads data/audit and data/raw. Stops with a non-zero exit code when a check fails and
 writes nothing in that case. Prints the SHA-256 for the line in docs/DECISIONS.md.
@@ -10,7 +10,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from cropyield.data.labels import (LABELS_PATH, build_labels, check_against_raw, check_labels,  # noqa: E402
                                    lacuna_groups, oaf_groups, sha256)

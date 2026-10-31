@@ -1,6 +1,6 @@
 """Open the project database and run the saved queries in sql/queries.
 
-The database is data/cropyield.duckdb, built by scripts/build_database.py (schema in sql/).
+The database is data/cropyield.duckdb, built by scripts/step6_build_database.py (schema in sql/).
 Every table is keyed by ``obs_id`` (one field in one season); the view ``master`` has one row
 per labelled observation with every feature, the view ``monthly`` one row per observation x
 month. Vectors are stored as arrays; ``wide`` spreads one array column into numbered columns.
@@ -31,7 +31,7 @@ def connect(read_only: bool = True) -> duckdb.DuckDBPyConnection:
     Example: ``con = connect(); con.sql("SELECT count(*) FROM master").fetchone()``
     """
     if not DATABASE.exists():
-        raise FileNotFoundError(f"{DATABASE} is missing; run: python scripts/build_database.py")
+        raise FileNotFoundError(f"{DATABASE} is missing; run: python scripts/step6_build_database.py")
     return duckdb.connect(str(DATABASE), read_only=read_only)
 
 

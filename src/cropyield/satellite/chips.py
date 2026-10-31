@@ -1,4 +1,4 @@
-"""Read one record folder written by scripts/imagery/download_sentinel2.py.
+"""Read one record folder written by scripts/step5_download_imagery.py.
 
 A record folder holds ``record.json`` and ``aoi_mask.tif`` plus one sub-folder per accepted
 scene with ``scene.json``, ``reflectance.tif``, ``scl.tif`` and ``valid_mask.tif``. Reflectance

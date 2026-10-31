@@ -84,7 +84,7 @@ an 8×8 m cut vs full-plot harvest gave r = 0.51). Realistic field-level R² is 
 **Cross-cohort transfer (X1, a side test, not a core question).** Yield definitions differ, so transfer is
 scored at three levels, each a weaker claim: raw t/ha, calibrated (10 % of the target groups fix the mean level
 only), and rank (Spearman, bottom-20 % recall). Each runs with source-scaled and target-scaled features.
-`scripts/run_transfer.py` needs no new data and only A1 features, so it costs one run; arms A2–A5 enter it only
+The transfer runner needs no new data and only A1 features, so it costs one run; arms A2–A5 enter it only
 after G3. Adjei (2026) found negative R² for every feature set in leave-one-country-out tests in five SSA
 countries; compare with that.
 

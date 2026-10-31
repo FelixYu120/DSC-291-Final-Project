@@ -46,7 +46,7 @@ follows the visit month (13 % March, 30 % April, 66 % May, 92 % June, 100 % July
   every month is clear. Model rows with at least 4 clear months: Malawi 2023 251, Kenya 3,977, Lacuna 1,880,
   Zimbabwe 2024 2,458. Seasonal indices, MOSAIKS and Presto exist for every one of them.
 - The download moves about 60 MB per field to keep about 2 MB, because reads fetch whole internal image blocks.
-  32 slices fill a 40 MB/s line and give 40–45 fields per minute (`scripts/cluster/README.md`).
+  32 slices fill a 40 MB/s line and give 40–45 fields per minute.
 - **2022 gap.** Collection 1 holds almost no scenes for January–November 2022 over our tiles (ESA
   reprocessing backlog). This drops Malawi 2022 and Lacuna 2022 and removes October–November 2022 from Malawi
   2023 and Lacuna 2023; those months are before or at planting, so the core is not hurt. Filling 2022 needs
@@ -110,9 +110,9 @@ training fold.
 10. Rows within 10 m of each other share `cluster_2km`.
 11. Input SHA-256 values match `data/metadata/download_manifest.json`.
 
-Build with `python scripts/labels/build_labels.py`. Frozen on 30 October:
+Build with `python scripts/step3_build_labels.py`. Frozen on 30 October:
 `data/processed/labels_v1.parquet`, SHA-256 `49aae383c4489aa98e9e7fe8c31cda6bf1cd752adc8e9540cffdc147a5e0ef92`
-(`DECISIONS.md`). The split manifest pins this hash and `run_experiment.py` stops on a mismatch, so a rebuild
+(`DECISIONS.md`). The split manifest pins this hash and the experiment runner stops on a mismatch, so a rebuild
 means new splits. One Kenya `unique_id` was stored by Excel as a date; the check compares its ISO text.
 
 ## Red flags found on 29 October
@@ -138,7 +138,7 @@ means new splits. One Kenya `unique_id` was stored by Excel as a date; the check
 
 ## What the imagery check found on 30 October
 
-From `python scripts/check_data.py`. None of these changes `labels_v1`: rows are never picked by a feature after
+From `python scripts/step7_check_data.py`. None of these changes `labels_v1`: rows are never picked by a feature after
 the freeze. Each one is a robustness row or a later arm.
 
 - **Clouds hide the Malawi peak.** 78 % of fields peak in February or March, but only 51 % have a clear March
@@ -171,6 +171,6 @@ the freeze. Each one is a robustness row or a later arm.
 `data/raw/` holds the provider files unchanged; `data/metadata/` the provider records, URLs and SHA-256
 checksums; `data/audit/` the audit outputs (`*_maize_audit.csv` all maize rows with flags,
 `*_screened_candidates.csv` rows passing the yield and location checks, `summary.json`, `report.html`).
-Screened rows are candidates, not validated labels. Rebuild with `python scripts/labels/audit_datasets.py`
-(offline). Licences and attribution: `data/README.txt`. Other sources we looked at and parked:
-[`DATA_SOURCES.md`](DATA_SOURCES.md).
+Screened rows are candidates, not validated labels. Rebuild with `python scripts/step2_audit_labels.py`
+(offline). Licences and attribution: `data/README.txt`. Other sources we looked at and parked: see
+`_parked/MANIFEST.csv`.

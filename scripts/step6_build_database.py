@@ -2,8 +2,8 @@
 
 The database is rebuilt from scratch on every run. Labels come from the committed audit CSVs
 (cropyield.data.cohorts), imagery tables from the chip folders the downloader wrote under
-data/imagery/sentinel2, Presto embeddings from the frozen encoder, and the MOSAIKS tables from
-the parquet files scripts/features/mosaiks_features.py writes under data/features/mosaiks.
+data/imagery/sentinel2, and the MOSAIKS tables from the parquet files under data/features/mosaiks
+when they exist. presto_embeddings stays empty: Presto is not on the data path.
 One observation is one field in one season, keyed everywhere by ``obs_id = "<dataset>:<source_id>"``.
 
 The SQL lives in sql/ (read sql/README.md): schema.sql creates the tables, views.sql the views.
@@ -16,7 +16,7 @@ Tables, all keyed by obs_id (every column is commented in sql/schema.sql):
     coverage             one row per observation x month: no_scene / cloudy / clear / download_error
     monthly_bands        one row per observation x month: median field reflectance per band
     vegetation_indices   one row per observation x month: NDVI, GCVI, MTCI, NDVI705, NDVI740
-    presto_embeddings    one row per observation with data: the frozen Presto embedding, FLOAT[128]
+    presto_embeddings    empty: the table stays in the schema and the build does not fill it
     mosaiks_monthly      one row per observation x month: MOSAIKS chip and field vectors, FLOAT[K]
     mosaiks_season       one row per observation: the season mean of the MOSAIKS vectors
     build_info           one row: when, from which commit and from which folders this was built
@@ -24,9 +24,9 @@ Views (sql/views.sql): season_indices, master (one row per labelled observation,
 imagery is missing) and monthly (one row per observation x month, for sequence models).
 
 Usage:
-    python scripts/build_database.py                 # data/cropyield.duckdb, with Presto embeddings
-    python scripts/build_database.py --no-presto     # skip the embeddings (torch is not imported)
-    python scripts/build_database.py --mosaiks-dir data/features/mosaiks   # where the MOSAIKS files are
+    python scripts/step6_build_database.py                 # data/cropyield.duckdb
+    python scripts/step6_build_database.py --db <path>     # a database file somewhere else
+    python scripts/step6_build_database.py --mosaiks-dir data/features/mosaiks   # where the MOSAIKS files are
 Then, for example:
     from cropyield.data.database import connect
     connect().sql("SELECT * FROM master LIMIT 5")
@@ -38,13 +38,11 @@ import json
 import subprocess
 import sys
 import time
-from collections.abc import Callable
 from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 
 import duckdb
-import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -54,8 +52,6 @@ sys.path.insert(0, str(ROOT / "src"))
 from cropyield.data.cohorts import AUDIT_DIR, COHORTS, load_cohort  # noqa: E402
 from cropyield.data.labels import LABELS_PATH  # noqa: E402
 from cropyield.features.indices import vegetation_indices  # noqa: E402
-from cropyield.features.presto_inputs import PrestoInputs, presto_inputs  # noqa: E402
-from cropyield.models.presto_weights import PRESTO_COMMIT, PRESTO_WEIGHTS_SHA256, weights_verified  # noqa: E402
 from cropyield.satellite.chips import FAILED_DOWNLOAD, Chip, read_chip  # noqa: E402
 from cropyield.satellite.monthly import MonthlySeries, month_range, monthly_series  # noqa: E402
 from cropyield.satellite.records import Download, field_mask, match_downloads  # noqa: E402
@@ -70,11 +66,11 @@ BAND_COLUMNS = [band.lower() for band in BANDS]          # b02 ... b12
 # The tables, in the order of sql/schema.sql. Frames are inserted BY NAME, so column order is free.
 TABLES = ("labels", "downloads", "scenes", "coverage", "monthly_bands", "vegetation_indices",
           "presto_embeddings", "mosaiks_monthly", "mosaiks_season", "build_info")
-# The MOSAIKS parquet files (scripts/features/mosaiks_features.py) and the columns each table takes.
+# The MOSAIKS parquet files and the columns each table takes.
 MOSAIKS_FILES = {"mosaiks_monthly": ("monthly.parquet", ["obs_id", "month", "chip", "field"]),
                  "mosaiks_season": ("season.parquet", ["obs_id", "months_used", "chip", "field"])}
-MOSAIKS_HINT = ("MOSAIKS features not found: mosaiks_monthly and mosaiks_season stay empty. "
-                "Make them with: python scripts/features/mosaiks_features.py")
+MOSAIKS_HINT = "MOSAIKS features not found: mosaiks_monthly and mosaiks_season stay empty."
+PRESTO_HINT = "presto_embeddings stays empty: Presto is not on the data path."
 
 
 # --- labels: the audit rows of every cohort -------------------------------------------------
@@ -221,25 +217,10 @@ def index_rows(series: MonthlySeries) -> list[dict]:
     return [{"obs_id": series.obs_id, "month": month, **values.to_dict()} for month, values in indices.iterrows()]
 
 
-def embedding_row(series: MonthlySeries, chip: Chip, encoder: Callable[[PrestoInputs], np.ndarray]) -> dict:
-    """The frozen Presto embedding as one list of 128 numbers (stored as FLOAT[128])."""
-    embedding = encoder(presto_inputs(series, chip.latitude, chip.longitude))
-    return {"obs_id": series.obs_id, "embedding": embedding.astype("float32").tolist()}
+IMAGERY_TABLES = ("downloads", "scenes", "coverage", "monthly_bands", "vegetation_indices")
 
 
-def presto_encoder() -> Callable[[PrestoInputs], np.ndarray]:
-    """Pretrained Presto as a function inputs -> embedding. Imports torch, so only called with Presto on."""
-    from cropyield.models.presto import encode, load_presto
-
-    model = load_presto()
-    return lambda inputs: encode(model, inputs)
-
-
-IMAGERY_TABLES = ("downloads", "scenes", "coverage", "monthly_bands", "vegetation_indices", "presto_embeddings")
-_worker_encoder: Callable | None = None
-
-
-def chip_rows(item: Download, encoder: Callable | None) -> dict[str, list[dict]]:
+def chip_rows(item: Download) -> dict[str, list[dict]]:
     """Read one chip once and return its rows of each imagery table."""
     rows: dict[str, list[dict]] = {name: [] for name in IMAGERY_TABLES}
     chip = read_chip(item.record_dir)
@@ -251,37 +232,20 @@ def chip_rows(item: Download, encoder: Callable | None) -> dict[str, list[dict]]
     series = monthly_series(chip, item.season_start, item.season_end)
     rows["monthly_bands"] += band_rows(series)
     rows["vegetation_indices"] += index_rows(series)
-    if encoder is not None and not series.missing.all():
-        rows["presto_embeddings"].append(embedding_row(series, chip, encoder))
     return rows
 
 
-def start_worker(with_presto: bool) -> None:
-    """One Presto model per worker process, on one thread: the parallelism is the processes."""
-    global _worker_encoder
-    if with_presto:
-        import torch
-
-        torch.set_num_threads(1)
-        _worker_encoder = presto_encoder()
-
-
-def worker_rows(item: Download) -> dict[str, list[dict]]:
-    return chip_rows(item, _worker_encoder)
-
-
-def imagery_frames(downloads: list[Download], with_presto: bool, workers: int = 1) -> dict[str, pd.DataFrame]:
+def imagery_frames(downloads: list[Download], workers: int = 1) -> dict[str, pd.DataFrame]:
     """Collect the rows of each imagery table, in the order of `downloads`, for any number of workers."""
     if workers > 1:
-        with ProcessPoolExecutor(workers, initializer=start_worker, initargs=(with_presto,)) as pool:
-            parts = list(pool.map(worker_rows, downloads, chunksize=25))
+        with ProcessPoolExecutor(workers) as pool:
+            parts = list(pool.map(chip_rows, downloads, chunksize=25))
     else:
-        encoder = presto_encoder() if with_presto else None
-        parts = [chip_rows(item, encoder) for item in downloads]
+        parts = [chip_rows(item) for item in downloads]
     return {name: pd.DataFrame([row for part in parts for row in part[name]]) for name in IMAGERY_TABLES}
 
 
-# --- MOSAIKS: parquet files written by scripts/features/mosaiks_features.py ----------------------
+# --- MOSAIKS: parquet files under data/features/mosaiks ------------------------------------------
 
 def mosaiks_present(mosaiks_dir: Path) -> bool:
     """True when both parquet files exist; otherwise the MOSAIKS tables stay empty."""
@@ -319,14 +283,14 @@ def git_commit() -> str | None:
     return result.stdout.strip() or None
 
 
-def build_info_frame(frames: dict, imagery_dir: Path, with_presto: bool, mosaiks_dir: Path) -> pd.DataFrame:
+def build_info_frame(frames: dict, imagery_dir: Path, mosaiks_dir: Path) -> pd.DataFrame:
     k_features, params = mosaiks_params(mosaiks_dir)
     return pd.DataFrame([{
         "built_at": datetime.now(timezone.utc).replace(tzinfo=None),
         "git_commit": git_commit(),
-        "presto_commit": PRESTO_COMMIT,
-        "presto_weights_sha256": PRESTO_WEIGHTS_SHA256 if with_presto else None,
-        "presto_embeddings_built": with_presto,
+        "presto_commit": None,
+        "presto_weights_sha256": None,
+        "presto_embeddings_built": False,
         "imagery_dir": relative_dir(imagery_dir),
         "n_labels": len(frames["labels"]),
         "n_downloads": len(frames["downloads"]),
@@ -365,16 +329,18 @@ def insert(con: duckdb.DuckDBPyConnection, table: str, frame: pd.DataFrame | pa.
     return con.execute(f"SELECT count(*) FROM {table}").fetchone()[0]
 
 
-def build_database(db: Path, imagery_dir: Path, with_presto: bool, mosaiks_dir: Path = DEFAULT_MOSAIKS,
+def build_database(db: Path, imagery_dir: Path, mosaiks_dir: Path = DEFAULT_MOSAIKS,
                    workers: int = 1) -> dict[str, int]:
     """Create ``db`` from scratch and return the row count of every table."""
     frames: dict = {"labels": labels_frame()}
     downloads = match_downloads(frames["labels"], imagery_dir)
-    frames.update(imagery_frames(downloads, with_presto, workers))
+    frames.update(imagery_frames(downloads, workers))
+    frames["presto_embeddings"] = pd.DataFrame()
+    print(PRESTO_HINT)
     frames.update(mosaiks_tables(mosaiks_dir))
     if not mosaiks_present(mosaiks_dir):
         print(MOSAIKS_HINT)
-    frames["build_info"] = build_info_frame(frames, imagery_dir, with_presto, mosaiks_dir)
+    frames["build_info"] = build_info_frame(frames, imagery_dir, mosaiks_dir)
 
     db.parent.mkdir(parents=True, exist_ok=True)
     for stale in (db, db.with_name(db.name + ".wal")):
@@ -382,7 +348,7 @@ def build_database(db: Path, imagery_dir: Path, with_presto: bool, mosaiks_dir: 
             stale.unlink(missing_ok=True)
         except PermissionError:  # Windows: another program still holds the file open
             raise PermissionError(f"{stale} is in use. Close every connection to it (con.close() in "
-                                  "04_database.ipynb) and run again.") from None
+                                  "the notebook) and run again.") from None
     with duckdb.connect(str(db)) as con:
         run_sql_file(con, SCHEMA_FILE)
         counts = {table: insert(con, table, frames[table]) for table in TABLES}
@@ -396,17 +362,12 @@ def main(argv=None) -> int:
     parser.add_argument("--imagery-dir", type=Path, default=DEFAULT_IMAGERY, help="folder holding run-*/records/")
     parser.add_argument("--mosaiks-dir", type=Path, default=DEFAULT_MOSAIKS,
                         help="folder holding monthly.parquet, season.parquet and params.json")
-    parser.add_argument("--no-presto", action="store_true", help="skip the Presto embeddings (no torch import)")
     parser.add_argument("--workers", type=int, default=1,
                         help="processes that read the chips")
     args = parser.parse_args(argv)
-    if not args.no_presto and not weights_verified():
-        print("Presto weights are missing; run scripts/models/get_presto.py or pass --no-presto", file=sys.stderr)
-        return 1
     started = time.perf_counter()
     try:
-        counts = build_database(args.db, args.imagery_dir, with_presto=not args.no_presto, mosaiks_dir=args.mosaiks_dir,
-                                workers=args.workers)
+        counts = build_database(args.db, args.imagery_dir, mosaiks_dir=args.mosaiks_dir, workers=args.workers)
     except PermissionError as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 1

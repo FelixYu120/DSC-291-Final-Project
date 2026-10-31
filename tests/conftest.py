@@ -1,4 +1,4 @@
-"""Synthetic record folder in the exact layout scripts/imagery/download_sentinel2.py writes.
+"""Synthetic record folder in the exact layout scripts/step5_download_imagery.py writes.
 
 No imagery is committed, so tests build a tiny 6 x 6 pixel chip with two accepted scenes. The
 field polygon touches a 3 x 3 block of pixels (the downloader's all_touched mask) but only a

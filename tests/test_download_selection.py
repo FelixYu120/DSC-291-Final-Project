@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "imagery" / "download_sentinel2.py"
-spec = importlib.util.spec_from_file_location("download_sentinel2", SCRIPT)
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "step5_download_imagery.py"
+spec = importlib.util.spec_from_file_location("step5_download_imagery", SCRIPT)
 downloader = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(downloader)
 

@@ -1,6 +1,6 @@
 """Write the frozen split files data/splits/<cohort>__<family>.csv and manifest.json (docs/EVALUATION.md).
 
-    python scripts/build_splits.py
+    python scripts/step4_build_splits.py
 
 Run once, from labels_v1, before any model is trained. Rows are the labels_v1 rows with
 include_primary, with or without imagery, so a split never changes when coverage changes. The

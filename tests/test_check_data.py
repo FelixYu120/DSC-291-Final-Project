@@ -1,12 +1,13 @@
-"""scripts/check_data.py on a tiny database: it reads the model rows and counts what it promises."""
+"""scripts/step7_check_data.py on a tiny database: it reads the model rows and counts what it promises."""
 import importlib.util
 from pathlib import Path
 
 import duckdb
+import numpy as np
 import pandas as pd
 import pytest
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "check_data.py"
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "step7_check_data.py"
 spec = importlib.util.spec_from_file_location("check_data", SCRIPT)
 check_data = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(check_data)
@@ -48,6 +49,13 @@ def test_clear_share_is_per_month_of_the_model_rows(con):
 def test_haze_counts_clear_months_with_a_high_blue_value(con):
     row = check_data.haze(con).iloc[0]
     assert (row["clear_months"], row["share_blue_high"]) == (2, 0.5)
+
+
+def test_spearman_uses_ranks_and_is_nan_for_a_constant_side():
+    y = np.array([1.0, 2.0, 3.0, 4.0])
+    assert check_data.spearman(y, y ** 3) == pytest.approx(1.0)
+    assert check_data.spearman(y, -y) == pytest.approx(-1.0)
+    assert np.isnan(check_data.spearman(y, np.ones(4)))
 
 
 def test_greenest_month_skips_a_month_without_a_value(con):

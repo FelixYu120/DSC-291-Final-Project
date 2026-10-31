@@ -1,0 +1,42 @@
+old_path,new_path,reason,sha256
+notebooks/00_data_tour.ipynb,_parked/notebooks/00_data_tour.ipynb,"Exploration notebook, not on the data path. notebooks/data_guide.ipynb replaces it.",d2c9e5559255c5c58b3064bfb218edc9f40c9688f0d108ae43523f6edb3ee2c0
+notebooks/01_presto_first_run.ipynb,_parked/notebooks/01_presto_first_run.ipynb,"Exploration notebook, not on the data path. notebooks/data_guide.ipynb replaces it.",c6bf35b88dab83782a4159f740e8b5e4fc2bbc329c7150a2e3e28d06f0306ed4
+notebooks/02_pilot48.ipynb,_parked/notebooks/02_pilot48.ipynb,"Exploration notebook, not on the data path. notebooks/data_guide.ipynb replaces it.",04ca0d3db597ce7a4fa6a3bba434e9c3f052b8b539813c1f6d51dbcb342d46bb
+notebooks/03_how_the_data_works.ipynb,_parked/notebooks/03_how_the_data_works.ipynb,"Exploration notebook, not on the data path. notebooks/data_guide.ipynb replaces it.",183bfa1606f2a1d297969e463bedd55b2c843ee3ca5d8225b8e7cfbd0642ab86
+notebooks/04_database.ipynb,_parked/notebooks/04_database.ipynb,"Exploration notebook, not on the data path. notebooks/data_guide.ipynb replaces it.",dec8b101d7c0bb970a012b1b70e48e01173fa8e28b6199dde085e58c64d7e5d9
+results/README.md,_parked/results/README.md,"Model result, not on the data path.",895ca271c5100093938f5a82d181fe4011b6c9c4c9f57f1f3e076b225b14e3f0
+results/metrics.csv,_parked/results/metrics.csv,"Model result, not on the data path.",a05c9a21d94f1f0691c980aa663f8c604bbfafe06745c89085882981c51e20e0
+configs/README.md,_parked/configs/README.md,"Experiment or pilot config, not on the data path.",10e386120ce8a702c2ced08b0476fbf1c726d252860ef07843b9bbf08cc8fd3f
+configs/b0_seasonal_indices_ridge.yaml,_parked/configs/b0_seasonal_indices_ridge.yaml,"Experiment or pilot config, not on the data path.",3f25e50325480ebb9c0b38d7006aa152bf6ffb02d54f3b020ac53db7385fb5f8
+configs/x1_cross_cohort_transfer.yaml,_parked/configs/x1_cross_cohort_transfer.yaml,"Experiment or pilot config, not on the data path.",00a5669c4bfa9c7089bdaef2bab57d5dd33bb55a086cd95ac918aeaadb0374cf
+configs/sentinel2_windows_malawi_2023_pilot.csv,_parked/configs/sentinel2_windows_malawi_2023_pilot.csv,"Experiment or pilot config, not on the data path.",98cb3684df21aaa9c76d0b1c55bdd243f002d0d7dd0a2e481e12d39fcdbebd1b
+docs/DATA_Description.md,_parked/docs/DATA_Description.md,"Superseded or parked document, not on the data path.",7f00eac84a67499e34ac59e9599c930a6b0ffdeafadfd5d7cd45d842c7aeca84
+docs/DATA_SOURCES.md,_parked/docs/DATA_SOURCES.md,"Superseded or parked document, not on the data path.",995ba5d9df851816571504d367e51f9e2516d6ad1db5ccc50e6afc5baf1b2f9b
+scripts/run_experiment.py,_parked/scripts/run_experiment.py,"Model run, not on the data path.",cd748fe23b277bfcfbdc1dbf96b5ff2e47d16cd0cf6241354a7db63a0325291c
+scripts/run_transfer.py,_parked/scripts/run_transfer.py,"Model run, not on the data path.",fdd50b9fb7cf93c0af6b691519eecc437cf8cad627aee44d778bc478d03052f8
+scripts/features/mosaiks_features.py,_parked/scripts/features/mosaiks_features.py,"MOSAIKS feature step, a model input outside this freeze.",38ab0dbaf23d0a582d869c53d9087d38083e483a2bac4216a0b7a639f7f2e4cb
+scripts/imagery/select_pilot.py,_parked/scripts/imagery/select_pilot.py,Pilot selection. The rule now lives in scripts/get_all_data.py.,742eb1daaa257ab9bfbe245fbe781b43bce60eecea73753cd634e5a22570ee1d
+scripts/models/get_presto.py,_parked/scripts/models/get_presto.py,"Presto weights step, outside this freeze.",f0cf9b2bbea585e84486736c6f0d1ce833b32b6fdb6176f15d92b324bd35f70f
+src/cropyield/eval/metrics.py,_parked/src/cropyield/eval/metrics.py,"Model scores, not on the data path.",1d9cd28fbb003e4c6855b368ed04223e47d26fabf2b34d4bc01b178759983456
+src/cropyield/features/mosaiks.py,_parked/src/cropyield/features/mosaiks.py,"MOSAIKS feature code, a model input outside this freeze.",5653bae1f038ca488c75e27e59342ceb6973e55f6a3381ca38c8664b341b330f
+src/cropyield/features/presto_inputs.py,_parked/src/cropyield/features/presto_inputs.py,"Presto input code, outside this freeze.",074b9e4b7ccad348828074056b839ef9779bbac02d93a9137eb708740c6f9a83
+tests/test_metrics.py,_parked/tests/test_metrics.py,Test of a parked file.,4f4e2751a34078fcd5cc13b43dbe3a74d6f90b8bf5c987a67cc19d11aad50f54
+tests/test_monthly_presto_inputs.py,_parked/tests/test_monthly_presto_inputs.py,Parked as it was. Its monthly tests are cut into tests/test_monthly.py.,9c083f622cd6bb0c7078acd123f15a981b01234c4189381873e9855c44c7114a
+tests/test_mosaiks.py,_parked/tests/test_mosaiks.py,Test of a parked file.,0dd4b19d6d84b20d758fc13a2e5c00b8e8778720464be7d52324a5a5b480029b
+tests/test_mosaiks_features.py,_parked/tests/test_mosaiks_features.py,Test of a parked file.,068f6163cbb9d2f3a151f918dc03a6c4031e02fdb94fdfc7968732eac3b9e488
+tests/test_presto_model.py,_parked/tests/test_presto_model.py,Test of a parked file.,a150e6718f0f96c5063c76a617b40dd430e9bac2c84094c093d51b14f2828c55
+tests/test_run_experiment.py,_parked/tests/test_run_experiment.py,Test of a parked file.,07c74c61936dc23c6c97a5d7142a3f00871072587278e773200468a1fd9c3e4b
+tests/test_run_transfer.py,_parked/tests/test_run_transfer.py,Test of a parked file.,614dac79d182ffdd062edc7167aa8c22165da08f944a82b4b5781e1d5c590993
+docs/archive/README.md,_parked/docs/archive/README.md,"Superseded or parked document, not on the data path.",cf755aa5aa7087fed90f8309e95492168e84dee99916655f212a32aae7935523
+docs/archive/RESEARCH_PLAN_2026-10-21.md,_parked/docs/archive/RESEARCH_PLAN_2026-10-21.md,"Superseded or parked document, not on the data path.",15f5524978e649f905cffdd9e81c3f67b635d1836c5e4dd52fed62022f115fc9
+docs/archive/project_map_2026-10-25.html,_parked/docs/archive/project_map_2026-10-25.html,"Superseded or parked document, not on the data path.",9863faea8c36fd9b1faad7d3fecc3aaf079e9897401e1872636ab5104a2b7d59
+scripts/cluster/README.md,_parked/scripts/cluster/README.md,"Cluster launcher of old script names, not on the data path.",517b9509abd436f38c2bcbe04965de7642a1973eb137b83072d18e63a3a2a610
+scripts/cluster/after_download.sh,_parked/scripts/cluster/after_download.sh,"Cluster launcher of old script names, not on the data path.",11803eb46a7c625e8848f976d81e67f1182d9ce59d3a6bd6b5726e2ac90d16d6
+scripts/cluster/download_all.sbatch,_parked/scripts/cluster/download_all.sbatch,"Cluster launcher of old script names, not on the data path.",1d740aae7452a0c9fe8f53e60021626118c52ea6bec2ce0131883819d0827796
+scripts/cluster/run_batches.sh,_parked/scripts/cluster/run_batches.sh,"Cluster launcher of old script names, not on the data path.",9a8b62c04f027c74d712f35cd17d6df1807b8a41f605a12c0ab70b3842a9938c
+src/cropyield/models/PRESTO_LICENSE,_parked/src/cropyield/models/PRESTO_LICENSE,"Model code, outside this freeze.",be77d9965ce4fce0f874c34967c44a2a4d919035ec2299a35af15f996d5e46a6
+src/cropyield/models/__init__.py,_parked/src/cropyield/models/__init__.py,"Model code, outside this freeze.",20ae092c17b36a526d6e170e2d52d64dd26fc8cb6f12bd1a36c1dc6444ff1e2a
+src/cropyield/models/baselines.py,_parked/src/cropyield/models/baselines.py,"Model code, outside this freeze.",9cac8f0a8479d7d50b78dec57ed11f79dcb9ede3907e053c458034ea367291b2
+src/cropyield/models/presto.py,_parked/src/cropyield/models/presto.py,"Model code, outside this freeze.",7187a2e6899a431cebf115986c7376f02e3c68935257192538ccd00f7d59e9cc
+src/cropyield/models/presto_single_file.py,_parked/src/cropyield/models/presto_single_file.py,"Model code, outside this freeze.",fb487a3a9ceb6040eaa8e97b9cd2dd9df8cb6c650ab889ac0868944ed55700df
+src/cropyield/models/presto_weights.py,_parked/src/cropyield/models/presto_weights.py,"Model code, outside this freeze.",25e8f1844513b750bb3efb930ca529d89a071bc9e593b59b20424ff1c56a0e97

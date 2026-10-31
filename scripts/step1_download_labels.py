@@ -12,7 +12,7 @@ from pathlib import Path
 import urllib.parse
 import urllib.request
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "raw"
 META = ROOT / "data" / "metadata"
 

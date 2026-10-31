@@ -27,10 +27,11 @@ def test_season_windows_are_fixed_per_zone():
     assert season_window(COHORTS["zimbabwe_2024"], 2024) == (date(2023, 10, 1), date(2024, 6, 30))
 
 
-def test_pilot_date_overrides_file_is_the_first_ten_cohort_rows():
-    expected = date_overrides(load_cohort("malawi_2023").head(10))
-    committed = pd.read_csv(ROOT / "configs" / "sentinel2_windows_malawi_2023_pilot.csv", dtype=str)
-    pd.testing.assert_frame_equal(committed, expected)
+def test_pilot_window_file_holds_the_first_twelve_malawi_rows():
+    expected = date_overrides(load_cohort("malawi_2023").head(12))
+    committed = pd.read_csv(ROOT / "configs" / "sentinel2_windows_pilot48.csv", dtype=str)
+    malawi = committed[committed["cohort"] == "malawi_2023"].drop(columns="cohort").reset_index(drop=True)
+    pd.testing.assert_frame_equal(malawi, expected)
 
 
 def test_chip_obs_id_joins_the_cohort_row(chip_dir):

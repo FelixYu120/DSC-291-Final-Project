@@ -32,7 +32,7 @@ every step. Details live in three companion files:
 | PARKED | Zimbabwe 2024 (vision-guided) | 2,458 positive | 43 % zeros whose share follows the visit month (13 % March, 100 % July): most zeros look like "not measured". Only for the photo stretch, positive rows only. |
 | DROPPED | Malawi 2022, Lacuna 2022, Nigeria 2022, curated OAF, other OAF countries, USDA, GROW-Africa | – | 2022 Collection-1 imagery gap, coarse coordinates, or the wrong scale. |
 
-**Model arms** (one row each in `results/metrics.csv`; the 9-cell whiteboard grid is cut to these):
+**Model arms** (one row each in the results table, parked with the model code, see `_parked/MANIFEST.csv`; the 9-cell whiteboard grid is cut to these):
 
 | Arm | Features | Head | Status |
 |---|---|---|---|
@@ -59,13 +59,13 @@ B0 is arm A1 on the core cohorts, next to R0, R1 and R2. It needs no new model c
 |---|---|
 | Rows | `labels_v1` rows with `include_primary` (see [`DATA.md`](DATA.md)) and at least 4 clear months. Malawi 2023 first, Kenya as soon as its chips are in. All arms are scored on exactly these rows. |
 | Features | The 10 columns of the `season_indices` view in `sql/views.sql`, clipped at the training 1st and 99th percentile, then standardised with training-fold statistics. The clip is there because MTCI reaches 1,300 where its median is about 4.5. |
-| Model | `Pipeline(Winsorize, StandardScaler, Ridge)`, alpha from `logspace(-3, 5, 17)` chosen by grouped CV inside the training fold only (`src/cropyield/models/baselines.py`). |
+| Model | `Pipeline(Winsorize, StandardScaler, Ridge)`, alpha from `logspace(-3, 5, 17)` chosen by grouped CV inside the training fold only. |
 | Split | `s1_cc2km` (new village: 5 folds over 2 km clusters) from `data/splits/`, plus `s2_region`, `temporal` and `random_diag` (labelled as a diagnostic). |
-| Metrics | Pooled out-of-fold RMSE (t/ha), MAE, bias, R², Spearman; per-fold rows in `results/metrics.csv`. |
-| Config | [`configs/b0_seasonal_indices_ridge.yaml`](../configs/b0_seasonal_indices_ridge.yaml) |
-| Done when | `results/metrics.csv` holds A1, R0, R1, R2 for Malawi 2023 under `s1_cc2km` (5 folds each); a second run gives identical numbers; the split file hash matches `data/splits/manifest.json`; the Malawi noise-ceiling row is there. A weak or negative R² is a finished B0, not a failure. |
+| Metrics | Pooled out-of-fold RMSE (t/ha), MAE, bias, R², Spearman; per-fold rows in the results table. |
+| Config | The B0 config, parked (`_parked/MANIFEST.csv`) |
+| Done when | The results table holds A1, R0, R1, R2 for Malawi 2023 under `s1_cc2km` (5 folds each); a second run gives identical numbers; the split file hash matches `data/splits/manifest.json`; the Malawi noise-ceiling row is there. A weak or negative R² is a finished B0, not a failure. |
 
-**Result (30 October, `results/metrics.csv`).** The "Done when" items hold: a second run gives the same numbers,
+**Result (30 October, the results table).** The "Done when" items hold: a second run gives the same numbers,
 the hashes match, the noise-ceiling row is there. Pooled out-of-fold scores, 95 % cluster-bootstrap CI in
 brackets:
 
@@ -88,7 +88,7 @@ ceiling is r = 0.90 and RMSE 0.90 t/ha between its two cuts, so A1 (RMSE 1.40 t/
 Lacuna gives the strongest signal, and it holds in new districts where coordinates fail. Lacuna is also point
 data, so points alone do not explain the weak Kenya score; location quality is the likely cause (`DATA.md`).
 
-**X1, transfer between cohorts (30 October, `configs/x1_cross_cohort_transfer.yaml`).** Ridge on A1 features,
+**X1, transfer between cohorts (30 October, parked config).** Ridge on A1 features,
 trained on all rows of one cohort, tested on all rows of another, with no target label:
 
 | Train on | Test on | Spearman | R² in raw t/ha | Spearman of the target's own model (new village) |
@@ -114,13 +114,13 @@ counts as done.
 | Stage | Dates | MVP | Done test | Owner | Fallback |
 |---|---|---|---|---|---|
 | **0 Data foundation** | Thu 29 Oct – Mon 2 Nov | `labels_v1` built and frozen; split files for Malawi 2023, Kenya, Lacuna 2023 frozen; Malawi 2023 chips complete; Kenya download running | the checks in `DATA.md` pass; hashes recorded in `DECISIONS.md` | data lead + imagery | Kenya chips late: B0 runs on Malawi alone, Kenya joins when ready |
-| **1 B0** | Tue 3 – Wed 4 Nov | B0 runner (config in, `metrics.csv` rows out) on Malawi 2023 | "Done when" in section 2 | baselines | runner bug: run B0 from a notebook once, then port it |
-| **2 Core arms** | Thu 5 – Sun 8 Nov | B0 on Kenya; A2 (after the one MOSAIKS refit) and A3 on both core cohorts; region and temporal splits run for A1 | rows in `metrics.csv`, same folds | representations + evaluation | MOSAIKS refit late: A3 first, A2 in stage 3 |
+| **1 B0** | Tue 3 – Wed 4 Nov | B0 runner (config in, result rows out) on Malawi 2023 | "Done when" in section 2 | baselines | runner bug: run B0 from a notebook once, then port it |
+| **2 Core arms** | Thu 5 – Sun 8 Nov | B0 on Kenya; A2 (after the one MOSAIKS refit) and A3 on both core cohorts; region and temporal splits run for A1 | rows in the results table, same folds | representations + evaluation | MOSAIKS refit late: A3 first, A2 in stage 3 |
 | **Gate G2: signal** | Sun 8 Nov | Does any satellite arm beat R1 on pooled RMSE under `s1_cc2km` (paired bootstrap CI excludes 0) in at least one core cohort? | | all | **No:** the paper becomes a measured negative result: noise ceiling, point vs polygon, label quality, coverage. A4 and A5 are skipped. |
 | **Midterm** | Mon 9 – Thu 12 Nov | Report (contents below) | submitted | writing lead | – |
-| **3 Complete the table** | Fri 13 – Sun 22 Nov | A4 GRU; head swap H; A5 AlphaEarth; Lacuna 2023 through all arms; point 3×3-pixel ablation; robustness rows (zeros, OAF site distance, harvest after window) | every core arm × core cohort × {new village, new region, temporal} in `metrics.csv` | all | A4 unstable: report it with its training curve; never tune on test folds |
+| **3 Complete the table** | Fri 13 – Sun 22 Nov | A4 GRU; head swap H; A5 AlphaEarth; Lacuna 2023 through all arms; point 3×3-pixel ablation; robustness rows (zeros, OAF site distance, harvest after window) | every core arm × core cohort × {new village, new region, temporal} in the results table | all | A4 unstable: report it with its training curve; never tune on test folds |
 | **Gate G3: scope** | Sun 22 Nov | Core table complete? | | all | **No:** no stretch item starts; finish the core |
-| **4 Freeze** | Mon 23 – Wed 25 Nov | Results frozen Wed 25 Nov (Thanksgiving is Thu 26 Nov); stretch only if G3 passed | every figure rebuilds from `metrics.csv` | evaluation | drop the stretch section, never the core table |
+| **4 Freeze** | Mon 23 – Wed 25 Nov | Results frozen Wed 25 Nov (Thanksgiving is Thu 26 Nov); stretch only if G3 passed | every figure rebuilds from the results table | evaluation | drop the stretch section, never the core table |
 | **5 Talk and paper** | Thu 26 Nov – Mon 7 Dec | Talk 1 or 3 Dec (each member presents one result); paper and oral 7 Dec | submitted | all | – |
 
 Stage 0 and stage 1 finished on 30 October, ahead of the dates above.
@@ -147,7 +147,7 @@ work paragraph; this stage plan with its gates; and the list of experiments we w
 
 Done by 30 October: `labels_v1` and the split files are frozen, the chips are complete for all five cohorts, the
 one MOSAIKS refit and the Presto embeddings are in `data/cropyield.duckdb`, and B0 and X1 are in
-`results/metrics.csv`. Next:
+the results table. Next:
 
 1. **Representations.** A2 and A3 on the core cohorts and Lacuna, on the same folds.
 2. **Robustness rows.** Fill the Malawi cloud months; Kenya without far points (`DATA.md`).

@@ -84,9 +84,9 @@ REPRODUCING
 From the project directory, using a Python 3.10+ environment:
 
   python -m pip install -e .
-  python scripts/labels/download_datasets.py
-  python scripts/labels/audit_datasets.py
-  python scripts/labels/build_labels.py
+  python scripts/step1_download_labels.py
+  python scripts/step2_audit_labels.py
+  python scripts/step3_build_labels.py
 
 The downloader uses cached catalogue responses when present and verifies
 existing downloads. It records errors in metadata/download_manifest.json.

@@ -8,4 +8,5 @@ afterwards. Full rules: `docs/EVALUATION.md`, section 4.
 - Columns: `obs_id`, `cohort`, `season_year`, `cluster_id`, `group_id`, `fold`, `repeat`, `family`.
 - Every `labels_v1` row of the cohort, also rows without imagery.
 - Seed `20261029`; `manifest.json` records the generator commit, the input and output SHA-256 and the row
-  counts. Tagged `splits-v1` in git.
+  counts. The git tag `splits-v1` marks the commit that holds this freeze; the generator commit is the one
+  before it.
