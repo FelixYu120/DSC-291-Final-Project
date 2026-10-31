@@ -11,7 +11,8 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."                      # the repository root
 PYTHON=${PYTHON:-python}
 SCOPE=${SCOPE:-all}
+WORKERS=${WORKERS:-16}
 
 "$PYTHON" scripts/get_data.py --scope "$SCOPE" --status
-"$PYTHON" scripts/features/mosaiks_features.py "$@"
-"$PYTHON" scripts/build_database.py
+"$PYTHON" scripts/features/mosaiks_features.py --workers "$WORKERS" "$@"
+"$PYTHON" scripts/build_database.py --workers "$WORKERS"

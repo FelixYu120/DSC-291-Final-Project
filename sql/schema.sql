@@ -33,7 +33,9 @@ CREATE TABLE labels (
     season_start        DATE NOT NULL,     -- fixed season window per agro-zone (docs/DECISIONS.md)
     season_end          DATE NOT NULL,     -- last day of the season window
     intercropping       VARCHAR,           -- provider flag as text ("0", "no", "yes"); NULL if absent
-    field_polygon       VARCHAR            -- GeoJSON geometry text of the field (Malawi); NULL for points
+    field_polygon       VARCHAR,           -- GeoJSON geometry text of the field (Malawi); NULL for points
+    include_primary     BOOLEAN NOT NULL,  -- from labels_v1: TRUE on the rows the models use
+    exclusion_reason    VARCHAR NOT NULL   -- from labels_v1: why a row is left out; empty on a model row
 );
 
 

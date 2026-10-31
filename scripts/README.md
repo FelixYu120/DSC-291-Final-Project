@@ -23,9 +23,12 @@ lives in [`sql/`](../sql/README.md).
 | `scripts/imagery/` | `select_pilot.py` | Writes `configs/sentinel2_windows_pilot48.csv`, the 48-record pilot and its windows (1b). | Called by step 1 |
 | `scripts/models/` | `get_presto.py` | Downloads and verifies the pretrained Presto weights (1a). | Called by step 1 |
 | `scripts/labels/` | `download_datasets.py`, `download_vision_guided_yield_data.py` | Download the original provider files into `data/raw/`. | Rarely: the labels are committed |
-| `scripts/labels/` | `audit_datasets.py`, `organize_country_data.py` | Turn the provider files into the audited label CSVs in `data/audit/` and `data/processed/`. | Rarely: the outputs are committed |
-| `scripts/optional/` | `download_usda_nass.py` | U.S. county corn yields (needs an API key). Not part of the main pipeline. | Only for the U.S. extension |
+| `scripts/labels/` | `audit_datasets.py` | Turns the provider files into the audited label CSVs in `data/audit/`. | Rarely: the outputs are committed |
+| `scripts/labels/` | `build_labels.py` | Builds `data/processed/labels_v1.parquet`, the one modelling table, and runs its checks. | Rarely: the output is committed and frozen |
+| `scripts/` | `build_splits.py` | Writes the frozen split files in `data/splits/` from `labels_v1`. | Once; refuses to change a frozen file |
+| `scripts/` | `check_data.py` | Prints what the database holds for the model rows: coverage, clear share per month, feature ranges, haze, greenest month, signal per cohort-year. | After every database build |
+| `scripts/` | `run_experiment.py` | Runs one config from `configs/`: frozen splits in, rows in `results/metrics.csv` out. | For every result |
+| `scripts/` | `run_transfer.py` | Trains on one cohort and scores another, at three harmonization levels: raw t/ha, calibrated level, rank only. | After B0 on every cohort it names |
 | `scripts/cluster/` | `run_batches.sh`, `download_all.sbatch`, `after_download.sh` | The full download in parallel slices (any Linux machine, or a SLURM array), then steps 2 and 3. See `scripts/cluster/README.md`. | For `--scope all` |
 
-`labels/requirements.txt` and `imagery/requirements.txt` list the extra packages of those stages; the main
-install (`python -m pip install -e ".[dev,presto]"`) covers steps 1–3.
+The main install (`python -m pip install -e ".[dev,presto]"`) covers everything.

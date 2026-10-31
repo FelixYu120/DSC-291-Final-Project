@@ -1,4 +1,4 @@
--- modelling_table: one cohort, one row per field with imagery: the label and every feature.
+-- modelling_table: one cohort, one row per model field (docs/DATA.md): the label and every feature.
 -- Change the cohort name in the WHERE line (see labels.cohort for the names). In Python,
 -- cropyield.data.database.wide() turns the array columns into numbered columns for scikit-learn.
 SELECT obs_id,
@@ -21,6 +21,6 @@ SELECT obs_id,
        mosaiks_months_used
 FROM master
 WHERE cohort = 'malawi_2023'
-  AND has_imagery
-  AND months_with_data > 0
+  AND include_primary
+  AND months_with_data >= 4
 ORDER BY obs_id;

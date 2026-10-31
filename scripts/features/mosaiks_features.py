@@ -19,8 +19,10 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import sys
 import time
+from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -42,6 +44,28 @@ NOTES = ("Paper/code: 3x3 patches cut from the images, centred + unit norm + ZCA
          "ReLU(+conv - b) and ReLU(-conv - b), mean over the image, b = 1 (paper text). "
          "Ours: per-band standardisation with NaN -> 0, 'same' padding with a response counted only "
          "over fully valid windows, 'chip' and 'field' poolings.")
+
+
+_worker: dict = {}
+
+
+def start_worker(filters: mosaiks.Filters, bias: float, bands: tuple[str, ...]) -> None:
+    """Keep the filters in each worker process, so they are not pickled for every chip."""
+    _worker.update(filters=filters, bias=bias, bands=bands)
+
+
+def featurize_download(download: Download) -> tuple[list[dict], dict]:
+    """Monthly rows and the season row of one chip folder."""
+    chip = read_chip(download.record_dir)
+    if chip.bands != _worker["bands"]:
+        raise ValueError(f"{chip.obs_id}: bands {chip.bands} differ from the filters' {_worker['bands']}")
+    field = field_mask(chip)
+    rows = [{"obs_id": chip.obs_id, "month": scene.date.strftime("%Y-%m"),
+             **dict(zip(("chip", "field"), mosaiks.featurize(scene, field, _worker["filters"], _worker["bias"])))}
+            for scene in chip.scenes]
+    return rows, {"obs_id": chip.obs_id, "months_used": sum(row["chip"] is not None for row in rows),
+                  "chip": mosaiks.season_mean([row["chip"] for row in rows]),
+                  "field": mosaiks.season_mean([row["field"] for row in rows])}
 
 
 def usable(downloads: list[Download]) -> list[Download]:
@@ -106,6 +130,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--bias", type=float, default=1.0, help="ReLU bias b")
     parser.add_argument("--seed", type=int, default=291)
     parser.add_argument("--refit", action="store_true", help="draw new filters even when saved ones exist")
+    parser.add_argument("--workers", type=int, default=1, help="processes that read the chips")
     parser.add_argument("--imagery-dir", type=Path, default=ROOT / "data" / "imagery" / "sentinel2")
     parser.add_argument("--out-dir", type=Path, default=ROOT / "data" / "features" / "mosaiks")
     args = parser.parse_args(argv)
@@ -123,21 +148,16 @@ def main(argv: list[str] | None = None) -> int:
     bands = tuple(params["bands"])
 
     started = time.perf_counter()
-    monthly: list[dict] = []
-    season: list[dict] = []
-    for download in downloads:
-        chip = read_chip(download.record_dir)
-        if chip.bands != bands:
-            raise ValueError(f"{chip.obs_id}: bands {chip.bands} differ from the filters' {bands}")
-        field = field_mask(chip)
-        rows = [{"obs_id": chip.obs_id, "month": scene.date.strftime("%Y-%m"),
-                 **dict(zip(("chip", "field"), mosaiks.featurize(scene, field, filters, args.bias)))}
-                for scene in chip.scenes]
-        monthly.extend(rows)
-        season.append({"obs_id": chip.obs_id,
-                       "months_used": sum(row["chip"] is not None for row in rows),
-                       "chip": mosaiks.season_mean([row["chip"] for row in rows]),
-                       "field": mosaiks.season_mean([row["field"] for row in rows])})
+    start_worker(filters, args.bias, bands)
+    if args.workers > 1:
+        os.environ.setdefault("OMP_NUM_THREADS", "1")  # the parallelism is the processes
+        os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+        with ProcessPoolExecutor(args.workers, initializer=start_worker, initargs=(filters, args.bias, bands)) as pool:
+            parts = list(pool.map(featurize_download, downloads, chunksize=25))
+    else:
+        parts = [featurize_download(download) for download in downloads]
+    monthly = [row for rows, _ in parts for row in rows]
+    season = [row for _, row in parts]
     seconds = time.perf_counter() - started
 
     pq.write_table(pa.table({

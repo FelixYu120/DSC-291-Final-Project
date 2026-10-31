@@ -52,6 +52,15 @@ def test_pilot_window_file_is_the_committed_one(tmp_path):
     assert path.read_bytes() == (ROOT / "configs" / "sentinel2_windows_pilot48.csv").read_bytes()
 
 
+def test_a_later_slice_does_not_rename_onto_a_finished_window_file(tmp_path, monkeypatch):
+    path = tmp_path / "pilot.csv"
+    rows = get_data.window_rows("pilot", get_data.scope_cohorts("pilot", None))
+    get_data.write_windows(rows, path)
+    monkeypatch.setattr(get_data, "replace_file", lambda *a: pytest.fail("the same bytes must not be written twice"))
+    assert len(get_data.write_windows(rows, path)) == 48
+    assert [item.name for item in tmp_path.iterdir()] == ["pilot.csv"]
+
+
 def test_plan_runs_offline_and_slices_match_the_window_file(tmp_path, monkeypatch):
     monkeypatch.setattr(get_data.get_presto, "main", lambda argv: pytest.fail("--plan must not fetch Presto"))
     code = get_data.main(["--scope", "cohorts", "--cohorts", "malawi_2023", "malawi_2022", "--plan",

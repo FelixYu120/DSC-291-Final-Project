@@ -27,7 +27,7 @@ it: `... JOIN downloads USING (obs_id)`. The monthly tables (`coverage`, `monthl
 
 | Name | One row per | What it holds |
 |---|---|---|
-| `labels` | field-season, **all** cohorts | yield (`yield_kg_ha`), source yield and unit, location, polygon, dates, season window |
+| `labels` | field-season, **all** cohorts | yield (`yield_kg_ha`), source yield and unit, location, polygon, dates, season window, `include_primary` and `exclusion_reason` from `labels_v1` |
 | `downloads` | field-season with a chip folder | downloader status, pixel counts, chip CRS, searched window |
 | `scenes` | accepted Sentinel-2 scene | date, satellite, tile, cloud numbers, clear field pixels |
 | `coverage` | downloaded field-season x month | `state`: `clear`, `cloudy`, `no_scene` or `download_error` |
@@ -42,7 +42,8 @@ it: `... JOIN downloads USING (obs_id)`. The monthly tables (`coverage`, `monthl
 | **`monthly`** (view) | downloaded field-season x month | `cohort`, `coverage_state`, the 10 bands, the 5 indices, `mosaiks_chip`, `mosaiks_field`, `yield_kg_ha` |
 
 `master` uses `LEFT JOIN`s, so a field without imagery keeps its label row with `has_imagery = FALSE` and `NULL` in
-every feature column. For modelling: `WHERE has_imagery AND months_with_data > 0`. `monthly` is the input of
+every feature column. For modelling: `WHERE include_primary AND months_with_data >= 4` (without `include_primary`
+you also get Lacuna intercrop rows, Zimbabwe 2024 zeros and the dropped years). `monthly` is the input of
 sequence models (GRU): `ORDER BY obs_id, month` gives each field's months in time order, `NULL` where a month has
 no clear scene.
 

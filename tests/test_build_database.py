@@ -141,6 +141,12 @@ def test_labels_hold_every_cohort_row_with_proper_types(db):
     assert row[4].startswith('{"type": "Polygon"')
 
 
+def test_master_marks_the_model_rows_of_labels_v1(db):
+    assert db.sql("SELECT count(*) FROM master WHERE include_primary").fetchone()[0] == 8575
+    assert db.sql("SELECT count(*) FROM master WHERE include_primary = (exclusion_reason <> '')").fetchone()[0] == 0
+    assert db.sql("SELECT include_primary FROM master WHERE obs_id = ?", params=[OBS_ID]).fetchone() == (True,)
+
+
 def test_monthly_bands_match_the_fixture_reflectance_and_are_null_elsewhere(db):
     rows = db.sql("SELECT month, b04, b08, field_pixels, missing FROM monthly_bands WHERE obs_id = ? ORDER BY month",
                   params=[OBS_ID]).fetchall()

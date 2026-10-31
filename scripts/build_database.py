@@ -39,6 +39,7 @@ import subprocess
 import sys
 import time
 from collections.abc import Callable
+from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -51,6 +52,7 @@ import pyarrow.parquet as pq
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from cropyield.data.cohorts import AUDIT_DIR, COHORTS, load_cohort  # noqa: E402
+from cropyield.data.labels import LABELS_PATH  # noqa: E402
 from cropyield.features.indices import vegetation_indices  # noqa: E402
 from cropyield.features.presto_inputs import PrestoInputs, presto_inputs  # noqa: E402
 from cropyield.models.presto_weights import PRESTO_COMMIT, PRESTO_WEIGHTS_SHA256, weights_verified  # noqa: E402
@@ -105,6 +107,7 @@ def labels_frame() -> pd.DataFrame:
     """One row per observation of every cohort, with the columns of the labels table."""
     rows = pd.concat([load_cohort(name) for name in COHORTS], ignore_index=True)
     polygons = field_polygons(rows["dataset"].unique())
+    frozen = pd.read_parquet(LABELS_PATH, columns=["obs_id", "include_primary", "exclusion_reason"]).set_index("obs_id")
     return pd.DataFrame({
         "obs_id": rows["obs_id"],
         "cohort": rows["cohort"],
@@ -126,6 +129,8 @@ def labels_frame() -> pd.DataFrame:
         "season_end": rows["season_end"],
         "intercropping": blank_to_null(rows["intercropping"]),
         "field_polygon": [polygons.get(key) for key in zip(rows["dataset"], rows["source_id"])],
+        "include_primary": rows["obs_id"].map(frozen["include_primary"]),
+        "exclusion_reason": rows["obs_id"].map(frozen["exclusion_reason"]),
     })
 
 
@@ -230,23 +235,50 @@ def presto_encoder() -> Callable[[PrestoInputs], np.ndarray]:
     return lambda inputs: encode(model, inputs)
 
 
-def imagery_frames(downloads: list[Download], encoder: Callable | None) -> dict[str, pd.DataFrame]:
-    """Read every chip once and collect the rows of each imagery table."""
-    rows: dict[str, list[dict]] = {name: [] for name in ("downloads", "scenes", "coverage", "monthly_bands",
-                                                         "vegetation_indices", "presto_embeddings")}
-    for item in downloads:
-        chip = read_chip(item.record_dir)
-        rows["downloads"].append(download_row(item, chip))
-        rows["scenes"] += scene_rows(item, chip)
-        rows["coverage"] += coverage_rows(item, chip)
-        if chip.status in FAILED_DOWNLOAD or not chip.scenes:
-            continue  # no band values to read; the coverage rows already say why every month is empty
-        series = monthly_series(chip, item.season_start, item.season_end)
-        rows["monthly_bands"] += band_rows(series)
-        rows["vegetation_indices"] += index_rows(series)
-        if encoder is not None and not series.missing.all():
-            rows["presto_embeddings"].append(embedding_row(series, chip, encoder))
-    return {name: pd.DataFrame(table) for name, table in rows.items()}
+IMAGERY_TABLES = ("downloads", "scenes", "coverage", "monthly_bands", "vegetation_indices", "presto_embeddings")
+_worker_encoder: Callable | None = None
+
+
+def chip_rows(item: Download, encoder: Callable | None) -> dict[str, list[dict]]:
+    """Read one chip once and return its rows of each imagery table."""
+    rows: dict[str, list[dict]] = {name: [] for name in IMAGERY_TABLES}
+    chip = read_chip(item.record_dir)
+    rows["downloads"].append(download_row(item, chip))
+    rows["scenes"] += scene_rows(item, chip)
+    rows["coverage"] += coverage_rows(item, chip)
+    if chip.status in FAILED_DOWNLOAD or not chip.scenes:
+        return rows  # no band values to read; the coverage rows already say why every month is empty
+    series = monthly_series(chip, item.season_start, item.season_end)
+    rows["monthly_bands"] += band_rows(series)
+    rows["vegetation_indices"] += index_rows(series)
+    if encoder is not None and not series.missing.all():
+        rows["presto_embeddings"].append(embedding_row(series, chip, encoder))
+    return rows
+
+
+def start_worker(with_presto: bool) -> None:
+    """One Presto model per worker process, on one thread: the parallelism is the processes."""
+    global _worker_encoder
+    if with_presto:
+        import torch
+
+        torch.set_num_threads(1)
+        _worker_encoder = presto_encoder()
+
+
+def worker_rows(item: Download) -> dict[str, list[dict]]:
+    return chip_rows(item, _worker_encoder)
+
+
+def imagery_frames(downloads: list[Download], with_presto: bool, workers: int = 1) -> dict[str, pd.DataFrame]:
+    """Collect the rows of each imagery table, in the order of `downloads`, for any number of workers."""
+    if workers > 1:
+        with ProcessPoolExecutor(workers, initializer=start_worker, initargs=(with_presto,)) as pool:
+            parts = list(pool.map(worker_rows, downloads, chunksize=25))
+    else:
+        encoder = presto_encoder() if with_presto else None
+        parts = [chip_rows(item, encoder) for item in downloads]
+    return {name: pd.DataFrame([row for part in parts for row in part[name]]) for name in IMAGERY_TABLES}
 
 
 # --- MOSAIKS: parquet files written by scripts/features/mosaiks_features.py ----------------------
@@ -333,11 +365,12 @@ def insert(con: duckdb.DuckDBPyConnection, table: str, frame: pd.DataFrame | pa.
     return con.execute(f"SELECT count(*) FROM {table}").fetchone()[0]
 
 
-def build_database(db: Path, imagery_dir: Path, with_presto: bool, mosaiks_dir: Path = DEFAULT_MOSAIKS) -> dict[str, int]:
+def build_database(db: Path, imagery_dir: Path, with_presto: bool, mosaiks_dir: Path = DEFAULT_MOSAIKS,
+                   workers: int = 1) -> dict[str, int]:
     """Create ``db`` from scratch and return the row count of every table."""
     frames: dict = {"labels": labels_frame()}
     downloads = match_downloads(frames["labels"], imagery_dir)
-    frames.update(imagery_frames(downloads, presto_encoder() if with_presto else None))
+    frames.update(imagery_frames(downloads, with_presto, workers))
     frames.update(mosaiks_tables(mosaiks_dir))
     if not mosaiks_present(mosaiks_dir):
         print(MOSAIKS_HINT)
@@ -364,13 +397,16 @@ def main(argv=None) -> int:
     parser.add_argument("--mosaiks-dir", type=Path, default=DEFAULT_MOSAIKS,
                         help="folder holding monthly.parquet, season.parquet and params.json")
     parser.add_argument("--no-presto", action="store_true", help="skip the Presto embeddings (no torch import)")
+    parser.add_argument("--workers", type=int, default=1,
+                        help="processes that read the chips")
     args = parser.parse_args(argv)
     if not args.no_presto and not weights_verified():
         print("Presto weights are missing; run scripts/models/get_presto.py or pass --no-presto", file=sys.stderr)
         return 1
     started = time.perf_counter()
     try:
-        counts = build_database(args.db, args.imagery_dir, with_presto=not args.no_presto, mosaiks_dir=args.mosaiks_dir)
+        counts = build_database(args.db, args.imagery_dir, with_presto=not args.no_presto, mosaiks_dir=args.mosaiks_dir,
+                                workers=args.workers)
     except PermissionError as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 1

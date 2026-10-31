@@ -1,8 +1,11 @@
 # The full download on a cluster
 
-The full data is every cohort: **11,364 field-seasons**, about **25 GB** of chips. On a laptop that takes
-about 8–10 days, so split it into slices that run at the same time. Every command below runs from the
-repository root.
+The full data is every cohort: **11,364 field-seasons**, about **25 GB** of chips. One process takes about
+8–10 days, so split it into slices that run at the same time. We keep about 2 MB per field but move about
+60 MB: a read fetches whole internal blocks of each image, up to 11 files per month. Measured on 30 October on
+one Windows laptop: 22 fields per minute with 16 slices (23 MB/s), 45 with 32 (41 MB/s, the full line, CPU
+31 %), no errors. So slices help only until the line is full. The core (4,237 fields) took about 2 hours.
+Every command below runs from the repository root.
 
 ## 1. Set up once
 
@@ -18,8 +21,9 @@ Use a disk with at least 40 GB free (chips, the catalogue cache of about 3 GB, t
 
 ## 2. Download
 
-Pick the way that fits the machine. Both run **N slices**; more slices finish sooner, but Earth Search is a
-free public service, so stay at or below 16.
+Pick the way that fits the machine. All of them run **N slices**; more slices finish sooner, but Earth Search
+is a free public service, so start with 16 and stop at 32. Add `SCOPE=cohorts COHORTS="malawi_2023
+kenya_oaf_2019_2020"` before `bash` to take only some cohorts (core first means B0 can run sooner).
 
 | Machine | Command | Notes |
 |---|---|---|
@@ -49,7 +53,8 @@ bash scripts/cluster/after_download.sh --refit   # ONCE: MOSAIKS filters drawn f
 
 `--refit` replaces the MOSAIKS filters fitted on the 48 pilot records with filters from 64 random chips of
 the full data. Do it **once**: new filters change every MOSAIKS feature. Every later run (for example after
-re-downloading a few records) is `bash scripts/cluster/after_download.sh` without `--refit`.
+re-downloading a few records) is `bash scripts/cluster/after_download.sh` without `--refit`. `WORKERS=8 bash
+...` sets the number of processes that read the chips (default 16).
 
 ## 4. Share the result with the team
 

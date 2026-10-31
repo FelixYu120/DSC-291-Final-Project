@@ -120,7 +120,11 @@ def write_windows(rows: pd.DataFrame, path: Path) -> pd.DataFrame:
     """Step 3: write cohort,dataset,source_id,start_date,end_date for the downloader, as select_pilot does."""
     table = select_pilot.window_table(rows)
     path.parent.mkdir(parents=True, exist_ok=True)
-    # Parallel --batch jobs write this same file at the same time: write beside it, then rename in one step.
+    # Parallel --batch jobs write this same file at the same time. Their renames can collide (one of
+    # 32 slices failed that way on 30 Oct), so skip the write when an earlier slice already made the file.
+    if path.exists() and path.read_bytes() == table.to_csv(index=False, lineterminator="\n").encode("utf-8"):
+        return table
+    # Otherwise write beside it, then rename in one step.
     temporary = path.with_name(f"{path.name}.{os.getpid()}.part")
     table.to_csv(temporary, index=False, lineterminator="\n")
     replace_file(temporary, path)
