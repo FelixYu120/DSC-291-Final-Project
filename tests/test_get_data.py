@@ -3,6 +3,7 @@ import argparse
 import importlib.util
 import json
 import os
+import re
 import subprocess
 import sys
 import tomllib
@@ -394,11 +395,16 @@ def download_cells() -> list[dict]:
     return [cell for cell in guide["cells"] if "notebook_download(" in "".join(cell["source"])]
 
 
+def cell_with_switch(index: int, value: bool) -> str:
+    """A download cell with its switch set, whichever way the guide was saved."""
+    return re.sub(r"^DOWNLOAD = \w+", f"DOWNLOAD = {value}", "".join(download_cells()[index]["source"]), count=1)
+
+
 def test_every_download_cell_of_the_guide_is_tagged_and_has_its_switch_and_slices_on_top():
     cells = download_cells()
     assert len(cells) == 2
     assert all(cell["metadata"]["tags"] == ["download"] for cell in cells)
-    assert all(cell["source"][0].startswith("DOWNLOAD = True") for cell in cells)
+    assert all(re.match(r"DOWNLOAD = (True|False)\b", cell["source"][0]) for cell in cells)
     assert all(cell["source"][1].startswith("SLICES = 32") for cell in cells)
 
 
@@ -408,7 +414,7 @@ def test_download_true_presses_the_button_of_its_scope(monkeypatch, index, scope
     monkeypatch.setitem(sys.modules, "get_all_data", SimpleNamespace(notebook_download=lambda *call: calls.append(call)))
     monkeypatch.setattr(sys, "path", list(sys.path))
     monkeypatch.chdir(ROOT)
-    exec("".join(download_cells()[index]["source"]), {})
+    exec(cell_with_switch(index, True), {})
     assert [call[:2] for call in calls] == [(scope, 32)]
 
 
@@ -416,5 +422,5 @@ def test_download_true_presses_the_button_of_its_scope(monkeypatch, index, scope
 def test_download_false_skips_the_cell_and_asks_nothing(monkeypatch, capsys, index):
     monkeypatch.setitem(sys.modules, "get_all_data", None)  # an import would now fail
     monkeypatch.setattr("builtins.input", lambda question: pytest.fail("the switch is off, so the cell must not ask"))
-    exec("".join(download_cells()[index]["source"]).replace("DOWNLOAD = True", "DOWNLOAD = False", 1), {})
+    exec(cell_with_switch(index, False), {})
     assert "Download is off" in capsys.readouterr().out
