@@ -1,0 +1,23 @@
+# X1: cross-cohort transfer with seasonal indices (scripts/run_transfer.py, docs/ROADMAP.md).
+# Every ordered pair of cohorts: train on one, score on the other, at the three harmonization levels.
+# A config that has been run is copied to a new name, never edited.
+
+experiment: x1_cross_cohort_transfer
+labels: data/processed/labels_v1.parquet
+
+cohorts:
+  - kenya_oaf_2019_2020
+  - malawi_2023
+  - zimbabwe_lacuna_2022_2023
+
+rows:
+  min_clear_months: 4
+
+arm:
+  features: [ndvi_season_max, ndvi_season_mean, gcvi_season_max, gcvi_season_mean,
+             mtci_season_max, mtci_season_mean, ndvi705_season_max, ndvi705_season_mean,
+             ndvi740_season_max, ndvi740_season_mean]
+  model: ridge_cv
+  alphas: {logspace: [-3, 5, 17]}
+
+seed: 20261029

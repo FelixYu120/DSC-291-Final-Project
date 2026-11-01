@@ -1,31 +1,33 @@
 # Scripts
 
-Run everything from the repository root. Three commands give a teammate all the data:
+Run everything from the repository root. The file names follow the data path, step by step.
+
+**With the team database you run none of these.** Labels and splits are frozen, and step 6 removes the Presto rows of the
+team database. Run them only to get the chips or to rebuild the data on purpose.
 
 ```bash
-python scripts/get_data.py                    # 1. labels check, Presto weights, Sentinel-2 chips
-python scripts/features/mosaiks_features.py   # 2. MOSAIKS features from the chips
-python scripts/build_database.py              # 3. data/cropyield.duckdb: every table plus the views
+python scripts/get_all_data.py           # labels check and Sentinel-2 chips
+python scripts/step6_build_database.py   # data/cropyield.duckdb: every table plus the views
+python scripts/step7_check_data.py       # what the database holds, per cohort
 ```
 
-Each step reuses what is already on disk, so running it again is cheap. Step 1 defaults to the 48-record
-pilot; `--scope all` takes every cohort (use the cluster and `--batch i/n` for that). The SQL behind step 3
-lives in [`sql/`](../sql/README.md).
+Each step reuses what is already on disk, so running it again is cheap. `get_all_data.py` defaults to the 48-record
+pilot; `--scope all` takes every cohort, and `--batch i/n` runs one of n parallel slices. The download cells of
+[`notebooks/data_guide.ipynb`](../notebooks/data_guide.ipynb) start those slices for you, show a loading bar and then
+run step 6. `--status` shows the progress at any time. The SQL behind step 6 lives in [`sql/`](../sql/README.md).
 
 ## Every script
 
-| Folder | Script | What it does | When to run it |
-|---|---|---|---|
-| `scripts/` | `get_data.py` | One command for steps 1a–1c below: checks the label files, fetches the Presto weights, writes the window file and downloads the chips. | Always; first |
-| `scripts/features/` | `mosaiks_features.py` | MOSAIKS random convolutional features for every downloaded chip: one vector per field and month, and a season mean. | After every download |
-| `scripts/` | `build_database.py` | Builds `data/cropyield.duckdb` from the labels, the chips, the Presto embeddings and the MOSAIKS features. | After step 2 |
-| `scripts/imagery/` | `download_sentinel2.py` | The Sentinel-2 downloader (1c). `get_data.py` calls it; run it alone only for special cases. | Called by step 1 |
-| `scripts/imagery/` | `select_pilot.py` | Writes `configs/sentinel2_windows_pilot48.csv`, the 48-record pilot and its windows (1b). | Called by step 1 |
-| `scripts/models/` | `get_presto.py` | Downloads and verifies the pretrained Presto weights (1a). | Called by step 1 |
-| `scripts/labels/` | `download_datasets.py`, `download_vision_guided_yield_data.py` | Download the original provider files into `data/raw/`. | Rarely: the labels are committed |
-| `scripts/labels/` | `audit_datasets.py`, `organize_country_data.py` | Turn the provider files into the audited label CSVs in `data/audit/` and `data/processed/`. | Rarely: the outputs are committed |
-| `scripts/optional/` | `download_usda_nass.py` | U.S. county corn yields (needs an API key). Not part of the main pipeline. | Only for the U.S. extension |
-| `scripts/cluster/` | `run_batches.sh`, `download_all.sbatch`, `after_download.sh` | The full download in parallel slices (any Linux machine, or a SLURM array), then steps 2 and 3. See `scripts/cluster/README.md`. | For `--scope all` |
+| Script | What it does | When to run it |
+|---|---|---|
+| `get_all_data.py` | One command for the data steps: checks the label files, writes the window file and downloads the chips. | Only if you need the chips |
+| `step1_download_labels.py` | Downloads the original provider files into `data/raw/`. | Rarely: the labels are committed |
+| `step1b_download_zimbabwe2024_labels.py` | Downloads the Zimbabwe 2024 label files. | Rarely: the labels are committed |
+| `step2_audit_labels.py` | Turns the provider files into the audited label CSVs in `data/audit/`. | Rarely: the outputs are committed |
+| `step3_build_labels.py` | Builds `data/processed/labels_v1.parquet`, the one modelling table, and runs its checks. | Rarely: the output is committed and frozen |
+| `step4_build_splits.py` | Writes the frozen split files in `data/splits/` from `labels_v1`. | Once; refuses to change a frozen file |
+| `step5_download_imagery.py` | The Sentinel-2 downloader. `get_all_data.py` calls it; run it alone only for special cases. | Called by `get_all_data.py` |
+| `step6_build_database.py` | Builds `data/cropyield.duckdb` from the labels, the chips and the MOSAIKS feature files that are already in `data/features/mosaiks/`. It leaves `presto_embeddings` empty. | After a download; never on the team database |
+| `step7_check_data.py` | Prints what the database holds for the model rows: coverage, clear share per month, feature ranges, haze, greenest month, signal per cohort-year. | After every database build |
 
-`labels/requirements.txt` and `imagery/requirements.txt` list the extra packages of those stages; the main
-install (`python -m pip install -e ".[dev,presto]"`) covers steps 1–3.
+The main install (`python -m pip install -r requirements.txt`) covers everything.

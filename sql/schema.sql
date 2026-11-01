@@ -1,6 +1,6 @@
 -- Schema of data/cropyield.duckdb: one CREATE TABLE per table, in pipeline order.
 --
--- scripts/build_database.py runs this file on a new, empty database, fills every table from
+-- scripts/step6_build_database.py runs this file on a new, empty database, fills every table from
 -- Python, and then runs views.sql. Nobody needs to run this file by hand.
 --
 -- The key of every table is obs_id = "<dataset>:<source_id>": one field in one season. Two
@@ -25,7 +25,7 @@ CREATE TABLE labels (
     source_yield        DOUBLE,            -- yield as the provider wrote it, in source_yield_units
     source_yield_units  VARCHAR,           -- unit of source_yield, e.g. t/ha
     yield_field         VARCHAR,           -- provider column the yield came from
-    latitude            DOUBLE NOT NULL,   -- WGS84 degrees; polygon centroid for polygon fields
+    latitude            DOUBLE NOT NULL,   -- WGS84 degrees; representative_point of the polygon for polygon fields
     longitude           DOUBLE NOT NULL,   -- WGS84 degrees
     geometry_type       VARCHAR,           -- Point, Polygon or MultiPolygon
     field_area_ha       DOUBLE,            -- only where the provider gives it (Malawi)
@@ -33,7 +33,9 @@ CREATE TABLE labels (
     season_start        DATE NOT NULL,     -- fixed season window per agro-zone (docs/DECISIONS.md)
     season_end          DATE NOT NULL,     -- last day of the season window
     intercropping       VARCHAR,           -- provider flag as text ("0", "no", "yes"); NULL if absent
-    field_polygon       VARCHAR            -- GeoJSON geometry text of the field (Malawi); NULL for points
+    field_polygon       VARCHAR,           -- GeoJSON geometry text of the field (Malawi); NULL for points
+    include_primary     BOOLEAN NOT NULL,  -- from labels_v1: TRUE on the rows the models use
+    exclusion_reason    VARCHAR NOT NULL   -- from labels_v1: why a row is left out; empty on a model row
 );
 
 
@@ -112,8 +114,8 @@ CREATE TABLE vegetation_indices (
 );
 
 
--- 7. presto_embeddings: one row per observation with at least one month of data.
---    Output of the frozen, pretrained Presto encoder (cropyield.models.presto).
+-- 7. presto_embeddings: one row per observation with an embedding.
+--    The build leaves this table empty: Presto is not on the data path.
 CREATE TABLE presto_embeddings (
     obs_id              VARCHAR NOT NULL,  -- key, see labels
     embedding           FLOAT[128]         -- the 128 Presto numbers; embedding[1] is the first
@@ -122,7 +124,7 @@ CREATE TABLE presto_embeddings (
 
 -- 8. mosaiks_monthly: one row per observation x month from data/features/mosaiks/monthly.parquet.
 --    Random convolutional features (MOSAIKS) of the chip; K = build_info.mosaiks_features.
---    Empty when the features were not made yet: python scripts/features/mosaiks_features.py
+--    Empty when data/features/mosaiks/ holds no feature files.
 CREATE TABLE mosaiks_monthly (
     obs_id              VARCHAR NOT NULL,  -- key, see labels
     month               VARCHAR NOT NULL,  -- 'YYYY-MM'
@@ -145,9 +147,9 @@ CREATE TABLE mosaiks_season (
 CREATE TABLE build_info (
     built_at                TIMESTAMP NOT NULL,  -- UTC
     git_commit              VARCHAR,             -- repository commit the script ran from
-    presto_commit           VARCHAR,             -- nasaharvest/presto commit of the vendored code and weights
-    presto_weights_sha256   VARCHAR,             -- checksum of the weights file; NULL with --no-presto
-    presto_embeddings_built BOOLEAN NOT NULL,    -- FALSE when built with --no-presto
+    presto_commit           VARCHAR,             -- NULL: the build runs no Presto code
+    presto_weights_sha256   VARCHAR,             -- NULL: the build loads no Presto weights
+    presto_embeddings_built BOOLEAN NOT NULL,    -- FALSE: the build leaves presto_embeddings empty
     imagery_dir             VARCHAR NOT NULL,    -- chip folder the build read
     n_labels                INTEGER NOT NULL,    -- rows in labels
     n_downloads             INTEGER NOT NULL,    -- rows in downloads

@@ -1,6 +1,6 @@
 """Open the project database and run the saved queries in sql/queries.
 
-The database is data/cropyield.duckdb, built by scripts/build_database.py (schema in sql/).
+The database is data/cropyield.duckdb, built by scripts/step6_build_database.py (schema in sql/).
 Every table is keyed by ``obs_id`` (one field in one season); the view ``master`` has one row
 per labelled observation with every feature, the view ``monthly`` one row per observation x
 month. Vectors are stored as arrays; ``wide`` spreads one array column into numbered columns.
@@ -15,6 +15,8 @@ Usage:
 """
 from __future__ import annotations
 
+from pathlib import Path
+
 import duckdb
 import numpy as np
 import pandas as pd
@@ -23,6 +25,7 @@ from cropyield import ROOT
 
 DATABASE = ROOT / "data" / "cropyield.duckdb"
 QUERIES = ROOT / "sql" / "queries"
+SCENE_LIST = ROOT / "configs" / "sentinel2_scenes_v1.parquet"  # frozen once, see docs/DECISIONS.md
 
 
 def connect(read_only: bool = True) -> duckdb.DuckDBPyConnection:
@@ -31,7 +34,7 @@ def connect(read_only: bool = True) -> duckdb.DuckDBPyConnection:
     Example: ``con = connect(); con.sql("SELECT count(*) FROM master").fetchone()``
     """
     if not DATABASE.exists():
-        raise FileNotFoundError(f"{DATABASE} is missing; run: python scripts/build_database.py")
+        raise FileNotFoundError(f"{DATABASE} is missing; run: python scripts/step6_build_database.py")
     return duckdb.connect(str(DATABASE), read_only=read_only)
 
 
@@ -50,6 +53,23 @@ def run_query(con: duckdb.DuckDBPyConnection, name: str) -> pd.DataFrame:
     Example: ``run_query(con, "table_overview")`` gives the row count of every table and view.
     """
     return con.execute(query_text(name)).df()
+
+
+def scene_differences(database: Path, scene_list: Path = SCENE_LIST) -> tuple[int, list[str]]:
+    """(records on disk, obs_ids whose scenes differ from the frozen list). It changes nothing.
+
+    A record is on disk when the ``downloads`` table holds it, so a partial copy can match. A
+    different item_id, or a month that only one side holds, makes a record differ.
+
+    Example: ``on_disk, differ = scene_differences(Path("data/cropyield.duckdb"))``
+    """
+    with duckdb.connect(str(database), read_only=True) as con:
+        on_disk = con.execute("SELECT obs_id FROM downloads").df()["obs_id"]
+        local = con.execute("SELECT obs_id, month, item_id FROM scenes").df()
+    frozen = pd.read_parquet(scene_list)
+    local, frozen = (rows[rows["obs_id"].isin(on_disk)] for rows in (local, frozen))
+    both = local.merge(frozen, how="outer", on=["obs_id", "month", "item_id"], indicator=True)
+    return len(on_disk), sorted(both.loc[both["_merge"] != "both", "obs_id"].unique())
 
 
 def wide(frame: pd.DataFrame, column: str, prefix: str) -> pd.DataFrame:

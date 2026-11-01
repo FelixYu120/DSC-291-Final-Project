@@ -1,1 +1,1 @@
-"""Evaluation: spatial splits, metrics, noise ceilings, targeting metrics, PPI."""
+"""Evaluation (docs/EVALUATION.md): frozen spatial and temporal splits."""

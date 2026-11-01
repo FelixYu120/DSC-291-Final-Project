@@ -31,6 +31,8 @@ class Cohort:
 
 # Windows are fixed per agro-zone (docs/DECISIONS.md 2026-10-25) and never anchored on a
 # row's crop-cut date. Kenya: 1 Feb - 30 Sep of the year. Malawi, Zimbabwe: 1 Oct - 30 Jun.
+# Only Kenya has a management filter here. The Lacuna rule lives in labels.py (include_primary),
+# so the download still covers every Lacuna row.
 COHORTS: dict[str, Cohort] = {
     "malawi_2022": Cohort("malawi_2022", "malawi_2022", (2022,), "malawi", (10, 1), (6, 30), -1),
     "malawi_2023": Cohort("malawi_2023", "malawi_2023", (2023,), "malawi", (10, 1), (6, 30), -1),
@@ -92,6 +94,6 @@ def load_cohort(name: str, audit_dir: Path = AUDIT_DIR) -> pd.DataFrame:
 
 
 def date_overrides(cohort_rows: pd.DataFrame) -> pd.DataFrame:
-    """Rows for ``download_sentinel2.py --date-overrides``: the fixed cohort window per record."""
+    """Rows for ``step5_download_imagery.py --date-overrides``: the fixed cohort window per record."""
     out = cohort_rows[["dataset", "source_id", "season_start", "season_end"]].copy()
     return out.rename(columns={"season_start": "start_date", "season_end": "end_date"}).reset_index(drop=True)

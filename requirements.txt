@@ -1,0 +1,20 @@
+# The exact versions of the packages that pyproject.toml names. Tested on Python 3.12.
+# From the repository root, in a new venv: python -m pip install -r requirements.txt
+-e .
+duckdb==1.5.5
+numpy==2.5.3
+openpyxl==3.1.5
+pandas==3.0.6
+pyarrow==25.0.1
+pyproj==3.8.0
+pyshp==3.1.6
+pyyaml==6.0.3
+rasterio==1.5.2
+requests==2.34.2
+scikit-learn==1.9.1
+scipy==1.18.1
+shapely==2.1.2
+pytest==9.1.1
+ruff==0.17.2
+ipykernel==7.4.0
+matplotlib==3.11.1

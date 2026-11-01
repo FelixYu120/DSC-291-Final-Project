@@ -1,0 +1,51 @@
+# B0: the absolute minimum baseline (docs/ROADMAP.md, section 2).
+# Arm A1 next to the references R0, R1, R2, on the same rows and the same frozen splits.
+# A config that has been run is copied to a new name, never edited.
+
+experiment: b0_seasonal_indices_ridge
+labels: data/processed/labels_v1.parquet      # docs/DATA.md; rows with include_primary only
+database: data/cropyield.duckdb                # features from the view season_indices / master
+
+cohorts:                                       # one model per cohort, never pooled
+  - malawi_2023                                # first: 260 polygons, about 4 h of download
+  - kenya_oaf_2019_2020                        # as soon as its chips are in
+
+rows:
+  min_clear_months: 4                          # months_with_data >= 4; every arm is scored on these rows
+
+splits:                                        # data/splits/<cohort>__<family>.csv, frozen (docs/EVALUATION.md)
+  - s1_cc2km                                   # new village: the headline split for B0
+  - s2_region                                  # new district
+  - temporal                                   # new season, where the cohort has one (Kenya)
+  - random_diag                                # optimistic diagnostic, labelled as such
+
+buffer_km:                                     # training fields this close to a test field are dropped
+  kenya_oaf_2019_2020: {s2_region: 2}
+
+reference_arm: R1                              # every arm's RMSE is compared with this one, paired
+
+target: yield_kg_ha                            # reported in t/ha
+
+arms:
+  A1:
+    features: [ndvi_season_max, ndvi_season_mean, gcvi_season_max, gcvi_season_mean,
+               mtci_season_max, mtci_season_mean, ndvi705_season_max, ndvi705_season_mean,
+               ndvi740_season_max, ndvi740_season_mean]
+    model: ridge_cv                            # StandardScaler + RidgeCV, fitted on the training fold only
+    alphas: {logspace: [-3, 5, 17]}
+    inner_cv: group_kfold_5                    # alpha chosen with the same grouping inside the training fold
+  R0:
+    model: train_mean
+  R1:
+    features: [lat, lon]
+    model: knn
+    k: 10
+  R2:
+    features: [months_with_data]
+    model: ridge_cv
+    alphas: {logspace: [-3, 5, 17]}
+    inner_cv: group_kfold_5
+
+noise_ceiling: [malawi_2023]                   # cc_ey_t vs subc_ey_t, rows in metrics.csv
+seed: 20261029
+output: results/metrics.csv

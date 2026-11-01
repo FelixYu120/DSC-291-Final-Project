@@ -1,0 +1,72 @@
+{
+  "seed": 20261029,
+  "folds": 5,
+  "generator_commit": "96e2e81af739fab7a6d3ce054177941778868260",
+  "labels_sha256": "49aae383c4489aa98e9e7fe8c31cda6bf1cd752adc8e9540cffdc147a5e0ef92",
+  "region_units": {
+    "malawi_2023": 5.0,
+    "kenya_oaf_2019_2020": "admin_unit",
+    "zimbabwe_lacuna_2022_2023": "admin_unit",
+    "zimbabwe_2024": "kmeans20"
+  },
+  "temporal": {
+    "kenya_oaf_2019_2020": [
+      2019,
+      2020
+    ]
+  },
+  "files": {
+    "malawi_2023__s1_cc2km.csv": {
+      "sha256": "d7536035db17f25e3a3658218ff97bf1e06897ba7d9e4a232c492d51572fd5a2",
+      "rows": 260
+    },
+    "malawi_2023__s2_region.csv": {
+      "sha256": "a12cdbf1b55c9731b35ce7993ba3afd174e55c7f5cc5effb42d00f1b8985e4db",
+      "rows": 260
+    },
+    "malawi_2023__random_diag.csv": {
+      "sha256": "b65cab99d548bc5b790cefa7654de9ec373461ccbd0783c26fb81c2899764128",
+      "rows": 260
+    },
+    "kenya_oaf_2019_2020__s1_cc2km.csv": {
+      "sha256": "752e4ac95980eea57f36685906735c49b0213f498cae7b88c293a360014e8801",
+      "rows": 3977
+    },
+    "kenya_oaf_2019_2020__s2_region.csv": {
+      "sha256": "93a6102262294f186898e4d4ef675233f3153addb39d28b9f19226441911de35",
+      "rows": 3977
+    },
+    "kenya_oaf_2019_2020__random_diag.csv": {
+      "sha256": "db6247d269334bf63f338bacc68fb1931b5df74390a472981f100f006cd4a02f",
+      "rows": 3977
+    },
+    "kenya_oaf_2019_2020__temporal.csv": {
+      "sha256": "dd0c3cc68f24ecf1c69de93cf329237cac89d671bed2f7ccf9aad29ef1b6f959",
+      "rows": 7954
+    },
+    "zimbabwe_lacuna_2022_2023__s1_cc2km.csv": {
+      "sha256": "253f437d30a3742779e164c6b30fda5d613d5fe38decccf2b45ce21d95288dff",
+      "rows": 1880
+    },
+    "zimbabwe_lacuna_2022_2023__s2_region.csv": {
+      "sha256": "da357af13e1fa78d55c812211fc9948d425673dff0426be4d20a396aed827252",
+      "rows": 1880
+    },
+    "zimbabwe_lacuna_2022_2023__random_diag.csv": {
+      "sha256": "d6dc5bc2e16ad5fb108652614b5b6898037adda54932a279703ba09c7c227d9f",
+      "rows": 1880
+    },
+    "zimbabwe_2024__s1_cc2km.csv": {
+      "sha256": "f96a188ad708c2fe9a8e3721e4517b2da3f85a823ca9b485e8d2a36cdb384d61",
+      "rows": 2458
+    },
+    "zimbabwe_2024__s2_region.csv": {
+      "sha256": "5fb70cec3dc6cf79431e2529bb6881f2cca067160990781755f21b481884b766",
+      "rows": 2458
+    },
+    "zimbabwe_2024__random_diag.csv": {
+      "sha256": "3a16126c2bedb7b8dc2162d8cfee2e9918f5f8a09e48ba3c3d84bf5e2fe426cd",
+      "rows": 2458
+    }
+  }
+}

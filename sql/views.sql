@@ -1,4 +1,4 @@
--- Views of data/cropyield.duckdb. scripts/build_database.py runs this file after the tables are
+-- Views of data/cropyield.duckdb. scripts/step6_build_database.py runs this file after the tables are
 -- filled (schema.sql). A view is a saved SELECT: it stores no data and is always up to date.
 --
 --   season_indices   one row per observation with data: season max and mean of each index
@@ -29,6 +29,7 @@ GROUP BY obs_id;
 -- master: one row per labelled observation, every feature next to its label.
 -- LEFT JOIN keeps every label row; an observation without imagery gets NULL in every feature
 -- column and has_imagery = FALSE. Filter with WHERE has_imagery for modelling.
+-- master leaves out most labels_v1 columns and all split files: join those on obs_id.
 CREATE VIEW master AS
 WITH months_with_data AS (
     SELECT obs_id,

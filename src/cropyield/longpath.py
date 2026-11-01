@@ -11,17 +11,19 @@ import os
 import time
 from pathlib import Path
 
+# Without the prefix, Windows stops a file path at 260 characters and a folder path at 248.
+_LIMIT = 248
 _PREFIX = "\\\\?\\"
 _UNC_PREFIX = "\\\\?\\UNC\\"
 
 
 def filesystem_path(path: Path | str, *, force: bool = False) -> str:
-    """Return a path the OS can open. On Windows, prefix paths of 260 characters or more."""
+    """Return a path the OS can open. On Windows, prefix paths of 248 characters or more."""
     text = os.fspath(path)
     if text.startswith(_PREFIX):
         return text
     text = os.path.abspath(text)
-    if os.name != "nt" or (not force and len(text) < 260):
+    if os.name != "nt" or (not force and len(text) < _LIMIT):
         return text
     if text.startswith("\\\\"):
         return _UNC_PREFIX + text[2:]
@@ -42,7 +44,7 @@ def replace_file(source: Path | str, target: Path | str, attempts: int = 10, wai
     """
     source_text = os.path.abspath(os.fspath(source))
     target_text = os.path.abspath(os.fspath(target))
-    force = os.name == "nt" and max(len(source_text), len(target_text)) >= 260
+    force = os.name == "nt" and max(len(source_text), len(target_text)) >= _LIMIT
     for attempt in range(attempts):
         try:
             os.replace(filesystem_path(source, force=force), filesystem_path(target, force=force))

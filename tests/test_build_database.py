@@ -1,6 +1,8 @@
-"""scripts/build_database.py on the synthetic chip folder: every table and view exists and holds the right values."""
+"""scripts/step6_build_database.py on the synthetic chip folder: every table and view exists and holds the right values."""
+import hashlib
 import importlib.util
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -12,11 +14,10 @@ import pytest
 from conftest import FIELD_REFLECTANCE, RECORD, SIZE, add_scenes, make_record_dir, write_scene
 
 from cropyield.data.cohorts import COHORTS, load_cohort
-from cropyield.data.database import wide
+from cropyield.data.database import SCENE_LIST, scene_differences, wide
 from cropyield.longpath import filesystem_path
-from cropyield.models.presto_weights import weights_verified
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "build_database.py"
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "step6_build_database.py"
 spec = importlib.util.spec_from_file_location("build_database", SCRIPT)
 build_database = importlib.util.module_from_spec(spec)
 sys.modules["build_database"] = build_database  # the script's dataclass needs its module importable
@@ -101,7 +102,7 @@ def db(tmp_path_factory):
     root = tmp_path_factory.mktemp("build")
     path = root / "cropyield.duckdb"
     assert build_database.main(["--db", str(path), "--imagery-dir", str(imagery_dir(root)),
-                                "--mosaiks-dir", str(mosaiks_dir(root)), "--no-presto"]) == 0
+                                "--mosaiks-dir", str(mosaiks_dir(root))]) == 0
     con = duckdb.connect(str(path), read_only=True)
     yield con
     con.close()
@@ -139,6 +140,12 @@ def test_labels_hold_every_cohort_row_with_proper_types(db):
     assert row[0] == "malawi_2023" and row[1] == 2950.0
     assert str(row[2]) == "2022-10-01" and str(row[3]) == "2023-05-17"  # observation_time 2023/05/17 08:55
     assert row[4].startswith('{"type": "Polygon"')
+
+
+def test_master_marks_the_model_rows_of_labels_v1(db):
+    assert db.sql("SELECT count(*) FROM master WHERE include_primary").fetchone()[0] == 8575
+    assert db.sql("SELECT count(*) FROM master WHERE include_primary = (exclusion_reason <> '')").fetchone()[0] == 0
+    assert db.sql("SELECT include_primary FROM master WHERE obs_id = ?", params=[OBS_ID]).fetchone() == (True,)
 
 
 def test_monthly_bands_match_the_fixture_reflectance_and_are_null_elsewhere(db):
@@ -209,7 +216,7 @@ def test_master_has_one_row_per_label_and_imagery_only_for_the_synthetic_records
         WHERE obs_id = ?
     """, params=[OBS_ID]).fetchone()
     expected_ndvi = (FIELD_REFLECTANCE["B08"] - FIELD_REFLECTANCE["B04"]) / (FIELD_REFLECTANCE["B08"] + FIELD_REFLECTANCE["B04"])
-    assert row == ("complete", 2, pytest.approx(expected_ndvi), None, K, 1.0, 2)  # no Presto: built with --no-presto
+    assert row == ("complete", 2, pytest.approx(expected_ndvi), None, K, 1.0, 2)  # no Presto: the build leaves it empty
     without_imagery = db.sql("""
         SELECT count(*)
         FROM master
@@ -260,8 +267,8 @@ def test_wide_spreads_an_array_column_into_numbered_columns(db):
 def test_without_mosaiks_files_the_tables_stay_empty_and_a_hint_is_printed(tmp_path, capsys):
     path = tmp_path / "no_mosaiks.duckdb"
     assert build_database.main(["--db", str(path), "--imagery-dir", str(imagery_dir(tmp_path)),
-                                "--mosaiks-dir", str(tmp_path / "nowhere"), "--no-presto"]) == 0
-    assert "python scripts/features/mosaiks_features.py" in capsys.readouterr().out
+                                "--mosaiks-dir", str(tmp_path / "nowhere")]) == 0
+    assert "mosaiks_monthly and mosaiks_season stay empty" in capsys.readouterr().out
     with duckdb.connect(str(path), read_only=True) as con:
         assert con.sql("SELECT count(*) FROM mosaiks_monthly").fetchone()[0] == 0
         assert con.sql("SELECT count(*) FROM mosaiks_season").fetchone()[0] == 0
@@ -270,17 +277,73 @@ def test_without_mosaiks_files_the_tables_stay_empty_and_a_hint_is_printed(tmp_p
             == (None, None)
 
 
-@pytest.mark.skipif(not weights_verified(), reason="run scripts/models/get_presto.py first")
-def test_presto_embeddings_fill_the_master_view(tmp_path):
-    pytest.importorskip("torch")
-    path = tmp_path / "with_presto.duckdb"
-    assert build_database.main(["--db", str(path), "--imagery-dir", str(imagery_dir(tmp_path)),
-                                "--mosaiks-dir", str(mosaiks_dir(tmp_path))]) == 0
+def test_presto_embeddings_stay_empty(db):
+    assert db.sql("SELECT count(*) FROM presto_embeddings").fetchone()[0] == 0
+    assert db.sql("SELECT presto_commit, presto_weights_sha256, presto_embeddings_built FROM build_info").fetchone() \
+        == (None, None, False)
+    assert db.sql("SELECT count(*) FROM master WHERE presto_embedding IS NOT NULL").fetchone()[0] == 0
+
+
+def test_two_worker_processes_build_the_same_tables(tmp_path):
+    path = tmp_path / "two_workers.duckdb"
+    subprocess.run([sys.executable, str(SCRIPT), "--db", str(path), "--imagery-dir", str(imagery_dir(tmp_path)),
+                    "--mosaiks-dir", str(tmp_path / "nowhere"), "--workers", "2"], check=True)
     with duckdb.connect(str(path), read_only=True) as con:
-        embeddings = con.sql("SELECT obs_id, len(embedding), embedding FROM presto_embeddings").fetchall()
-        assert len(embeddings) == 1 and embeddings[0][:2] == (OBS_ID, 128) and np.isfinite(embeddings[0][2]).all()
-        assert con.sql("SELECT presto_embedding[1] IS NOT NULL, len(presto_embedding) FROM master WHERE obs_id = ?",
-                       params=[OBS_ID]).fetchone() == (True, 128)
-        rows = con.sql("SELECT presto_embedding FROM master WHERE has_imagery AND presto_embedding IS NOT NULL").df()
-        X = wide(rows, "presto_embedding", "presto")
-        assert X.shape == (1, 128) and list(X.columns[[0, -1]]) == ["presto_000", "presto_127"]
+        assert con.sql("SELECT count(*) FROM downloads").fetchone()[0] == 3
+        assert con.sql("SELECT count(*) FROM monthly_bands").fetchone()[0] == len(MONTHS)
+        assert con.sql("SELECT count(*) FROM presto_embeddings").fetchone()[0] == 0
+
+
+SCENES = [("a", "2023-01", "S2A_1"), ("a", "2023-02", "S2A_2"), ("b", "2023-01", "S2B_1"), ("c", "2023-01", "S2C_1")]
+
+
+def scene_copy(tmp_path: Path, local: list[tuple], on_disk: list[str], frozen: list[tuple] = SCENES) -> tuple[Path, Path]:
+    """A database with these rows and a frozen list, as the compare cell finds them."""
+    database, scene_list = tmp_path / "copy.duckdb", tmp_path / "scenes.parquet"
+    with duckdb.connect(str(database)) as con:
+        con.execute("CREATE TABLE downloads (obs_id VARCHAR)")
+        con.execute("CREATE TABLE scenes (obs_id VARCHAR, month VARCHAR, item_id VARCHAR)")
+        con.executemany("INSERT INTO downloads VALUES (?)", [[obs_id] for obs_id in on_disk])
+        con.executemany("INSERT INTO scenes VALUES (?, ?, ?)", [list(row) for row in local])
+    columns = list(zip(*frozen))
+    pq.write_table(pa.table({"obs_id": columns[0], "month": columns[1], "item_id": columns[2]}), scene_list)
+    return database, scene_list
+
+
+def test_compare_counts_only_the_records_on_disk(tmp_path):
+    assert scene_differences(*scene_copy(tmp_path, SCENES[:3], ["a", "b"])) == (2, [])
+
+
+def test_compare_names_a_record_with_another_item_id(tmp_path):
+    local = [SCENES[0], ("a", "2023-02", "S2A_other"), SCENES[2]]
+    assert scene_differences(*scene_copy(tmp_path, local, ["a", "b"])) == (2, ["a"])
+
+
+def test_compare_names_a_record_with_a_missing_month(tmp_path):
+    assert scene_differences(*scene_copy(tmp_path, [SCENES[0], SCENES[2]], ["a", "b"])) == (2, ["a"])
+
+
+def test_compare_names_a_record_on_disk_that_holds_no_scene(tmp_path):
+    assert scene_differences(*scene_copy(tmp_path, SCENES[:2], ["a", "b"])) == (2, ["b"])
+
+
+def test_compare_names_a_record_with_an_extra_month(tmp_path):
+    local = [*SCENES[:3], ("b", "2023-02", "S2B_2")]
+    assert scene_differences(*scene_copy(tmp_path, local, ["a", "b"])) == (2, ["b"])
+
+
+def test_compare_changes_nothing(tmp_path):
+    database, scene_list = scene_copy(tmp_path, SCENES[:3], ["a", "b"])
+    before = database.read_bytes(), scene_list.read_bytes()
+    scene_differences(database, scene_list)
+    assert (database.read_bytes(), scene_list.read_bytes()) == before
+
+
+def test_the_frozen_scene_list_keeps_its_recorded_hash_and_order():
+    table = pq.read_table(SCENE_LIST)
+    rows = list(zip(table["obs_id"].to_pylist(), table["month"].to_pylist()))
+    assert table.column_names == ["obs_id", "month", "item_id"]
+    assert (table.num_rows, len(set(table["obs_id"].to_pylist()))) == (84_967, 11_364)
+    assert rows == sorted(rows)
+    decisions = (SCRIPT.parents[1] / "docs" / "DECISIONS.md").read_text(encoding="utf-8")
+    assert hashlib.sha256(SCENE_LIST.read_bytes()).hexdigest() in decisions
