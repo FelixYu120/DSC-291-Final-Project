@@ -12,6 +12,7 @@ tests/           pytest
 notebooks/       data_guide.ipynb: the one guide to the data
 docs/            ROADMAP.md (plan), DATA.md, EVALUATION.md, RELATED_WORK.md, DECISIONS.md, STRUCTURE.md (this file)
 _parked/         what is not on the data path; MANIFEST.csv lists it, LANDING.md applies it
+requirements.txt the exact package versions; pyproject.toml names the packages
 ```
 
 ## Rules

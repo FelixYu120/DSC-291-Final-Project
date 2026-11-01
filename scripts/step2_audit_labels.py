@@ -2,6 +2,9 @@
 
 Outputs are screening candidates, not satellite-validated field observations.
 See data/audit/report.html for definitions, caveats and source-specific issues.
+
+The *_maize_audit.csv tables are the only record of the rows this stage drops. labels_v1 starts
+from the screened candidates, so it never sees those rows.
 """
 from __future__ import annotations
 
@@ -190,6 +193,7 @@ def oaf_full():
         if crop not in ("maize", "corn"):
             continue
         y, ya = num(d.get("yield_kg_ph")), num(d.get("yield_kg_pa"))
+        # This kg/acre fallback fires for 0 rows: every usable maize row has its own yield_kg_ph.
         converted = y is None and ya is not None and ya >= 0
         if converted:
             y = ya / ACRE_HA

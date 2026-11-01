@@ -32,7 +32,7 @@ split is reported only as a labelled diagnostic.
 
 | Cohort | Spatial structure (evidence) | New village | New region | New season |
 |---|---|---|---|---|
-| Kenya OAF (3,977) | semivariance reaches about 0.9 of the variance by 1 km; district ICC 0.30 | 849 clusters, 5 folds, about 795 test fields per fold | leave-district-out over 50 normalised districts, 5 folds; drop training fields within 2 km of a test field (median test–train gap is only 4.6 km) | 2019 (1,768) → 2020 (2,209) and the reverse; split the 2020 test into districts seen in 2019 (1,849) and unseen (360, 11 districts) to separate time from space |
+| Kenya OAF (3,977) | semivariance reaches about 0.9 of the variance by 1 km; district ICC 0.30 | 849 clusters, 5 folds, about 795 test fields per fold | leave-district-out over 50 normalised districts, 5 folds; no split file drops training fields near a test field, because that rule lived in the runner, which is parked (median test–train gap is only 4.6 km) | 2019 (1,768) → 2020 (2,209) and the reverse; split the 2020 test into districts seen in 2019 (1,849) and unseen (360, 11 districts) to separate time from space |
 | Malawi 2023 (260) | range about 1–2 km; one district | 53 clusters, 5 folds, about 52 per fold; pooled scores only | no region scale; stress test with 5 km clusters (21), 5 folds | none (Kasungu 2022 → 2023 needs the 2022 imagery) |
 | Lacuna 2023 (second) | structure is between districts (`Admin1` ICC 0.41, range about 50 km) | 289 clusters, 5 folds | **leave-`Admin1`-out**, 5 folds: the key test for this cohort | none (2022 has 169 rows and no imagery) |
 
@@ -61,7 +61,7 @@ CI excludes 0.
 | Cohort | Two measurements | Agreement | Implied limit |
 |---|---|---|---|
 | Malawi 2023 | 10×10 m main cut vs nested 5×5 m cut (disjoint, adjacent) | r = 0.904; nested reads +0.45 t/ha higher; SD of difference 0.78 t/ha | single-cut reliability ≈ 0.90; RMSE floor ≈ 0.78 / √2 ≈ 0.55 t/ha |
-| Zimbabwe 2024 | box 1 vs box 2 (label = their mean) | r = 0.90 | reliability of the mean ≈ 0.95 |
+| Zimbabwe 2024 | box 1 vs box 2 (label = their mean) | r = 0.87 on the 2,416 `include_primary` rows with both boxes (0.90 with the zero rows) | reliability of the mean ≈ 0.93 |
 
 Kenya and Lacuna release one value per field, so they have no ceiling. These ceilings are upper bounds:
 they ignore GPS-to-field mismatch and the gap between a small cut and the whole field (Lobell et al. 2020:
@@ -73,7 +73,7 @@ an 8×8 m cut vs full-plot harvest gave r = 0.51). Realistic field-level R² is 
 > Semivariograms of yield show that most spatial dependence lies below 1–2 km in Malawi and Kenya and at the
 > district scale in Lacuna Zimbabwe. We therefore report two split families per cohort. "New village" is
 > 5-fold cross-validation over 2 km connected clusters, so no test field lies within 2 km of a training
-> field. "New region" holds out whole units: One Acre Fund districts (with a 2 km training buffer) and Lacuna
+> field. "New region" holds out whole units: One Acre Fund districts and Lacuna
 > `Admin1` units. Temporal generalization is tested by training on Kenya 2019 and testing on 2020 and the
 > reverse, with the 2020 test split into districts seen and unseen in 2019. All models share the same folds
 > and are compared with a training-mean baseline and a coordinates-only kNN baseline, which reaches R² of

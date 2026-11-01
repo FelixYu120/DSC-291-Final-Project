@@ -5,6 +5,7 @@ import json
 import os
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -23,6 +24,14 @@ get_data = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(get_data)
 
 COLUMNS = ["cohort", "dataset", "source_id", "start_date", "end_date"]
+
+
+def test_requirements_pin_exactly_the_packages_of_pyproject():
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+    lines = (ROOT / "requirements.txt").read_text(encoding="utf-8").splitlines()
+    pinned = [line.split("==")[0] for line in lines if "==" in line]
+    assert pinned == project["dependencies"] + project["optional-dependencies"]["dev"]
+    assert "-e ." in lines
 
 
 @pytest.mark.parametrize("name", ["step1_download_labels", "step1b_download_zimbabwe2024_labels", "step2_audit_labels",
@@ -281,6 +290,17 @@ def test_any_answer_but_yes_starts_no_download_and_writes_nothing(cell, tmp_path
     assert cell.started == [] and cell.built == []
     assert not cell.data_dir.exists()
     assert "No download started." in capsys.readouterr().out
+
+
+def test_a_step_of_the_notebook_runs_with_one_matrix_thread():
+    assert get_data.background_options()["env"]["OPENBLAS_NUM_THREADS"] == "1"
+
+
+def test_the_cell_says_when_a_slice_ended_with_an_error(cell, monkeypatch, capsys):
+    ended = [SimpleNamespace(returncode=code, poll=lambda: 0) for code in (1, 0)]
+    monkeypatch.setattr(get_data, "start_slices", lambda *call: ended)
+    cell.press("yes")
+    assert "1 of 32 slices ended with an error." in capsys.readouterr().out
 
 
 def test_the_cell_states_the_cost_before_it_asks(cell, capsys):

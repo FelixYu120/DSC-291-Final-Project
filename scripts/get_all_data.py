@@ -286,8 +286,13 @@ def stop_with_parent() -> None:
 
 
 def background_options() -> dict:
-    """Popen options for a step of the notebook: no console window for each process on Windows."""
-    return {"cwd": ROOT, "env": {**os.environ, "PYTHONIOENCODING": "utf-8"},
+    """Popen options for a step of the notebook: no console window for each process on Windows.
+
+    One matrix thread per process: these steps do no matrix math, and numpy otherwise reserves memory
+    per CPU core. On 20 cores that is 686 MB per slice, so 32 slices filled the page file at the start
+    and two died (1 Nov 2026). One thread needs 76 MB.
+    """
+    return {"cwd": ROOT, "env": {**os.environ, "PYTHONIOENCODING": "utf-8", "OPENBLAS_NUM_THREADS": "1"},
             "creationflags": getattr(subprocess, "CREATE_NO_WINDOW", 0)}
 
 
@@ -394,6 +399,9 @@ def notebook_download(scope: str, slices: int, data_dir: Path) -> None:
         print(f"Stopped at {done / len(table):.1%}: {done:,} of {len(table):,} fields are on disk. "
               "Run this cell again: it downloads only the missing fields.")
         return
+    errors = sum(process.returncode != 0 for process in processes)
+    if errors:
+        print(f"{errors} of {slices} slices ended with an error. Their logs are in {output_dir / 'logs'}.")
     if not build:
         print("Database not built: the existing database stays as it is.")
     elif field_counts(table, status)[0] == 0:

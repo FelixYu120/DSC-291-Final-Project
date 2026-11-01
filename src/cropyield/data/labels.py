@@ -38,7 +38,11 @@ MALAWI_2023_ZIP = RAW_DIR / "malawi" / "mwi_kas_lc_fo_202305_cc_yield.zip"
 
 @dataclass(frozen=True)
 class Measurement:
-    """How one cohort measures yield and locates a field (docs/DATA.md, first table)."""
+    """How one cohort measures yield and locates a field (docs/DATA.md, first table).
+
+    Cut area, number of cuts and moisture are declared from the provider documents: one constant
+    per cohort, not a measurement of the row.
+    """
     role: str                     # core, second, parked or dropped
     iso3: str
     definition: str
@@ -185,6 +189,7 @@ def cohort_frame(name: str, oaf: pd.DataFrame, lacuna: pd.DataFrame) -> pd.DataF
     frame["intercropped"] = frame["intercropped"].astype("boolean")
     frame["irrigated"] = frame["irrigated"].astype("boolean")
     observed = dates(text_column(rows, "observation_time"))
+    # obs_date: the harvest date, else the crop-cut or photo date, else NaT.
     frame["obs_date"] = frame["harvest_date"].fillna(observed)
     frame["obs_date_source"] = np.where(frame["harvest_date"].notna(), "harvest_date", np.where(
         observed.notna(), "photo_filename" if name == "zimbabwe_2024" else "crop_cut_time", "none"))
@@ -234,6 +239,7 @@ def add_cohort_flags(frame: pd.DataFrame) -> pd.DataFrame:
 
 def exclusion_reasons(frame: pd.DataFrame) -> pd.Series:
     """Why a row is out of the primary analysis; '' for rows that are in. First reason wins."""
+    # An NA in intercropped or irrigated counts as pure stand and rainfed. No Lacuna row is NA.
     conditions = [
         (frame["cohort"] == "malawi_2022", "dropped_cohort_2022_imagery_gap"),
         ((frame["cohort"] == "zimbabwe_lacuna_2022_2023") & (frame["season_year"] == 2022), "dropped_year_2022_imagery_gap"),

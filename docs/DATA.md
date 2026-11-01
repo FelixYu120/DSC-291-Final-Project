@@ -6,7 +6,7 @@ Every model reads one table, `labels_v1`, built and frozen before the first fit.
 ## Short answers to the proposal feedback
 
 - **Do the cohorts measure yield the same way?** No. Cut size, number of cuts and moisture basis differ
-  (table below), and three of seven cohort-years do not state a moisture basis at all.
+  (table below), and six of seven cohort-years do not state a moisture basis at all.
 - **Do they all have exact field boundaries?** No. Only Malawi has walked polygons. Every other cohort is a
   GPS point, and no provider states its accuracy; OAF says points are "occasionally" at the homestead.
 - **So:** we do not pool. One model per cohort, metrics within cohort. Shared code, separate fits. Pooled
@@ -23,8 +23,8 @@ Every model reads one table, `labels_v1`, built and frozen before the first fit.
 
 | Cohort | Yield definition | Location | Dates | Fields used | Groups for spatial splits | Median / zeros |
 |---|---|---|---|---|---|---|
-| **Kenya OAF 2019** | mean of 2 boxes of 6×6 m, "grain yield"; moisture not stated; kg/ha = kg/acre × 2.471 | field GPS point, sometimes homestead | planting and harvest date per row (long rains) | 1,768 pure stand | `district` 39, `site` 475 (raw workbook) | 2.73 t/ha / 3.3 % |
-| **Kenya OAF 2020** | same | same | same; 434 harvests after 30 Sep | 2,209 pure stand | `district` 50, `site` 683 | 3.04 t/ha / 0.7 % |
+| **Kenya OAF 2019** | mean of 2 boxes of 6×6 m, "grain yield"; moisture not stated; the label is the provider's `yield_kg_ph`, which equals `yield_kg_pa` × 2.47105 | field GPS point, sometimes homestead | planting and harvest date per row (long rains) | 1,768 pure stand | `district` 39, `site` 473 (raw workbook) | 2.73 t/ha / 3.3 % |
+| **Kenya OAF 2020** | mean of 2 boxes; the provider does not state the 2020 box size, so the 6×6 m of `labels_v1` is an assumption; moisture not stated; the label is `yield_kg_ph` | same as 2019 | same as 2019; 434 harvests after 30 Sep | 2,209 pure stand | `district` 50, `site` 684 | 3.04 t/ha / 0.7 % |
 | **Malawi 2023** | one 10×10 m cut (`cc_ey_t`), shelled, 13 % moisture; nested 5×5 m cut `subc_ey_t` reads a median +17 % higher | walked polygon, median 0.59 ha | cut 17–26 May 2023; no planting date | 260 | none in the file: 2 km clusters (53) | 2.44 t/ha / 0 % |
 | Lacuna 2023 (second) | one 8×5 m cut (40 m²), "dry weight", t/ha = dry kg × 0.25; moisture and grain-vs-cob not stated; unit provisional | point | planting and harvest date per row | 2,097; 1,880 pure stand rainfed | `Admin1` 20 (mixes districts, towns, one province) | 3.02 t/ha / 1.3 % |
 | Zimbabwe 2024 (parked) | mean of 2 boxes of 40 m², threshed and dried; moisture not stated | point; pilot points on bare soil | no dates; photo-filename date only | 2,458 positive of 4,332 | none (the paper's 87 zones are not released) | 0.09 t/ha / 43 % |
@@ -44,7 +44,7 @@ follows the visit month (13 % March, 30 % April, 66 % May, 92 % June, 100 % July
 - Sentinel-2 L2A from Earth Search `sentinel-2-c1-l2a`, monthly, one clear scene per month (SCL mask).
 - **All cohorts done on 30 October:** 11,364 of 11,364 records `complete`, which means no scene failed, not that
   every month is clear. Model rows with at least 4 clear months: Malawi 2023 251, Kenya 3,977, Lacuna 1,880,
-  Zimbabwe 2024 2,458. Seasonal indices, MOSAIKS and Presto exist for every one of them.
+  Zimbabwe 2024 2,458. Seasonal indices exist for every one of them. MOSAIKS and Presto exist only in the owner's copy of the database.
 - The download moves about 60 MB per field to keep about 2 MB, because reads fetch whole internal image blocks.
   32 slices fill a 40 MB/s line and give 40–45 fields per minute.
 - **2022 gap.** Collection 1 holds almost no scenes for January–November 2022 over our tiles (ESA
@@ -112,8 +112,8 @@ training fold.
 
 Build with `python scripts/step3_build_labels.py`. Frozen on 30 October:
 `data/processed/labels_v1.parquet`, SHA-256 `49aae383c4489aa98e9e7fe8c31cda6bf1cd752adc8e9540cffdc147a5e0ef92`
-(`DECISIONS.md`). The split manifest pins this hash and the experiment runner stops on a mismatch, so a rebuild
-means new splits. One Kenya `unique_id` was stored by Excel as a date; the check compares its ISO text.
+(`DECISIONS.md`). The split manifest pins this hash, so a rebuild means new splits. The experiment runner, which
+stopped on a mismatch, is parked. One Kenya `unique_id` was stored by Excel as a date; the check compares its ISO text.
 
 ## Red flags found on 29 October
 
@@ -121,8 +121,8 @@ means new splits. One Kenya `unique_id` was stored by Excel as a date; the check
   `plot_acres` and Lacuna `Admin1`, `Field_Irri` are in the raw files but not in the screened CSVs. Without
   them every "region" split is a grid split.
 - **Kenya.** The fixed 1 Feb – 30 Sep window ends before 20–24 % of recorded harvests (850 rows; peak
-  greenness is still inside). 12 rows have a harvest on or before planting; 17 impossible planting dates (one
-  in 2100). District spelling changes between years (`kakamega(south)` vs `kakamegasouth`): normalise.
+  greenness is still inside). 13 rows carry `impossible_date`: 12 have a harvest on or before planting, and 5 have a planting
+  year out of range (one in 2100); 4 rows are in both groups. District spelling changes between years (`kakamega(south)` vs `kakamegasouth`): normalise.
   Field points sit a median 1.75 km from the site point; 141 fields in 2019 are more than 10 km away
   (max 110 km). 108 coordinates are exact duplicates (likely homestead GPS). Only the mean of the two boxes
   is released, so Kenya has no noise ceiling.
@@ -156,9 +156,9 @@ the freeze. Each one is a robustness row or a later arm.
   level moves between years (`ndvi_season_mean` 0.52 in 2019, 0.59 in 2020).
 - **Peak timing carries yield.** Kenya 2019 mean yield rises with the peak month: May 2.48, June 2.70, July 3.24,
   August 3.97 t/ha. The 10 season features cannot see timing; a series model (A4) can.
-- **Cloud count is not the signal.** `months_with_data` has Spearman −0.02 to −0.07 with yield, and R2 scores
+- **Cloud count is not the signal.** `months_with_data` has Spearman −0.01 to −0.08 with yield, and R2 scores
   like R0.
-- **Index tails.** Kenya MTCI runs from −395 to 11,341 (median 4.6), hence the clip in the B0 pipeline. The other
+- **Index tails.** Kenya monthly MTCI runs from −2,828 to 11,341 (median 3.3), hence the clip in the B0 pipeline. The other
   indices stay in normal ranges. Haze is low: 0.8–2.3 % of clear months have a field-median blue above 0.15.
 - **Lacuna is the cleanest point cohort.** All 1,880 fields have at least 4 clear months (median 7; December 95 %,
   January 80 %, February 74 %, March 90 % clear). `ndvi705_season_max` has Spearman 0.45 with yield, against 0.17–0.21

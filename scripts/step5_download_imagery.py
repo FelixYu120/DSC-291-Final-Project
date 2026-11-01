@@ -82,6 +82,8 @@ def parse_date(value):
 
 def time_window(row, policy="fallback", fallback_days=180, override=None):
     """Return inclusive dates and their provenance; never silently fix dates."""
+    # get_all_data.py passes the fixed window of every record, so on the project path the override
+    # always applies and the date fallbacks below never run.
     if override:
         start, end = map(date.fromisoformat, override)
         if not 0 < (end - start).days <= 730:
@@ -282,7 +284,11 @@ def aoi_for(record, grid):
 
 
 def read_asset(asset, grid, categorical=False):
-    """Read only intersecting COG blocks, on the same grid for every band/date."""
+    """Read only intersecting COG blocks, on the same grid for every band/date.
+
+    The 20 m reflectance bands reach the 10 m grid by bilinear resampling. SCL holds classes, so it
+    uses nearest neighbour.
+    """
     info = asset.get("raster:bands", [{}])[0]
     nodata = info.get("nodata", 0)
     if not categorical and ("scale" not in info or "offset" not in info):
@@ -383,6 +389,7 @@ def process_record(record, run_dir, catalog, args):
         for item in candidates:
             if not re.fullmatch(r"[A-Za-z0-9_.-]+", item["id"]) or item["id"] in (".", ".."):
                 raise ValueError("Unsafe STAC item identifier")
+            # An error moves to the next scene. If a later scene passes, the record can still end complete.
             try:
                 attempt = download_scene(item, directory / item["id"], record, grid, aoi, args)
             except Exception as exc:

@@ -11,13 +11,13 @@ and how much of that skill survives in new villages, new districts and a new sea
 
 ## Get started
 
-Clone **outside OneDrive** (for example `C:\Dev\`). Use Python 3.10 or newer. Run these commands once, from the
+Clone **outside OneDrive** (for example `C:\Dev\`). Use Python 3.12 or newer. Run these commands once, from the
 repository root:
 
 ```bash
 python -m venv .venv
 .venv\Scripts\activate                   # macOS/Linux: source .venv/bin/activate
-python -m pip install -e ".[dev]"
+python -m pip install -r requirements.txt   # the exact package versions, and this repository
 python -m pytest -q                      # small checks, no imagery needed
 ```
 

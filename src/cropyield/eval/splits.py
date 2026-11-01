@@ -3,6 +3,8 @@
 Rules and evidence: docs/EVALUATION.md. A split is a table with one row per observation, per
 repeat; it is written once by scripts/step4_build_splits.py and never edited. Everything is seeded,
 so the same labels give byte-identical split files.
+
+There is no distance buffer here: only s1_cc2km keeps test and training fields apart by distance.
 """
 from __future__ import annotations
 
