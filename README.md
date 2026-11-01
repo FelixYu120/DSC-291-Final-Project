@@ -2,8 +2,8 @@
 
 Felix Yu, Florian Saewert, Liuan Lu, Pamely Zantou, Zida Jin. UCSD DSC 291, Fall 2026.
 
-**Start with the data guide: [`notebooks/data_guide.ipynb`](notebooks/data_guide.ipynb).** It shows which files make
-the data, where the data comes from, how it is matched, and what X and Y look like.
+**Start with the data guide: [`notebooks/data_guide.ipynb`](notebooks/data_guide.ipynb).** It teaches the data from
+zero: which files make it, where it comes from, how it is matched and split, and what X and Y look like.
 
 **Question.** Within one smallholder cohort, which Sentinel-2 representation predicts field-level maize yield best,
 and how much of that skill survives in new villages, new districts and a new season? The plan is
@@ -21,10 +21,14 @@ python -m pip install -r requirements.txt   # the exact package versions, and th
 python -m pytest -q                      # small checks, no imagery needed
 ```
 
-Labels and splits come with the clone. To get the chips and the database, open
-[`notebooks/data_guide.ipynb`](notebooks/data_guide.ipynb) with the `.venv` kernel, for example in VS Code. In Step 2,
-press the Run arrow of the pilot test, then of all the data. Each cell asks for a typed `yes`, shows a loading bar,
-continues after a stop, and builds the database.
+Labels and splits come with the clone. Then get the team database: download the file from the link in the team chat,
+and put it at `data/cropyield.duckdb`. Do not rebuild it. Open
+[`notebooks/data_guide.ipynb`](notebooks/data_guide.ipynb) with the `.venv` kernel, for example in VS Code, and press
+Run All. Step 2 of the guide checks that your file is the team copy.
+
+You need the chips only to draw pixels or to build new image features. In Step 2 of the guide, set `DOWNLOAD = True` in
+the pilot cell and press its Run arrow, then do the same for all the data. Each cell then asks for a typed `yes`, shows
+a loading bar, continues after a stop, and builds a database of your own.
 
 Without the notebook, the same steps are:
 
@@ -42,7 +46,7 @@ python scripts/step7_check_data.py       # what the database holds, per cohort
 | [`scripts/`](scripts/README.md) | the data path, one script per step |
 | [`sql/`](sql/README.md) | the database schema, views and example queries |
 | `src/cropyield/` | the package that the scripts and the notebook import |
-| `data/` | labels and splits are frozen and committed; chips and the database stay local |
+| `data/` | labels and splits are frozen and committed; the database is one shared file; chips stay local |
 | `docs/` | plan, data notes, evaluation, related work, decisions and structure |
 | `_parked/` | everything that is not on the data path, safe and listed in `_parked/MANIFEST.csv` |
 

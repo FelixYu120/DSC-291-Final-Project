@@ -1,8 +1,8 @@
 # Evaluation protocol: generalization across space and time
 
 Answers the feedback "How will you measure generalization across time and space?". Everything here is
-fixed before the first model is trained. Evidence: semivariograms and location-only baselines computed on
-the screened audit CSVs on 29 October 2026 (exploratory; the runner reproduces them as arm R1).
+fixed before the first model is trained. Evidence: semivariograms computed on the screened audit CSVs on
+29 October 2026, and arm R1 on the frozen folds and the `load_xy` rows, checked on 1 November 2026.
 
 ## Why the protocol matters: location alone already "predicts" yield
 
@@ -10,10 +10,10 @@ A kNN on coordinates only (10 neighbours, no imagery), out-of-fold R²:
 
 | Cohort | Random 5-fold | New village (2 km clusters) | New region |
 |---|---:|---:|---:|
-| Kenya OAF | 0.29 | 0.22 | 0.12 (district) |
-| Malawi 2023 | 0.02 | −0.11 | −0.37 (5 km clusters) |
-| Lacuna | 0.42 | 0.28 | −0.27 (`Admin1`) |
-| Zimbabwe 2024 | 0.38 | 0.30 | −0.26 (20 k-means blocks) |
+| Kenya OAF | 0.28 | 0.22 | 0.11 (district) |
+| Malawi 2023 | −0.04 | −0.12 | −0.37 (5 km clusters) |
+| Lacuna | 0.40 | 0.13 | −0.39 (`Admin1`) |
+| Zimbabwe 2024 | 0.26 | 0.21 | −0.04 (20 k-means blocks) |
 
 Random splits give R² up to 0.4 for knowing where a field is (the optimism gap of Ploton et al. 2020).
 So every model is compared with this coordinates-only baseline (arm R1) **on the same split**, and a random
@@ -32,7 +32,7 @@ split is reported only as a labelled diagnostic.
 
 | Cohort | Spatial structure (evidence) | New village | New region | New season |
 |---|---|---|---|---|
-| Kenya OAF (3,977) | semivariance reaches about 0.9 of the variance by 1 km; district ICC 0.30 | 849 clusters, 5 folds, about 795 test fields per fold | leave-district-out over 50 normalised districts, 5 folds; no split file drops training fields near a test field, because that rule lived in the runner, which is parked (median test–train gap is only 4.6 km) | 2019 (1,768) → 2020 (2,209) and the reverse; split the 2020 test into districts seen in 2019 (1,849) and unseen (360, 11 districts) to separate time from space |
+| Kenya OAF (3,977) | about half of the variance sits below 50 m, and the rest builds up to 50–100 km (semivariance over variance: 0.55 below 50 m, 0.60 at 1–2 km, 0.78 at 20–50 km, 0.99 at 50–100 km); district ICC 0.30 | 849 clusters, 5 folds, about 795 test fields per fold | leave-district-out over 50 normalised districts, 5 folds; no split file drops training fields near a test field, because that rule lived in the runner, which is parked (median test–train gap is only 4.6 km) | 2019 (1,768) → 2020 (2,209) and the reverse; split the 2020 test into districts seen in 2019 (1,849) and unseen (360, 11 districts) to separate time from space |
 | Malawi 2023 (260) | range about 1–2 km; one district | 53 clusters, 5 folds, about 52 per fold; pooled scores only | no region scale; stress test with 5 km clusters (21), 5 folds | none (Kasungu 2022 → 2023 needs the 2022 imagery) |
 | Lacuna 2023 (second) | structure is between districts (`Admin1` ICC 0.41, range about 50 km) | 289 clusters, 5 folds | **leave-`Admin1`-out**, 5 folds: the key test for this cohort | none (2022 has 169 rows and no imagery) |
 
@@ -70,14 +70,14 @@ an 8×8 m cut vs full-plot harvest gave r = 0.51). Realistic field-level R² is 
 ## 3. Paragraph for the midterm report
 
 > We evaluate generalization with spatially blocked splits that are frozen before any model is trained.
-> Semivariograms of yield show that most spatial dependence lies below 1–2 km in Malawi and Kenya and at the
-> district scale in Lacuna Zimbabwe. We therefore report two split families per cohort. "New village" is
+> Semivariograms of yield show that spatial dependence ends within 1–2 km in Malawi, runs to about 50 km in
+> Kenya, and sits at the district scale in Lacuna Zimbabwe. We therefore report two split families per cohort. "New village" is
 > 5-fold cross-validation over 2 km connected clusters, so no test field lies within 2 km of a training
 > field. "New region" holds out whole units: One Acre Fund districts and Lacuna
 > `Admin1` units. Temporal generalization is tested by training on Kenya 2019 and testing on 2020 and the
 > reverse, with the 2020 test split into districts seen and unseen in 2019. All models share the same folds
 > and are compared with a training-mean baseline and a coordinates-only kNN baseline, which reaches R² of
-> 0.29–0.42 under random splits in the point cohorts but falls to 0.12 or below when regions are held out. We report RMSE (t/ha),
+> 0.26–0.40 under random splits in the point cohorts but falls to 0.11 or below when regions are held out. We report RMSE (t/ha),
 > R², within-group Spearman ρ and bottom-20 % recall with cluster-bootstrap confidence intervals, and a noise
 > ceiling from the paired crop cuts in Malawi 2023.
 

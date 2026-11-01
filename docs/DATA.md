@@ -44,7 +44,7 @@ follows the visit month (13 % March, 30 % April, 66 % May, 92 % June, 100 % July
 - Sentinel-2 L2A from Earth Search `sentinel-2-c1-l2a`, monthly, one clear scene per month (SCL mask).
 - **All cohorts done on 30 October:** 11,364 of 11,364 records `complete`, which means no scene failed, not that
   every month is clear. Model rows with at least 4 clear months: Malawi 2023 251, Kenya 3,977, Lacuna 1,880,
-  Zimbabwe 2024 2,458. Seasonal indices exist for every one of them. MOSAIKS and Presto exist only in the owner's copy of the database.
+  Zimbabwe 2024 2,458. Seasonal indices exist for every one of them. MOSAIKS and Presto exist only in the team database (`configs/team_database_v1.json`); a database you build yourself does not hold them.
 - The download moves about 60 MB per field to keep about 2 MB, because reads fetch whole internal image blocks.
   32 slices fill a 40 MB/s line and give 40–45 fields per minute.
 - **2022 gap.** Collection 1 holds almost no scenes for January–November 2022 over our tiles (ESA

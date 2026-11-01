@@ -1,5 +1,9 @@
 # Roadmap (scope reset, 29 October 2026)
 
+**Update, 1 November 2026.** The owner ruled that fine-tuning a foundation model is the goal of the project. That
+ruling wins over each "stretch" below. The next step is one small baseline table, then the arms in section 1
+(`docs/DECISIONS.md`).
+
 This replaces the 25 October roadmap. It answers the proposal feedback (Emily, Prabhmeet) by cutting the
 project to what five people can finish by 7 December, with one runnable baseline first and a fallback at
 every step. Details live in three companion files:
