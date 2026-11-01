@@ -5,13 +5,16 @@ disk, so running it again is cheap.
 
     python scripts/get_all_data.py                                  # the 48-record pilot (default)
     python scripts/get_all_data.py --scope cohorts --cohorts kenya_oaf_2019_2020 malawi_2023
-    python scripts/get_all_data.py --scope all                      # 5 cohorts: ~11,400 records, ~25 GB, ~10 days serial
-    python scripts/get_all_data.py --scope all --batch 3/10         # slice 3 of 10, for parallel jobs
+    python scripts/get_all_data.py --scope all                      # 5 cohorts: ~11,400 records, ~25 GB, ~10 days in one process
+    python scripts/get_all_data.py --scope all --batch 3/32         # slice 3 of 32, for parallel jobs: ~4 hours for all 32
     python scripts/get_all_data.py --scope all --plan               # offline: counts and a size/time estimate
     python scripts/get_all_data.py --scope all --status             # offline: complete / failed / not on disk so far
 
 Labels (data/audit) are committed to git, so they are only checked. The exit code is the
 downloader's: non-zero when any record failed.
+
+The download cells of notebooks/data_guide.ipynb call notebook_download. It asks for a typed yes,
+runs the slices in the background with a loading bar, builds the database and reports.
 """
 from __future__ import annotations
 
@@ -19,8 +22,12 @@ import argparse
 from collections import Counter
 import os
 from pathlib import Path
+import subprocess
 import sys
+import threading
+import time
 
+import duckdb
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,14 +35,21 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))  # the step scripts are plain files, not a package
 import step5_download_imagery  # noqa: E402  scripts/step5_download_imagery.py
 from cropyield.data.cohorts import AUDIT_DIR, COHORTS, date_overrides, load_cohort  # noqa: E402
+from cropyield.data.database import SCENE_LIST, scene_differences  # noqa: E402
 from cropyield.longpath import replace_file  # noqa: E402
-from cropyield.satellite.records import record_folders  # noqa: E402
+from cropyield.satellite.chips import FAILED_DOWNLOAD  # noqa: E402
+from cropyield.satellite.records import RecordScan  # noqa: E402
 
 IMAGERY_DIR = ROOT / "data" / "imagery" / "sentinel2"  # the downloader's default output folder
 STEPS = 4
 # Measured on the 48-record pilot on a laptop (28 Oct 2026). Real values vary with cloud cover.
 MB_PER_RECORD = 2
-MINUTES_PER_RECORD = 1
+# Measured on the full download (30 Oct 2026, docs/DECISIONS.md). A read fetches whole image blocks, so the
+# line moves far more than the disk keeps. 32 slices made 45 fields per minute and filled a 40 MB/s line.
+MB_MOVED_PER_RECORD = 60
+DEFAULT_SLICES = 32
+FIELDS_PER_MINUTE_PER_SLICE = 45 / DEFAULT_SLICES
+REFRESH_SECONDS = 5
 # The week-0 pilot (docs/DECISIONS.md, 28 Oct 2026): per cohort, the first rows of its screened audit
 # file in file order, split evenly over the harvest years. The sizes are in docs/ROADMAP.md.
 PILOT_SIZES = {"malawi_2023": 12, "kenya_oaf_2019_2020": 12, "zimbabwe_2024": 16, "zimbabwe_lacuna_2022_2023": 8}
@@ -164,32 +178,230 @@ def record_status(output_dir: Path) -> dict[tuple[str, str, str, str], str]:
 
     The window is part of the key: a folder downloaded for another window does not count.
     """
-    status = {}
-    for _, record in record_folders(output_dir):
-        meta = record["record"]
-        status[(meta["dataset"], meta["source_id"], meta["start_date"], meta["end_date"])] = record["status"]
-    return status
+    return RecordScan(output_dir).statuses()
+
+
+def record_keys(rows: pd.DataFrame):
+    """The record_status key of each window-file row."""
+    return zip(rows["dataset"], rows["source_id"], rows["start_date"], rows["end_date"])
 
 
 def print_summary(selected: pd.DataFrame, output_dir: Path) -> None:
     """Step 4: per cohort, how many of this job's records are complete, failed, or not on disk."""
     status = record_status(output_dir)
     for cohort, rows in selected.groupby("cohort", sort=False):
-        keys = zip(rows["dataset"], rows["source_id"], rows["start_date"], rows["end_date"])
-        counts = Counter(status.get(key, "not_on_disk") for key in keys)
+        counts = Counter(status.get(key, "not_on_disk") for key in record_keys(rows))
         text = ", ".join(f"{n} {name}" for name, n in sorted(counts.items()))
         print(f"  {cohort:<28} {len(rows):>6} records: {text}")
 
 
-def print_plan(selected: pd.DataFrame) -> None:
-    """Step 4 for --plan: records per cohort and a rough size and time estimate."""
+def format_time(seconds: float) -> str:
+    """12 min, or 4 h 12 min."""
+    minutes = max(1, round(seconds / 60))
+    return f"{minutes} min" if minutes < 60 else f"{minutes // 60} h {minutes % 60} min"
+
+
+def cost_text(records: int, slices: int = DEFAULT_SLICES) -> str:
+    """What a download costs: GB moved over the line, GB kept on disk, and the time in parallel slices."""
+    minutes = records / (slices * FIELDS_PER_MINUTE_PER_SLICE)
+    return (f"{records:,} records: about {records * MB_MOVED_PER_RECORD / 1000:.1f} GB moved, "
+            f"about {records * MB_PER_RECORD / 1000:.1f} GB kept, "
+            f"about {format_time(minutes * 60)} with {slices} parallel slices")
+
+
+def print_plan(selected: pd.DataFrame, total: int, slices: int) -> None:
+    """Step 4 for --plan: records per cohort, then what the whole scope costs in parallel slices."""
     for cohort, rows in selected.groupby("cohort", sort=False):
         print(f"  {cohort:<28} {len(rows):>6} records")
-    n = len(selected)
-    hours = n * MINUTES_PER_RECORD / 60
-    print(f"  {n} records: about {n * MB_PER_RECORD / 1000:.1f} GB and {hours:.0f} hours ({hours / 24:.1f} days) "
-          f"on one laptop. This is an estimate from the pilot ({MB_PER_RECORD} MB and {MINUTES_PER_RECORD} min "
-          "per record); the real values vary.")
+    print(f"  {cost_text(total, slices)}. This is an estimate from the full download of 30 Oct 2026: "
+          f"{MB_MOVED_PER_RECORD} MB moved and {MB_PER_RECORD} MB kept per record, and "
+          f"{FIELDS_PER_MINUTE_PER_SLICE * DEFAULT_SLICES:.0f} fields per minute with {DEFAULT_SLICES} slices. "
+          "More slices help only until the line is full, and the real values vary.")
+
+
+def field_counts(table: pd.DataFrame, status: dict) -> tuple[int, int]:
+    """(done, failed) among the records of a window table. A failed record gets a new try on the next run."""
+    counts = Counter(status.get(key, "not_on_disk") for key in record_keys(table))
+    failed = sum(counts[name] for name in FAILED_DOWNLOAD)
+    return len(table) - counts["not_on_disk"] - failed, failed
+
+
+def seconds_left(total: int, done: int, done_at_start: int, elapsed: float) -> float | None:
+    """Time left at the speed of this run; None until it has finished a record of its own.
+
+    Records already on disk at the start do not count, so a restart does not look fast.
+    """
+    if done <= done_at_start:
+        return None
+    return (total - done) * elapsed / (done - done_at_start)
+
+
+def bar_text(done: int, total: int, failed: int, gigabytes: float, left: float | None) -> str:
+    """The line under the loading bar."""
+    if done == total:
+        time_text = "finished"
+    else:
+        time_text = "time left not known yet" if left is None else f"about {format_time(left)} left"
+    failed_text = f" | {failed:,} failed" if failed else ""
+    return f"{done / total:.1%} done | {done:,} of {total:,} fields{failed_text} | {gigabytes:.2f} GB on disk | {time_text}"
+
+
+def bar_html(done: int, total: int, failed: int, gigabytes: float, left: float | None) -> str:
+    return (f'<progress value="{done}" max="{total}" style="width:100%"></progress>'
+            f"<pre>{bar_text(done, total, failed, gigabytes, left)}</pre>")
+
+
+def loading_bar():
+    """Show a bar in the cell output, and return the function that replaces it. Only the notebook needs IPython."""
+    from IPython.display import HTML, display
+
+    handle = display(HTML("<pre>Reading what is already on disk ...</pre>"), display_id=True)
+    return lambda html: handle.update(HTML(html))
+
+
+def typed_yes(question: str) -> bool:
+    """True only for a typed yes. A run with no keyboard, such as nbconvert, counts as no."""
+    try:
+        return input(question).strip().lower() == "yes"
+    except (EOFError, NotImplementedError):
+        return False
+
+
+def presto_rows(database: Path) -> int:
+    """Rows in presto_embeddings of an existing database. The build leaves that table empty."""
+    if not database.exists():
+        return 0
+    with duckdb.connect(str(database), read_only=True) as con:
+        return con.execute("SELECT count(*) FROM presto_embeddings").fetchone()[0]
+
+
+def stop_with_parent() -> None:
+    """End this process when the kernel that started it ends: the pipe on stdin then closes."""
+    def watch() -> None:
+        try:
+            os.read(sys.stdin.fileno(), 1)
+        finally:
+            os._exit(1)
+    threading.Thread(target=watch, daemon=True).start()
+
+
+def background_options() -> dict:
+    """Popen options for a step of the notebook: no console window for each process on Windows."""
+    return {"cwd": ROOT, "env": {**os.environ, "PYTHONIOENCODING": "utf-8"},
+            "creationflags": getattr(subprocess, "CREATE_NO_WINDOW", 0)}
+
+
+def start_slices(scope: str, slices: int, output_dir: Path) -> list[subprocess.Popen]:
+    """Start slices 1 to n of the scope in the background. Each one writes a log beside the chips."""
+    logs = output_dir / "logs"
+    logs.mkdir(parents=True, exist_ok=True)
+    processes = []
+    for index in range(1, slices + 1):
+        command = [sys.executable, str(Path(__file__).resolve()), "--scope", scope, "--batch", f"{index}/{slices}",
+                   "--output-dir", str(output_dir), "--stop-with-parent"]
+        with open(logs / f"slice_{index}_of_{slices}.log", "ab") as log:
+            processes.append(subprocess.Popen(command, stdin=subprocess.PIPE, stdout=log, stderr=subprocess.STDOUT,
+                                              **background_options()))
+    return processes
+
+
+def stop_slices(processes: list[subprocess.Popen]) -> None:
+    for process in processes:
+        process.terminate()
+        process.stdin.close()
+    for process in processes:
+        process.wait()
+
+
+def watch_slices(processes: list[subprocess.Popen], table: pd.DataFrame, scan: RecordScan,
+                 show, refresh: float = REFRESH_SECONDS) -> None:
+    """Update the loading bar until every slice has stopped."""
+    started, done_at_start = time.monotonic(), None
+    while True:
+        running = any(process.poll() is None for process in processes)  # asked first: the last scan sees every record
+        done, failed = field_counts(table, scan.statuses())
+        done_at_start = done if done_at_start is None else done_at_start
+        left = seconds_left(len(table), done, done_at_start, time.monotonic() - started)
+        show(bar_html(done, len(table), failed, scan.gigabytes(), left))
+        if not running:
+            return
+        time.sleep(refresh)
+
+
+def run_database_build(data_dir: Path, output_dir: Path) -> None:
+    """scripts/step6_build_database.py on these folders. It prints its table counts, or its error."""
+    command = [sys.executable, str(ROOT / "scripts" / "step6_build_database.py"),
+               "--db", str(data_dir / "cropyield.duckdb"), "--imagery-dir", str(output_dir),
+               "--mosaiks-dir", str(data_dir / "features" / "mosaiks"), "--workers", str(min(16, os.cpu_count() or 1))]
+    result = subprocess.run(command, capture_output=True, encoding="utf-8", check=False, **background_options())
+    print(result.stdout + result.stderr)
+
+
+def report(table: pd.DataFrame, status: dict, database: Path) -> None:
+    """The last two lines of a download cell."""
+    complete = sum(status.get(key) == "complete" for key in record_keys(table))
+    total = len(table)
+    print(f"Complete: yes, all {total:,} records are complete." if complete == total else
+          f"Complete: no, {complete:,} of {total:,} records are complete. Run this cell again: "
+          "it downloads only the missing fields.")
+    if database.exists():
+        on_disk, differ = scene_differences(database, SCENE_LIST)
+        print(f"Same scenes: {on_disk - len(differ):,} of {on_disk:,} records hold the same scenes as the frozen list.")
+    else:
+        print("Same scenes: not checked, because there is no database.")
+
+
+def notebook_download(scope: str, slices: int, data_dir: Path) -> None:
+    """A download cell of the guide: ask, run the slices with a loading bar, build the database, report."""
+    output_dir, database = data_dir / "imagery" / "sentinel2", data_dir / "cropyield.duckdb"
+    cohort_names = scope_cohorts(scope, None)
+    rows = window_rows(scope, cohort_names)
+    table = window_table(rows)
+    print("Checking what is already on disk ...")
+    scan = RecordScan(output_dir)
+    done, _ = field_counts(table, scan.statuses())
+    missing = len(table) - done
+    print(f"Cost:    {cost_text(len(table), slices)}.")
+    print(f"On disk: {done:,} of {len(table):,} fields are done ({done / len(table):.1%}). "
+          + (f"This run gets only the other {missing:,}." if missing else "This run fetches nothing new."))
+    print("Stop:    you can stop at any time. Every finished field stays on disk.")
+    print("Restart: run this cell again. It checks the disk and downloads only the missing fields.")
+    if not typed_yes("Type yes to start the download: "):
+        print("No download started.")
+        return
+    build = True
+    embeddings = presto_rows(database)
+    if embeddings:  # asked now, because nobody waits at the keyboard until the chips are done
+        print(f"The database holds {embeddings:,} rows in presto_embeddings. The database build removes them.")
+        build = typed_yes("Type yes to build the database after the chips: ")
+    warn_if_onedrive()
+    check_labels(cohort_names)
+    # Written here, once, so that the slices find the window file ready and do not race to write it.
+    write_windows(rows, window_path(scope, cohort_names, output_dir))
+    show = loading_bar()
+    processes = start_slices(scope, slices, output_dir)
+    print(f"{slices} parallel slices started. Their logs are in {output_dir / 'logs'}.")
+    stopped = False
+    try:
+        watch_slices(processes, table, scan, show)
+    except KeyboardInterrupt:
+        stopped = True
+    finally:
+        stop_slices(processes)
+    status = scan.statuses()
+    if stopped:
+        done, _ = field_counts(table, status)
+        print(f"Stopped at {done / len(table):.1%}: {done:,} of {len(table):,} fields are on disk. "
+              "Run this cell again: it downloads only the missing fields.")
+        return
+    if not build:
+        print("Database not built: the existing database stays as it is.")
+    elif field_counts(table, status)[0] == 0:
+        print("Database not built: no record is done. Read the logs, then press Run again.")
+    else:
+        print("Building the database ...")
+        run_database_build(data_dir, output_dir)
+    report(table, status, database)
 
 
 def arguments(argv=None) -> argparse.Namespace:
@@ -203,6 +415,8 @@ def arguments(argv=None) -> argparse.Namespace:
     parser.add_argument("--status", action="store_true",
                         help="offline: how many records of the scope are complete, failed or not on disk; download nothing")
     parser.add_argument("--output-dir", type=Path, default=IMAGERY_DIR, help="where the chips and window file go")
+    parser.add_argument("--stop-with-parent", action="store_true",
+                        help="end when the pipe on stdin closes; the notebook starts its slices this way")
     args = parser.parse_args(argv)
     if args.scope == "cohorts" and not args.cohorts:
         parser.error("--scope cohorts needs --cohorts <name> ...")
@@ -213,6 +427,8 @@ def arguments(argv=None) -> argparse.Namespace:
 
 def main(argv=None) -> int:
     args = arguments(argv)
+    if args.stop_with_parent:
+        stop_with_parent()
     warn_if_onedrive()
     cohort_names = scope_cohorts(args.scope, args.cohorts)
     if args.status:  # safe while download jobs run: it only reads record.json files
@@ -240,7 +456,7 @@ def main(argv=None) -> int:
 
     print(f"[4/{STEPS}] Summary")
     if args.plan:
-        print_plan(selected)
+        print_plan(selected, len(table), args.batch[1] if args.batch[1] > 1 else DEFAULT_SLICES)
     else:
         print_summary(selected, args.output_dir)
     return code

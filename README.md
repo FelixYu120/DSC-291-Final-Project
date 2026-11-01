@@ -11,15 +11,27 @@ and how much of that skill survives in new villages, new districts and a new sea
 
 ## Get started
 
-Clone **outside OneDrive** (for example `C:\Dev\`). Use Python 3.10 or newer and a virtual environment. Run these
-commands from the repository root:
+Clone **outside OneDrive** (for example `C:\Dev\`). Use Python 3.10 or newer. Run these commands once, from the
+repository root:
 
 ```bash
-python -m pip install -e ".[dev]"        # once
-python scripts/get_all_data.py           # labels check and Sentinel-2 chips (48-record pilot)
+python -m venv .venv
+.venv\Scripts\activate                   # macOS/Linux: source .venv/bin/activate
+python -m pip install -e ".[dev]"
+python -m pytest -q                      # small checks, no imagery needed
+```
+
+Labels and splits come with the clone. To get the chips and the database, open
+[`notebooks/data_guide.ipynb`](notebooks/data_guide.ipynb) with the `.venv` kernel, for example in VS Code. In Step 2,
+press the Run arrow of the pilot test, then of all the data. Each cell asks for a typed `yes`, shows a loading bar,
+continues after a stop, and builds the database.
+
+Without the notebook, the same steps are:
+
+```bash
+python scripts/get_all_data.py           # labels check and Sentinel-2 chips (48-record pilot, one process)
 python scripts/step6_build_database.py   # data/cropyield.duckdb
 python scripts/step7_check_data.py       # what the database holds, per cohort
-python -m pytest -q                      # small checks, no imagery needed
 ```
 
 ## Where things are

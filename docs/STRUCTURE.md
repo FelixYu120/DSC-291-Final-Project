@@ -7,7 +7,7 @@ data/            raw/ metadata/ audit/ processed/ (labels, committed)   splits/ 
 scripts/         the data path in step order: get_all_data.py, then step1 to step7 (scripts/README.md)
 sql/             DuckDB schema, views and example queries (sql/README.md)
 src/cropyield/   data/  satellite/  features/  eval/   one subpackage per pipeline stage
-configs/         the Sentinel-2 window file of the pilot
+configs/         the Sentinel-2 window file of the pilot, and the frozen scene list sentinel2_scenes_v1.parquet
 tests/           pytest
 notebooks/       data_guide.ipynb: the one guide to the data
 docs/            ROADMAP.md (plan), DATA.md, EVALUATION.md, RELATED_WORK.md, DECISIONS.md, STRUCTURE.md (this file)

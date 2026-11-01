@@ -1,4 +1,5 @@
 """scripts/step6_build_database.py on the synthetic chip folder: every table and view exists and holds the right values."""
+import hashlib
 import importlib.util
 import json
 import subprocess
@@ -13,7 +14,7 @@ import pytest
 from conftest import FIELD_REFLECTANCE, RECORD, SIZE, add_scenes, make_record_dir, write_scene
 
 from cropyield.data.cohorts import COHORTS, load_cohort
-from cropyield.data.database import wide
+from cropyield.data.database import SCENE_LIST, scene_differences, wide
 from cropyield.longpath import filesystem_path
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "step6_build_database.py"
@@ -291,3 +292,58 @@ def test_two_worker_processes_build_the_same_tables(tmp_path):
         assert con.sql("SELECT count(*) FROM downloads").fetchone()[0] == 3
         assert con.sql("SELECT count(*) FROM monthly_bands").fetchone()[0] == len(MONTHS)
         assert con.sql("SELECT count(*) FROM presto_embeddings").fetchone()[0] == 0
+
+
+SCENES = [("a", "2023-01", "S2A_1"), ("a", "2023-02", "S2A_2"), ("b", "2023-01", "S2B_1"), ("c", "2023-01", "S2C_1")]
+
+
+def scene_copy(tmp_path: Path, local: list[tuple], on_disk: list[str], frozen: list[tuple] = SCENES) -> tuple[Path, Path]:
+    """A database with these rows and a frozen list, as the compare cell finds them."""
+    database, scene_list = tmp_path / "copy.duckdb", tmp_path / "scenes.parquet"
+    with duckdb.connect(str(database)) as con:
+        con.execute("CREATE TABLE downloads (obs_id VARCHAR)")
+        con.execute("CREATE TABLE scenes (obs_id VARCHAR, month VARCHAR, item_id VARCHAR)")
+        con.executemany("INSERT INTO downloads VALUES (?)", [[obs_id] for obs_id in on_disk])
+        con.executemany("INSERT INTO scenes VALUES (?, ?, ?)", [list(row) for row in local])
+    columns = list(zip(*frozen))
+    pq.write_table(pa.table({"obs_id": columns[0], "month": columns[1], "item_id": columns[2]}), scene_list)
+    return database, scene_list
+
+
+def test_compare_counts_only_the_records_on_disk(tmp_path):
+    assert scene_differences(*scene_copy(tmp_path, SCENES[:3], ["a", "b"])) == (2, [])
+
+
+def test_compare_names_a_record_with_another_item_id(tmp_path):
+    local = [SCENES[0], ("a", "2023-02", "S2A_other"), SCENES[2]]
+    assert scene_differences(*scene_copy(tmp_path, local, ["a", "b"])) == (2, ["a"])
+
+
+def test_compare_names_a_record_with_a_missing_month(tmp_path):
+    assert scene_differences(*scene_copy(tmp_path, [SCENES[0], SCENES[2]], ["a", "b"])) == (2, ["a"])
+
+
+def test_compare_names_a_record_on_disk_that_holds_no_scene(tmp_path):
+    assert scene_differences(*scene_copy(tmp_path, SCENES[:2], ["a", "b"])) == (2, ["b"])
+
+
+def test_compare_names_a_record_with_an_extra_month(tmp_path):
+    local = [*SCENES[:3], ("b", "2023-02", "S2B_2")]
+    assert scene_differences(*scene_copy(tmp_path, local, ["a", "b"])) == (2, ["b"])
+
+
+def test_compare_changes_nothing(tmp_path):
+    database, scene_list = scene_copy(tmp_path, SCENES[:3], ["a", "b"])
+    before = database.read_bytes(), scene_list.read_bytes()
+    scene_differences(database, scene_list)
+    assert (database.read_bytes(), scene_list.read_bytes()) == before
+
+
+def test_the_frozen_scene_list_keeps_its_recorded_hash_and_order():
+    table = pq.read_table(SCENE_LIST)
+    rows = list(zip(table["obs_id"].to_pylist(), table["month"].to_pylist()))
+    assert table.column_names == ["obs_id", "month", "item_id"]
+    assert (table.num_rows, len(set(table["obs_id"].to_pylist()))) == (84_967, 11_364)
+    assert rows == sorted(rows)
+    decisions = (SCRIPT.parents[1] / "docs" / "DECISIONS.md").read_text(encoding="utf-8")
+    assert hashlib.sha256(SCENE_LIST.read_bytes()).hexdigest() in decisions

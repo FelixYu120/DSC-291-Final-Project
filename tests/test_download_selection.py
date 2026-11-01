@@ -74,3 +74,37 @@ def test_verified_scene_accepts_a_whole_file(tmp_path):
 def test_verified_scene_refuses_an_unreadable_file_with_a_matching_hash(tmp_path):
     # The header of the broken pilot file: TIFF magic, first-directory offset 0.
     assert downloader.verified_scene(scene_folder(tmp_path, b"II*\x00\x00\x00\x00\x00" + b"\x00" * 64)) is None
+
+
+def test_a_restart_keeps_a_finished_record_and_fetches_only_the_rest(tmp_path):
+    from types import SimpleNamespace
+
+    import numpy as np
+    from rasterio.transform import from_origin
+
+    searched = []
+
+    class Catalog:
+        def search(self, record):
+            searched.append(record["record_key"])
+            return []
+
+    args = SimpleNamespace(refresh_catalog=False, chip_size=8, resolution=10, max_scenes=12, candidates_per_month=3)
+    place = {"start_date": "2023-01-01", "end_date": "2023-06-30", "longitude": 31.0, "latitude": -18.0,
+             "geometry": {"type": "Point", "coordinates": [31.0, -18.0]}}
+    finished = tmp_path / "records" / "finished"
+    scene_folder(finished / "S2A_item")
+    grid = {"crs": "EPSG:32736", "transform": from_origin(500000, 8500000, 10, 10), "width": 4, "height": 4}
+    downloader.write_tif(finished / "aoi_mask.tif", np.ones((4, 4), "uint8"), grid, None, ["mask"])
+    (finished / "record.json").write_text(json.dumps({
+        "status": "complete", "accepted_item_ids": ["S2A_item"], "aoi_sha256": downloader.sha256(finished / "aoi_mask.tif")}))
+    before = (finished / "record.json").stat().st_mtime_ns
+
+    catalog = Catalog()
+    kept = downloader.process_record({**place, "record_key": "finished"}, tmp_path, catalog, args)
+    fetched = downloader.process_record({**place, "record_key": "stopped_halfway"}, tmp_path, catalog, args)
+
+    assert kept == {"record_key": "finished", "status": "complete", "scenes": 1, "reused": True}
+    assert fetched["status"] == "no_scenes"
+    assert searched == ["stopped_halfway"]
+    assert (finished / "record.json").stat().st_mtime_ns == before

@@ -9,8 +9,9 @@ python scripts/step7_check_data.py       # what the database holds, per cohort
 ```
 
 Each step reuses what is already on disk, so running it again is cheap. `get_all_data.py` defaults to the 48-record
-pilot; `--scope all` takes every cohort, and `--batch i/n` runs one of n parallel slices. The SQL behind step 6 lives
-in [`sql/`](../sql/README.md).
+pilot; `--scope all` takes every cohort, and `--batch i/n` runs one of n parallel slices. The download cells of
+[`notebooks/data_guide.ipynb`](../notebooks/data_guide.ipynb) start those slices for you, show a loading bar and then
+run step 6. `--status` shows the progress at any time. The SQL behind step 6 lives in [`sql/`](../sql/README.md).
 
 ## Every script
 

@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 from cropyield import longpath
-from cropyield.longpath import filesystem_path, replace_file
+from cropyield.longpath import filesystem_path, path_exists, replace_file
 from cropyield.satellite.chips import read_chip
 from conftest import RECORD, make_record_dir, write_scene, add_scenes
 
@@ -15,6 +15,14 @@ def test_filesystem_path_leaves_short_paths_unchanged():
     text = filesystem_path(Path("data") / "imagery" / "sentinel2")
     assert not text.startswith("\\\\?\\")
     assert text.endswith(os.path.join("data", "imagery", "sentinel2"))
+
+
+@pytest.mark.skipif(os.name != "nt", reason="MAX_PATH is a Windows limit")
+def test_a_folder_of_250_characters_can_be_made(tmp_path):
+    folder = tmp_path / ("d" * (250 - len(os.path.abspath(tmp_path)) - 1))
+    assert len(os.path.abspath(folder)) == 250
+    Path(filesystem_path(folder)).mkdir()
+    assert path_exists(folder)
 
 
 @pytest.mark.skipif(os.name != "nt", reason="MAX_PATH is a Windows limit")
