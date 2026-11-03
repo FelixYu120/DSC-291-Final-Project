@@ -2,8 +2,9 @@
 
 Run everything from the repository root. The file names follow the data path, step by step.
 
-**With the team database you run none of these.** Labels and splits are frozen, and step 6 removes the Presto rows of the
-team database. Run them only to get the chips or to rebuild the data on purpose.
+**With the team database, start with `python scripts/run_baselines.py`.** No data-building step is needed.
+Labels and splits are frozen, and step 6 removes the Presto rows of the team database. The download/build
+commands below are only for deliberately obtaining chips or building another database. Step 7 is read-only.
 
 ```bash
 python scripts/get_all_data.py           # labels check and Sentinel-2 chips
@@ -20,6 +21,7 @@ run step 6. `--status` shows the progress at any time. The SQL behind step 6 liv
 
 | Script | What it does | When to run it |
 |---|---|---|
+| `run_baselines.py` | R0/R1/A1 on the frozen spatial folds for Malawi, Kenya and Lacuna; saves predictions, tuning choices, metrics and provenance. | With the shared database, after setup; see `docs/BASELINES.md` |
 | `get_all_data.py` | One command for the data steps: checks the label files, writes the window file and downloads the chips. | Only if you need the chips |
 | `step1_download_labels.py` | Downloads the original provider files into `data/raw/`. | Rarely: the labels are committed |
 | `step1b_download_zimbabwe2024_labels.py` | Downloads the Zimbabwe 2024 label files. | Rarely: the labels are committed |

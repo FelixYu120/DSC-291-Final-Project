@@ -2,6 +2,7 @@
 
 One line per decision: date, what, why. Newest on top.
 
+- 2026-11-03 Implement the user-requested R0/R1/A1 reproduction on the existing `s1_cc2km` splits for Malawi, Kenya and Lacuna in `scripts/run_baselines.py`. Reuse the archived model definitions in a new `cropyield.baselines` package; preserve parked files and frozen inputs. Nested grouped tuning uses training-only clipping/scaling; each run saves predictions, chosen alphas, checksums and pooled group-bootstrap intervals. The runner permits only these previously evaluated arms, so this does not resolve or change the restriction on new models using fold 0.
 - 2026-11-01 Next step, approved by the owner: one baseline table (R0, R1 and A1 on Malawi, Kenya and Lacuna, on `s1_cc2km`) that one command rebuilds, then the midterm text. `s2_region` and `temporal` follow in the same loop: a model run may drop near training rows on Kenya `s2_region`, the new-season test carries its spatial warning, and the split files stay as they are.
 - 2026-11-01 Owner ruling on the fold rule: R0, R1, R2 and A1 were scored on fold 0 of `s1_cc2km`. No new arm is scored on it, in any split family.
 - 2026-11-01 Owner ruling: fine-tuning a foundation model is the goal of the project, and no longer stretch. The note on top of `docs/ROADMAP.md` says so.

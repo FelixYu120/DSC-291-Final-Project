@@ -26,6 +26,23 @@ and put it at `data/cropyield.duckdb`. Do not rebuild it. Open
 [`notebooks/data_guide.ipynb`](notebooks/data_guide.ipynb) with the `.venv` kernel, for example in VS Code, and press
 Run All. Step 2 of the guide checks that your file is the team copy.
 
+## Run the spatial baselines
+
+With the shared database in place, run:
+
+```bash
+python scripts/run_baselines.py
+```
+
+This compares R0 (training mean), R1 (10 nearest training locations), and A1 (seasonal vegetation indices
+with Ridge regression) separately for Malawi, Kenya and Lacuna, using the existing `s1_cc2km` folds.
+It verifies the database/label/split checksums, tunes A1 inside each training fold, and saves score tables
+under `results/spatial_baselines/` and field predictions under `data/runs/spatial_baselines/`.
+See [the code walkthrough and interpretation guide](docs/BASELINES.md). The command reads the database;
+it does not need imagery downloads or a database rebuild.
+
+## Optional imagery download
+
 You need the chips only to draw pixels or to build new image features. In Step 2 of the guide, set `DOWNLOAD = True` in
 the pilot cell and press its Run arrow, then do the same for all the data. Each cell then asks for a typed `yes`, shows
 a loading bar, continues after a stop, and builds a database of your own.
