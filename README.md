@@ -5,6 +5,11 @@ Felix Yu, Florian Saewert, Liuan Lu, Pamely Zantou, Zida Jin. UCSD DSC 291, Fall
 **Start with the data guide: [`notebooks/data_guide.ipynb`](notebooks/data_guide.ipynb).** It teaches the data from
 zero: which files make it, where it comes from, how it is matched and split, and what X and Y look like.
 
+**For the quality review, read [`notebooks/data_quality_review.ipynb`](notebooks/data_quality_review.ipynb).**
+It explains the Kenya date and location checks, the stricter cloud screening, how a plot maps to satellite
+pixels, and what still needs improvement. Saved tables and diagrams are readable on GitHub. Run All uses
+the committed aggregate evidence and optional local read-only checks; it downloads nothing and trains no model.
+
 **Question.** Within one smallholder cohort, which Sentinel-2 representation predicts field-level maize yield best,
 and how much of that skill survives in new villages, new districts and a new season? The plan is
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
@@ -86,7 +91,8 @@ python scripts/step7_check_data.py       # what the database holds, per cohort
 
 | Path | What it holds |
 |---|---|
-| [`notebooks/data_guide.ipynb`](notebooks/data_guide.ipynb) | the one guide to the data |
+| [`notebooks/data_guide.ipynb`](notebooks/data_guide.ipynb) | the original data pipeline guide |
+| [`notebooks/data_quality_review.ipynb`](notebooks/data_quality_review.ipynb) | step-by-step quality review, plot-to-pixel diagrams, evidence and next improvements |
 | [`scripts/`](scripts/README.md) | the data path, one script per step |
 | [`sql/`](sql/README.md) | the database schema, views and example queries |
 | `src/cropyield/` | the package that the scripts and the notebook import |

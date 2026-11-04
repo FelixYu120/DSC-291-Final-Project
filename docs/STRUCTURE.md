@@ -9,7 +9,7 @@ sql/             DuckDB schema, views and example queries (sql/README.md)
 src/cropyield/   data/  satellite/  features/  eval/  baselines/   one subpackage per pipeline stage
 configs/         the Sentinel-2 window file of the pilot, and the frozen scene list sentinel2_scenes_v1.parquet
 tests/           pytest
-notebooks/       data_guide.ipynb: the one guide to the data
+notebooks/       data_guide.ipynb: original pipeline; data_quality_review.ipynb: explained quality review
 docs/            ROADMAP.md (plan), DATA.md, EVALUATION.md, RELATED_WORK.md, DECISIONS.md, STRUCTURE.md (this file)
 _parked/         what is not on the data path; MANIFEST.csv lists it, LANDING.md says how to take a file back
 requirements.txt the exact package versions; pyproject.toml names the packages

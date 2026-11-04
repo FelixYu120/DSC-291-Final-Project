@@ -1,5 +1,9 @@
 # Reviewed data variant: Kenya dates, locations and clouds
 
+Read the [executed notebook walkthrough](../notebooks/data_quality_review.ipynb) for step-by-step
+explanations, pixel-selection diagrams, recorded results, optional local checks and reproduction commands.
+It runs without the database or image archive using committed aggregate evidence; detailed derivatives stay local.
+
 This work on `felix-branch` prepares a separate dataset. The original database, provider files,
 frozen labels and spatial splits remain unchanged. No model is trained or scored. The variant is a
 documented sensitivity dataset; it has not replaced the team's frozen inputs.
