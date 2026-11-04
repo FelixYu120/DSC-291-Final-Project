@@ -1,0 +1,1058 @@
+{
+  "variant": "kenya_date_review_and_strict_scl60m_v1",
+  "original_labels_sha256": "49aae383c4489aa98e9e7fe8c31cda6bf1cd752adc8e9540cffdc147a5e0ef92",
+  "source_observations": 11364,
+  "retained_observations": 11364,
+  "original_measurements_coordinates_and_eligibility_unchanged": true,
+  "no_models_trained_or_scored": true,
+  "core_coverage": [
+    {
+      "cohort": "kenya_oaf_2019_2020",
+      "eligible": 3977,
+      "before": 3977,
+      "after": 3972
+    },
+    {
+      "cohort": "malawi_2023",
+      "eligible": 260,
+      "before": 251,
+      "after": 206
+    },
+    {
+      "cohort": "zimbabwe_lacuna_2022_2023",
+      "eligible": 1880,
+      "before": 1880,
+      "after": 1873
+    }
+  ],
+  "assembly_source_sha256": "06bf10a664340e46a5d06558499f0213ef08506f3807d6cb22f5aa1b6351ccfd",
+  "cloud_run_manifest_sha256": "a7824980102358ac46df35540675746eb3b17b11f5f342c78a3150b176f5904f",
+  "kenya_provenance_sha256": "242c636f47fe7fdba577a310fecf080cdef28bc5c1eb2b7da489af717485b98e",
+  "kenya": {
+    "observations_retained": 3977,
+    "observations_removed": 0,
+    "yield_changes": 0,
+    "coordinate_changes": 0,
+    "date_decisions": {
+      "retain_source_dates": 3964,
+      "quarantine_both_ambiguous_date_order": 8,
+      "quarantine_plant_year_outside_season_range": 5
+    },
+    "dates_recovered_from_source": 0,
+    "original_missing_plant_dates": 0,
+    "original_missing_harvest_dates": 89,
+    "raw_harvest_date_types_for_original_missing": {
+      "NoneType": 89
+    },
+    "exact_coordinate_observations": 203,
+    "exact_coordinate_groups": 95,
+    "near_10m_observations": 560,
+    "near_10m_groups": 253,
+    "near_10m_pairs": 450,
+    "exact_pairs": 133,
+    "exact_pairs_cross_year": 0,
+    "near_pairs_cross_year": 46,
+    "pairs_identical_full_source_row": 0,
+    "pairs_identical_payload_except_id": 0,
+    "pairs_same_source_id": 0,
+    "exact_pairs_same_yield": 0,
+    "exact_pairs_same_monthly_bands": 133,
+    "near_pairs_grouped_in_frozen_spatial_split": true,
+    "interpretation": "Quarantined dates are unknown, not corrected true dates. Repeated coordinates are not proof of duplicate fields.",
+    "location_scope": "field_or_homestead_or_nearby_per_provider",
+    "area_scope": "crop_and_field_type_land_not_verified_individual_field",
+    "provider_metadata_evidence": {
+      "location": "Workbook Variables!C40:C41",
+      "area": "Workbook Variables!C75:C76 and Description row 2"
+    },
+    "audit_dates_agree_with_raw": true
+  },
+  "cloud_policy": {
+    "version": 1,
+    "allowed_scl": [
+      4,
+      5
+    ],
+    "cloud_shadow_scl": [
+      3,
+      8,
+      9,
+      10
+    ],
+    "unknown_scl": [
+      0,
+      1,
+      7
+    ],
+    "buffer_metres": 60.0,
+    "grid_metres": 10,
+    "native_scl_metres": 20,
+    "month_rule": "every touched field pixel must pass; otherwise original monthly values become NULL",
+    "unknown_rule": "unknown classification within the buffer is unverified, never clear",
+    "buffer_note": "Conservative project choice, not a validated universal cloud-free guarantee",
+    "sources": [
+      "https://sentiwiki.copernicus.eu/web/s2-processing",
+      "https://documentation.dataspace.copernicus.eu/APIs/openEO/openeo-community-examples/python/30_openeo-processing/scl-dilation-mask/scl-dilation-mask.html"
+    ]
+  },
+  "cloud_totals": {
+    "unique_scenes": 1307,
+    "reviewed_field_months": 84967,
+    "kept_field_months": 82381,
+    "unverified_field_months": 1288,
+    "unreviewed_field_months": 0
+  },
+  "point_area_validation": [
+    {
+      "radius_m": 10,
+      "synthetic_offset_m": 0,
+      "fields": 260,
+      "median_fraction_support_inside_field": 1.0,
+      "median_fraction_field_covered": 0.053540016898257645,
+      "median_intersection_over_union": 0.053540016898257645,
+      "mean_share_directions_point_inside": 1.0
+    },
+    {
+      "radius_m": 10,
+      "synthetic_offset_m": 10,
+      "fields": 260,
+      "median_fraction_support_inside_field": 1.0,
+      "median_fraction_field_covered": 0.05267317522396102,
+      "median_intersection_over_union": 0.05264932061789081,
+      "mean_share_directions_point_inside": 0.9971153846153846
+    },
+    {
+      "radius_m": 10,
+      "synthetic_offset_m": 20,
+      "fields": 260,
+      "median_fraction_support_inside_field": 0.9971370592272754,
+      "median_fraction_field_covered": 0.0496482819175785,
+      "median_intersection_over_union": 0.0496482819175785,
+      "mean_share_directions_point_inside": 0.9634615384615385
+    },
+    {
+      "radius_m": 10,
+      "synthetic_offset_m": 30,
+      "fields": 260,
+      "median_fraction_support_inside_field": 0.7773922540435794,
+      "median_fraction_field_covered": 0.03979814657692732,
+      "median_intersection_over_union": 0.03953563512836697,
+      "mean_share_directions_point_inside": 0.7971153846153847
+    },
+    {
+      "radius_m": 20,
+      "synthetic_offset_m": 0,
+      "fields": 260,
+      "median_fraction_support_inside_field": 0.9999999999999998,
+      "median_fraction_field_covered": 0.2099905698011338,
+      "median_intersection_over_union": 0.20870725913464283,
+      "mean_share_directions_point_inside": 1.0
+    },
+    {
+      "radius_m": 20,
+      "synthetic_offset_m": 10,
+      "fields": 260,
+      "median_fraction_support_inside_field": 0.9971034472657742,
+      "median_fraction_field_covered": 0.2041977918446849,
+      "median_intersection_over_union": 0.20278782338191148,
+      "mean_share_directions_point_inside": 0.9971153846153846
+    },
+    {
+      "radius_m": 20,
+      "synthetic_offset_m": 20,
+      "fields": 260,
+      "median_fraction_support_inside_field": 0.8975981873720047,
+      "median_fraction_field_covered": 0.18899008145885135,
+      "median_intersection_over_union": 0.18546592798758688,
+      "mean_share_directions_point_inside": 0.9634615384615385
+    },
+    {
+      "radius_m": 20,
+      "synthetic_offset_m": 30,
+      "fields": 260,
+      "median_fraction_support_inside_field": 0.715539252660045,
+      "median_fraction_field_covered": 0.1543540905844457,
+      "median_intersection_over_union": 0.14578370206747873,
+      "mean_share_directions_point_inside": 0.7971153846153847
+    },
+    {
+      "radius_m": 30,
+      "synthetic_offset_m": 0,
+      "fields": 260,
+      "median_fraction_support_inside_field": 0.9876751237915887,
+      "median_fraction_field_covered": 0.44619436152268865,
+      "median_intersection_over_union": 0.4363304901252024,
+      "mean_share_directions_point_inside": 1.0
+    },
+    {
+      "radius_m": 30,
+      "synthetic_offset_m": 10,
+      "fields": 260,
+      "median_fraction_support_inside_field": 0.9271887778801277,
+      "median_fraction_field_covered": 0.4321736662271405,
+      "median_intersection_over_union": 0.41487705255778107,
+      "mean_share_directions_point_inside": 0.9971153846153846
+    },
+    {
+      "radius_m": 30,
+      "synthetic_offset_m": 20,
+      "fields": 260,
+      "median_fraction_support_inside_field": 0.8063550893894156,
+      "median_fraction_field_covered": 0.38646269414747725,
+      "median_intersection_over_union": 0.35375109650325753,
+      "mean_share_directions_point_inside": 0.9634615384615385
+    },
+    {
+      "radius_m": 30,
+      "synthetic_offset_m": 30,
+      "fields": 260,
+      "median_fraction_support_inside_field": 0.6412528120998832,
+      "median_fraction_field_covered": 0.3098160693112987,
+      "median_intersection_over_union": 0.26495047299700697,
+      "mean_share_directions_point_inside": 0.7971153846153847
+    }
+  ],
+  "inputs": {
+    "kenya": "data/runs/kenya_review/kenya-review-20261104T070141577669Z/KEN",
+    "clouds": "data/runs/cloud_review/all-retained-60m",
+    "point_areas": "data/runs/point_area_review/2026-11-03-final"
+  },
+  "notes": [
+    "Derived Kenya date columns use reviewed values; original_* columns retain source dates.",
+    "Quarantined dates are unknown; no true replacement dates were recovered.",
+    "Other cohorts' dates were not corrected by the Kenya review.",
+    "NULL monthly bands mean withheld or missing; no values are imputed.",
+    "Old Presto/MOSAIKS embeddings are not included because their cloud masks have not been rebuilt.",
+    "Point buffers and FTW polygons remain separate unvalidated candidates.",
+    "Frozen labels, database, source measurements and spatial splits are unchanged."
+  ],
+  "boundary_review": {
+    "source": "Fields of The World global-data-2e, global annual predicted field boundaries, CC BY 4.0",
+    "source_page": "https://source.coop/ftw/global-data-2e",
+    "source_version": "global-data-2e",
+    "radius_m": 30,
+    "pilot_limit_per_country_year": null,
+    "records": 463,
+    "status_counts": {
+      "no_candidate_unknown": 459,
+      "ambiguous_multiple_candidates": 2,
+      "one_predicted_candidate_requires_review": 2
+    },
+    "queries": [
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 5,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 6,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 12,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 5,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 6,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 3,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 6,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 8,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 9,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 7,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2019,
+        "zone": 36,
+        "observations": 12,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 13,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "KEN",
+        "year": 2020,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 5,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 1,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 10,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 12,
+        "candidates_fetched": 13,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 6,
+        "candidates_fetched": 3,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 1,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 9,
+        "candidates_fetched": 26,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 8,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 1,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 8,
+        "candidates_fetched": 73,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 6,
+        "candidates_fetched": 1,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 11,
+        "candidates_fetched": 9,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 4,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 3,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 9,
+        "candidates_fetched": 35,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 16,
+        "candidates_fetched": 15,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 7,
+        "candidates_fetched": 48,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 6,
+        "candidates_fetched": 4,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 12,
+        "candidates_fetched": 7,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 10,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 1,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 12,
+        "candidates_fetched": 163,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 12,
+        "candidates_fetched": 5,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 2,
+        "candidates_fetched": 0,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 9,
+        "candidates_fetched": 30,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 26,
+        "candidates_fetched": 71,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 19,
+        "candidates_fetched": 29,
+        "error": null
+      },
+      {
+        "country": "MWI",
+        "year": 2023,
+        "zone": 36,
+        "observations": 8,
+        "candidates_fetched": 0,
+        "error": null
+      }
+    ],
+    "labels_sha256_before": "49aae383c4489aa98e9e7fe8c31cda6bf1cd752adc8e9540cffdc147a5e0ef92",
+    "labels_sha256_after": "49aae383c4489aa98e9e7fe8c31cda6bf1cd752adc8e9540cffdc147a5e0ef92",
+    "inputs_unchanged": true,
+    "module_sha256": "ce9f49c62d6c11592542c6b6425233dc29ea7ca7ae8c2e751da26127655ef434",
+    "score_scale": "0 to 100; uncalibrated model score",
+    "source_limitations": "Predictions filter fields below 900 square meters; sparse 2017\u20132019 imagery; annual imagery can include postharvest observations.",
+    "interpretation": "FTW boundaries are model predictions, not surveyed field truth. No matches means unknown. Malawi overlap is validation evidence only; no yield-based selection or coordinate changes are performed."
+  },
+  "boundary_match_coverage": [
+    {
+      "country": "KEN",
+      "observations": 203,
+      "with_candidate": 0
+    },
+    {
+      "country": "MWI",
+      "observations": 260,
+      "with_candidate": 4
+    }
+  ],
+  "output_sha256": {
+    "labels_reviewed.parquet": "21b08fb49b993db7468a80384d0d1aaabdf9254235edaccd836b450d5ff80ec0",
+    "ZWE/zimbabwe_2024/clean_season_indices.parquet": "57e9d9eee8c901747b74a291d25ad3d858cb00bc52331531c831f44a783ae77a",
+    "ZWE/zimbabwe_2024/cleaned_monthly_bands.parquet": "d8fc6726990cfdddbff3ea2948b8dc17a29da2e4a5ee5ad82e65bd4d776d3d2e",
+    "ZWE/zimbabwe_2024/field_coverage.parquet": "e2ef4a797483a3a3dd3fc405503824c94c14ebb15369b62850797ee8d9dd889f",
+    "ZWE/zimbabwe_2024/labels_reviewed.parquet": "bb996336180b66dc9b4bfbe24c642da688589f4f0e66a6ea1f3605c7d17fc891",
+    "ZWE/zimbabwe_lacuna_2022_2023/clean_season_indices.parquet": "f3cf979943a98e9f310c7f46e0d6d115f2ef71c30a68e8d0549a55650d0d2041",
+    "ZWE/zimbabwe_lacuna_2022_2023/cleaned_monthly_bands.parquet": "d66209cb35af5841a53370b5a7120bcceda8322aedb0481a1d796402de999584",
+    "ZWE/zimbabwe_lacuna_2022_2023/field_coverage.parquet": "6817ec5958ec46f85a04e876a34cfc06ba81233043d7cdc80d26b45eecc7139e",
+    "ZWE/zimbabwe_lacuna_2022_2023/labels_reviewed.parquet": "6515e68d2bdf3a79ab46b531ffa8ce84fe7ee9eb434697f5fe03c86430f2057b",
+    "MWI/malawi_2022/clean_season_indices.parquet": "a27847cfd1f44e8f99ba99a63e58f106a3ff28613cbb1a08c3c923a4415664a0",
+    "MWI/malawi_2022/cleaned_monthly_bands.parquet": "aa7f1672dd53ef498dc5388f0e0bf07cd42cb7abcc07d4d54db79c55cf9b426f",
+    "MWI/malawi_2022/field_coverage.parquet": "8455ed50981c125138a6acb1565dc45d81682d6e4e86b7abacf68bb79925005c",
+    "MWI/malawi_2022/labels_reviewed.parquet": "01477a61f65a95959a2a6cad34a73b31a641f3a40531acbd54776737c5f9a37e",
+    "MWI/malawi_2023/clean_season_indices.parquet": "0d73c2b23f6e04ee8d9cf336ae76d2da449cfa43c263ff6ff99b58b039812a18",
+    "MWI/malawi_2023/cleaned_monthly_bands.parquet": "3bbc8e93ed5a6d06897fde4272071f78aec117fc093c06631a982f6006782474",
+    "MWI/malawi_2023/field_coverage.parquet": "3aa06205840bb332a01e0fa8a2a2148edf68c9f6ccc19e95c22ac11f8af7fc5d",
+    "MWI/malawi_2023/labels_reviewed.parquet": "d3843f1658bc73008f5cbfd00e8998509f06e399e61e11f42099b2108223cbea",
+    "MWI/malawi_2023/predicted_boundaries.parquet": "80d2e45d2312e987dbbfa3e1e14edc260162cee8c59b239253f8c002fe8f1346",
+    "KEN/kenya_oaf_2019_2020/clean_season_indices.parquet": "651e93b759232086b9344971ef36bc3fc5900ed00cd44eba0ddb46f29e543aca",
+    "KEN/kenya_oaf_2019_2020/cleaned_monthly_bands.parquet": "97687975c7c944f5f918553f57c97dbc7830b0f1007ee44939c4010e3e0e7bd3",
+    "KEN/kenya_oaf_2019_2020/field_coverage.parquet": "aaeed9dd1dbb74548f13a7bf5200f420d2f52b98e15289c75d8c7f71d7cb737a",
+    "KEN/kenya_oaf_2019_2020/labels_reviewed.parquet": "f194de6dd09acd73ca89a9ce87cf2616083531e7a82ef4a355acaea2bb60a640",
+    "KEN/kenya_oaf_2019_2020/predicted_boundaries.parquet": "9e657ef52acfe7ea36405bd280c37dc2cda1451083871157a8da955c634f8514"
+  },
+  "validation": {
+    "data_pipeline_tests_passed": 250,
+    "platform_tests_skipped": 2,
+    "assembler_tests_passed_after_final_changes": 16,
+    "protected_inputs_unchanged": 27,
+    "all_original_rows_yields_coordinates_and_groups_preserved": true,
+    "derived_date_changes": {
+      "plant_date_to_null": 13,
+      "harvest_date_to_null": 8,
+      "obs_date_to_null": 8
+    },
+    "ruff_passed": true,
+    "country_output_hashes_and_report_links_verified": true,
+    "training_run": false
+  },
+  "local_report": "data/runs/quality_variant/felix-reviewed-v1/report.html",
+  "boundary_interpretation": "No defensible field-boundary replacement from this FTW lookup: Kenya0/203 and Malawi4/260 have candidates within30m; predicted polygons remain separate.",
+  "snapshot_note": "Aggregate results only. Record-level data, masks, derivative tables and candidate geometries stay in ignored data/runs/."
+}

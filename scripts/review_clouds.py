@@ -10,17 +10,24 @@ not reconstruct within-field reflectance medians or update pretrained embeddings
 from __future__ import annotations
 
 import argparse
-from datetime import UTC, datetime
 import json
-from pathlib import Path
 import subprocess
 import sys
+from datetime import UTC, datetime
+from pathlib import Path
 
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from cropyield.satellite.cloud_review import (CORE, derived_tables, load_inputs, policy, run_reviews, sha256)  # noqa: E402
+from cropyield.satellite.cloud_review import (
+    CORE,
+    derived_tables,
+    load_inputs,
+    policy,
+    run_reviews,
+    sha256,
+)
 
 
 def main(argv=None):

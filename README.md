@@ -47,6 +47,12 @@ every field location or yield measurement has been independently verified.
 See [the data-quality guide](docs/DATA_QUALITY.md) for interpretation and provider questions, and the
 [aggregate audit snapshot](results/data_quality/summary.json) for recorded findings.
 
+The [reviewed quality variant](docs/QUALITY_REMEDIATION.md) adds source-backed Kenya date decisions,
+repeated-coordinate evidence, an actual SCL cloud review of all 84,967 accepted field-months, and
+explicitly provisional point-area candidates. It preserves the frozen data and saves a separate
+country/cohort dataset. Under the stricter cloud rule, 6,051 core observations retain at least four
+months; this does not change the original 6,108 count above.
+
 ## Run the spatial baselines
 
 With the shared database in place, run:

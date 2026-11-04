@@ -292,6 +292,8 @@ def run_review(output_root: Path) -> Path:
     (destination / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     provenance = {"protected_sha256_before": before, "protected_sha256_after": after,
                   "inputs_unchanged": True, "module_sha256": sha256(Path(__file__)),
+                  "derived_output_sha256": {name: sha256(destination / name) for name in
+                                            ("record_review.parquet", "date_review.csv", "coordinate_pairs.csv", "summary.json")},
                   "source_workbook_sheet": "Data", "source_row_convention": "Excel row number including header",
                   "no_training": True, "no_automatic_label_or_coordinate_edits": True}
     (destination / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")

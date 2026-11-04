@@ -23,6 +23,11 @@ run step 6. `--status` shows the progress at any time. The SQL behind step 6 liv
 
 | Script | What it does | When to run it |
 |---|---|---|
+| `review_kenya_records.py` | Reconcile Kenya dates/locations with raw workbook; write proposed date fields and duplicate-location evidence. | For the separate quality variant |
+| `review_clouds.py` | Read SCL pixels for frozen scenes; cache masks and create strict monthly/seasonal derivatives by country/cohort. | `plan` first, then `review`; no reflectance archive download or source edits |
+| `review_point_areas.py` | Create labelled buffer supports and measure their geometry against Malawi polygons under synthetic offsets. | For point-area sensitivity, not field-boundary recovery |
+| `review_boundary_candidates.py` | Fetch same-year FTW predictions by bounded HTTP range reads; report nearby/ambiguous matches. | Pilot first; predictions never replace source boundaries |
+| `assemble_quality_variant.py` | Combine completed reviews into separate country/cohort tables and an HTML report. | After reviews; see `docs/QUALITY_REMEDIATION.md` |
 | `audit_data_quality.py` | Reads the shared database and source labels; checks integrity and writes HTML/JSON summaries plus country/cohort review tables. Does not change inputs or run models. | First, after obtaining the team database; see `docs/DATA_QUALITY.md` |
 | `run_baselines.py` | R0/R1/A1 on the frozen spatial folds for Malawi, Kenya and Lacuna; saves predictions, tuning choices, metrics and provenance. | When intentionally running the baseline experiment, after reviewing data quality; see `docs/BASELINES.md` |
 | `get_all_data.py` | One command for the data steps: checks the label files, writes the window file and downloads the chips. | Only if you need the chips |

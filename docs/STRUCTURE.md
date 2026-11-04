@@ -24,6 +24,11 @@ It writes a local HTML report and country/cohort review tables under `data/runs/
 An aggregate audit snapshot lives in `results/data_quality/summary.json`. This path runs no models
 and does not change the frozen data.
 
+`docs/QUALITY_REMEDIATION.md` describes the separate reviewed variant. `review_kenya_records.py`,
+`review_clouds.py`, `review_point_areas.py` and `review_boundary_candidates.py` create local review
+outputs; `assemble_quality_variant.py` combines completed reviews into `KEN/`, `MWI/` and `ZWE/`
+cohort folders under a new `data/runs/quality_variant/` directory. These never replace the frozen inputs.
+
 ## Rules
 
 1. Branch per task, pull request, one reviewer. `main` always passes `python -m pytest`.

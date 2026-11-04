@@ -6,32 +6,30 @@ and outside a configurable cloud/shadow buffer. It never invents reflectance.
 """
 from __future__ import annotations
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import UTC, datetime
 import hashlib
 import json
 import math
 import os
-from pathlib import Path
 import re
 import tempfile
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import UTC, datetime
+from pathlib import Path
 
 import duckdb
 import numpy as np
 import pandas as pd
 import rasterio
+import requests
 from rasterio.enums import Resampling
 from rasterio.features import rasterize
 from rasterio.transform import from_origin
 from rasterio.vrt import WarpedVRT
 from rasterio.warp import transform, transform_geom
-import requests
 from scipy.ndimage import distance_transform_edt
 from shapely import from_wkt
 from shapely.geometry import mapping
-
-from cropyield import ROOT
 
 API = "https://earth-search.aws.element84.com/v1"
 COLLECTION = "sentinel-2-c1-l2a"
@@ -228,25 +226,27 @@ def scene_job(item_id, rows, cache, mask_policy):
     if any(row["acquired"] != acquisition or row["month"] != acquisition[:7] for row in records):
         raise ValueError("STAC acquisition date differs from frozen scene date")
     results, arrays = [], {}
-    with rasterio.Env(GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR", CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif",
-                      GDAL_HTTP_TIMEOUT="45", GDAL_HTTP_MAX_RETRY="2", GDAL_HTTP_RETRY_DELAY="1",
-                      GDAL_CACHEMAX=256 * 1024 * 1024):
-        with rasterio.open(asset["href"]) as source:
-            if not np.allclose(source.res, [20, 20]):
-                raise ValueError(f"Unexpected native SCL resolution: {source.res}")
-            for number, row in enumerate(records):
-                grid, halo = chip_grid(row["lon"], row["lat"], mask_policy["buffer_metres"])
-                with WarpedVRT(source, **grid, src_nodata=0, nodata=0, dtype="uint8",
-                               resampling=Resampling.nearest) as vrt:
-                    scl = vrt.read(1)
-                stats, masks = review_chip(scl, grid, halo, row, mask_policy["buffer_metres"])
-                prefix = f"r{number:05d}"
-                arrays.update({f"{prefix}_{name}": value for name, value in masks.items()})
-                results.append({"obs_id": row["obs_id"], "item_id": item_id, "month": row["month"],
-                                "cohort": row["cohort"], "country_iso3": row["country_iso3"],
-                                "include_primary": row["include_primary"], **stats,
-                                "mask_prefix": prefix, "mask_path": str(directory / "masks.npz"),
-                                "metadata_path": str(metadata_path), "error": None})
+    with (
+        rasterio.Env(GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR", CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif",
+                     GDAL_HTTP_TIMEOUT="45", GDAL_HTTP_MAX_RETRY="2", GDAL_HTTP_RETRY_DELAY="1",
+                     GDAL_CACHEMAX=256 * 1024 * 1024),
+        rasterio.open(asset["href"]) as source,
+    ):
+        if not np.allclose(source.res, [20, 20]):
+            raise ValueError(f"Unexpected native SCL resolution: {source.res}")
+        for number, row in enumerate(records):
+            grid, halo = chip_grid(row["lon"], row["lat"], mask_policy["buffer_metres"])
+            with WarpedVRT(source, **grid, src_nodata=0, nodata=0, dtype="uint8",
+                           resampling=Resampling.nearest) as vrt:
+                scl = vrt.read(1)
+            stats, masks = review_chip(scl, grid, halo, row, mask_policy["buffer_metres"])
+            prefix = f"r{number:05d}"
+            arrays.update({f"{prefix}_{name}": value for name, value in masks.items()})
+            results.append({"obs_id": row["obs_id"], "item_id": item_id, "month": row["month"],
+                            "cohort": row["cohort"], "country_iso3": row["country_iso3"],
+                            "include_primary": row["include_primary"], **stats,
+                            "mask_prefix": prefix, "mask_path": str(directory / "masks.npz"),
+                            "metadata_path": str(metadata_path), "error": None})
     directory.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(dir=directory, suffix=".npz", delete=False) as stream:
         temporary = Path(stream.name)
@@ -285,7 +285,7 @@ def run_reviews(scenes, cache, mask_policy, workers=8):
                 output, cached = future.result()
                 results.extend(output)
                 status = "cached" if cached else "reviewed"
-            except Exception as error:
+            except Exception as error:  # noqa: BLE001 - every scene failure must remain explicitly unverified
                 message = f"{type(error).__name__}: {error}"
                 failures.append({"item_id": item, "error": message})
                 for row in rows.itertuples():
