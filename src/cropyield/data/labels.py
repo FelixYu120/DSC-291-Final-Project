@@ -8,12 +8,12 @@ target; models standardise inside the training fold.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
 import hashlib
 import io
 import json
-from pathlib import Path
 import zipfile
+from dataclasses import dataclass
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -276,26 +276,53 @@ def build_labels(oaf: pd.DataFrame, lacuna: pd.DataFrame) -> pd.DataFrame:
 def check_labels(labels: pd.DataFrame) -> list[str]:
     """Checks 1, 2, 4, 6, 8 and 10 of docs/DATA.md, on the table alone. Empty list: all pass."""
     problems = []
-    if labels["obs_id"].isna().any() or labels["obs_id"].duplicated().any():
-        problems.append("obs_id is not unique and non-null")
+    missing = sorted(set(COLUMNS) - set(labels.columns))
+    if missing:
+        return [f"labels are missing required columns: {', '.join(missing)}"]
+    if (labels["obs_id"].isna().any() or labels["obs_id"].astype("string").str.strip().eq("").any()
+            or labels["obs_id"].duplicated().any()):
+        problems.append("obs_id is not unique, non-null and non-blank")
+    if labels["source_id"].isna().any() or labels["source_id"].astype("string").str.strip().eq("").any():
+        problems.append("source_id is null or blank")
     counts = labels.groupby(["cohort", "season_year"]).size().to_dict()
     if counts != EXPECTED_ROWS:
         problems.append(f"row counts changed: {counts}")
-    primary = labels[labels["include_primary"]]
-    if not primary["yield_kg_ha"].between(0, MAX_YIELD_KG_HA).all():
+    valid_inclusion = labels["include_primary"].map(lambda value: isinstance(value, (bool, np.bool_)))
+    if not valid_inclusion.all():
+        problems.append("include_primary must be a non-null boolean")
+    included = labels["include_primary"].where(valid_inclusion, False).astype(bool)
+    reason = labels["exclusion_reason"].astype("string")
+    if reason.isna().any() or not included.equals(reason.fillna("").eq("").astype(bool)):
+        problems.append("include_primary disagrees with exclusion_reason")
+    primary = labels[included]
+    if not pd.to_numeric(primary["yield_kg_ha"], errors="coerce").between(0, MAX_YIELD_KG_HA).fillna(False).all():
         problems.append("an included row has a yield outside [0, 15000] kg/ha")
-    if primary[["lat", "lon"]].isna().any(axis=None):
-        problems.append("an included row has no coordinates")
+    lat = pd.to_numeric(labels["lat"], errors="coerce")
+    lon = pd.to_numeric(labels["lon"], errors="coerce")
+    coordinates_ok = (lat.between(-90, 90) & lon.between(-180, 180) & ~((lat == 0) & (lon == 0))).fillna(False)
+    if not coordinates_ok.all():
+        problems.append("a row has missing, non-finite or invalid WGS84 coordinates")
     for column in ("yield_definition", "cut_area_m2", "n_cuts"):
+        if labels[column].isna().any() or labels[column].astype("string").str.strip().eq("").any():
+            problems.append(f"a row has missing {column}")
         if (labels.groupby("cohort")[column].nunique() != 1).any():
             problems.append(f"a cohort has more than one {column}")
+    for column in ("cut_area_m2", "n_cuts"):
+        value = pd.to_numeric(labels[column], errors="coerce")
+        if not (np.isfinite(value) & (value > 0)).fillna(False).all():
+            problems.append(f"{column} must be finite and positive")
+    cuts = pd.to_numeric(labels["n_cuts"], errors="coerce")
+    if not (cuts == cuts.round()).fillna(False).all():
+        problems.append("n_cuts must be an integer")
     lacuna = primary[primary["cohort"] == "zimbabwe_lacuna_2022_2023"]
     if lacuna["intercropped"].any() or lacuna["irrigated"].any():
         problems.append("an included Lacuna row is intercropped or irrigated")
     if primary.loc[primary["cohort"] == "zimbabwe_2024", "is_zero"].any():
         problems.append("an included Zimbabwe 2024 row has zero yield")
     for cohort, rows in labels.groupby("cohort"):
-        close = connected_clusters(rows["lat"].to_numpy(), rows["lon"].to_numpy(), 0.01)
+        if not coordinates_ok.loc[rows.index].all():
+            continue  # Report invalid inputs rather than crashing the spatial check.
+        close = connected_clusters(lat.loc[rows.index].to_numpy(dtype=float), lon.loc[rows.index].to_numpy(dtype=float), 0.01)
         if (pd.Series(rows["cluster_2km"].to_numpy()).groupby(close).nunique() > 1).any():
             problems.append(f"{cohort}: rows within 10 m are in different clusters")
     return problems
@@ -304,7 +331,27 @@ def check_labels(labels: pd.DataFrame) -> list[str]:
 def check_against_raw(labels: pd.DataFrame, oaf: pd.DataFrame, lacuna: pd.DataFrame) -> list[str]:
     """Checks 3, 5, 7 and 9 of docs/DATA.md: rows re-derive from the provider files."""
     problems = []
-    kenya = labels[labels["cohort"] == "kenya_oaf_2019_2020"].merge(oaf, on="source_row", validate="one_to_one")
+
+    def joined(cohort: str, raw: pd.DataFrame, key: str, name: str) -> pd.DataFrame:
+        rows = labels[labels["cohort"] == cohort]
+        if rows[key].isna().any() or raw[key].isna().any() or rows[key].duplicated().any() or raw[key].duplicated().any():
+            problems.append(f"{name}: raw linkage key {key} is missing or duplicated")
+            # Do not allow a many-to-many join to fabricate evidence of agreement.
+            return rows.head(0).merge(raw.head(0), on=key)
+        result = rows.merge(raw, on=key, how="left", validate="one_to_one", indicator=True)
+        if (result["_merge"] != "both").any():
+            problems.append(f"{name}: a label has no matching provider row")
+        return result.loc[result["_merge"] == "both"].drop(columns="_merge")
+
+    def same_numbers(actual, expected, tolerance: float, allow_both_missing: bool = False) -> bool:
+        actual = pd.to_numeric(actual, errors="coerce")
+        expected = pd.to_numeric(expected, errors="coerce")
+        same = np.isfinite(actual) & np.isfinite(expected) & ((actual - expected).abs() <= tolerance)
+        if allow_both_missing:
+            same |= actual.isna() & expected.isna()
+        return bool(same.fillna(False).all())
+
+    kenya = joined("kenya_oaf_2019_2020", oaf, "source_row", "Kenya")
     # Excel stored one id as a date; the audit wrote it with isoformat().
     raw_id = kenya["unique_id"].map(lambda value: value.isoformat() if hasattr(value, "isoformat") else str(value))
     if (kenya["source_id"] != raw_id).any():
@@ -312,38 +359,45 @@ def check_against_raw(labels: pd.DataFrame, oaf: pd.DataFrame, lacuna: pd.DataFr
     per_ha = pd.to_numeric(kenya["yield_kg_ph"], errors="coerce")
     per_acre = pd.to_numeric(kenya["yield_kg_pa"], errors="coerce") / ACRE_HA
     expected = per_ha.fillna(per_acre)
-    if (np.abs(kenya["yield_kg_ha"] - expected) > 1e-6).any():
+    if not same_numbers(kenya["yield_kg_ha"], expected, 1e-6):
         problems.append("Kenya: yield_kg_ha differs from the workbook")
     if ((np.abs(per_ha - per_acre) > np.maximum(1, per_ha.abs() * 0.01)) & per_ha.notna() & per_acre.notna()).any():
         problems.append("Kenya: kg/ha and kg/acre disagree by more than 1 %")
-    if (np.abs(kenya["lat"] - pd.to_numeric(kenya["field_latitude"])) > 1e-7).any():
-        problems.append("Kenya: latitude differs from the workbook")
-    if (kenya["admin_unit"] == "").any():
+    for column, raw_column, name in (("lat", "field_latitude", "latitude"), ("lon", "field_longitude", "longitude")):
+        if not same_numbers(kenya[column], kenya[raw_column], 1e-7):
+            problems.append(f"Kenya: {name} differs from the workbook or is non-finite")
+    if kenya["admin_unit"].isna().any() or kenya["admin_unit"].astype("string").str.strip().eq("").any():
         problems.append("Kenya: a row has no district")
 
-    zimbabwe = labels[labels["cohort"] == "zimbabwe_lacuna_2022_2023"].merge(lacuna, on="source_id", validate="one_to_one")
-    if (np.abs(zimbabwe["yield_kg_ha"] - zimbabwe["raw_yield_t_ha"].astype(float) * 1000) > 1e-6).any():
+    zimbabwe = joined("zimbabwe_lacuna_2022_2023", lacuna, "source_id", "Lacuna")
+    if not same_numbers(zimbabwe["yield_kg_ha"], pd.to_numeric(zimbabwe["raw_yield_t_ha"], errors="coerce") * 1000, 1e-6):
         problems.append("Lacuna: yield_kg_ha differs from the GeoJSON")
-    if (np.abs(zimbabwe["raw_yield_t_ha"].astype(float) - zimbabwe["raw_dry_kg"].astype(float) * 0.25) > 1e-3).any():
+    if not same_numbers(zimbabwe["raw_yield_t_ha"], pd.to_numeric(zimbabwe["raw_dry_kg"], errors="coerce") * 0.25, 1e-3):
         problems.append("Lacuna: t/ha is not dry kg x 0.25")
-    if (np.abs(zimbabwe["lat"] - zimbabwe["raw_lat"].astype(float)) > 1e-7).any():
-        problems.append("Lacuna: latitude differs from the GeoJSON")
+    for column, raw_column, name in (("lat", "raw_lat", "latitude"), ("lon", "raw_lon", "longitude")):
+        if not same_numbers(zimbabwe[column], zimbabwe[raw_column], 1e-7):
+            problems.append(f"Lacuna: {name} differs from the GeoJSON or is non-finite")
 
-    malawi = labels[labels["cohort"] == "malawi_2023"].merge(malawi_2023_raw(), on="source_id", validate="one_to_one")
-    if (np.abs(malawi["yield_kg_ha"] - malawi["cc_ey_t"].astype(float) * 1000) > 1e-6).any():
+    malawi = joined("malawi_2023", malawi_2023_raw(), "source_id", "Malawi 2023")
+    if not same_numbers(malawi["yield_kg_ha"], pd.to_numeric(malawi["cc_ey_t"], errors="coerce") * 1000, 1e-6):
         problems.append("Malawi 2023: yield_kg_ha differs from cc_ey_t")
-    if (np.abs(malawi["cut2_kg_ha"] - malawi["subc_ey_t"].astype(float) * 1000) > 1e-6).any():
+    if not same_numbers(malawi["cut2_kg_ha"], pd.to_numeric(malawi["subc_ey_t"], errors="coerce") * 1000,
+                        1e-6, allow_both_missing=True):
         problems.append("Malawi 2023: nested cut differs from subc_ey_t")
 
     boxes = labels[(labels["cohort"] == "zimbabwe_2024") & labels["cut1_kg_ha"].notna() & labels["cut2_kg_ha"].notna()]
-    if (np.abs(boxes["yield_kg_ha"] - (boxes["cut1_kg_ha"] + boxes["cut2_kg_ha"]) / 2) > 1).any():
+    if not same_numbers(boxes["yield_kg_ha"], (boxes["cut1_kg_ha"] + boxes["cut2_kg_ha"]) / 2, 1):
         problems.append("Zimbabwe 2024: yield is not the mean of the two boxes")
 
-    recorded = {entry["path"].replace("\\", "/"): entry["sha256"] for entry in manifest_entries()}
+    recorded = [(entry["path"].replace("\\", "/"), entry["sha256"]) for entry in manifest_entries()]
     for path in (OAF_WORKBOOK, LACUNA_GEOJSON, MALAWI_2023_ZIP):
         key = path.relative_to(RAW_DIR).as_posix()
-        found = [value for name, value in recorded.items() if name.endswith(key)]
-        if found and found[0] != sha256(path):
+        found = {value for name, value in recorded if name == key or name.endswith("/" + key)}
+        if not found:
+            problems.append(f"{key}: no SHA-256 in the download manifest")
+        elif len(found) != 1:
+            problems.append(f"{key}: conflicting SHA-256 entries in the download manifest")
+        elif next(iter(found)) != sha256(path):
             problems.append(f"{key}: SHA-256 differs from the download manifest")
     return problems
 

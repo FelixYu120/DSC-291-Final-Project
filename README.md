@@ -26,6 +26,27 @@ and put it at `data/cropyield.duckdb`. Do not rebuild it. Open
 [`notebooks/data_guide.ipynb`](notebooks/data_guide.ipynb) with the `.venv` kernel, for example in VS Code, and press
 Run All. Step 2 of the guide checks that your file is the team copy.
 
+## Check data quality first
+
+With the shared database in place, run this read-only audit before starting a new experiment:
+
+```bash
+python scripts/audit_data_quality.py
+```
+
+The audit checks file fingerprints, source measurements and coordinates, table links, monthly coverage,
+index calculations and feature arrays. It creates a local HTML report, a machine-readable summary and
+record review tables organized by country and cohort under `data/runs/data_quality/<timestamp>/`.
+It does not train models, remove observations, or rebuild the database.
+
+The active cohorts contain **6,117 eligible observations**, of which **6,108 have at least four clear
+months**: 3,977 Kenya, 251 Malawi and 1,880 Lacuna. Review flags identify uncertainty; they are not an
+automatic exclusion list. A successful audit means the implemented integrity checks passed, not that
+every field location or yield measurement has been independently verified.
+
+See [the data-quality guide](docs/DATA_QUALITY.md) for interpretation and provider questions, and the
+[aggregate audit snapshot](results/data_quality/summary.json) for recorded findings.
+
 ## Run the spatial baselines
 
 With the shared database in place, run:

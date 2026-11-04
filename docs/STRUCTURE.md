@@ -19,6 +19,11 @@ The active modelling entry point is `scripts/run_baselines.py`, configured by
 `configs/spatial_baselines_v1.yaml`. `docs/BASELINES.md` explains it. Score tables and run metadata go to
 `results/spatial_baselines/<run_id>/`; field predictions stay in ignored `data/runs/spatial_baselines/<run_id>/`.
 
+The data-quality entry point is `scripts/audit_data_quality.py`; see `docs/DATA_QUALITY.md`.
+It writes a local HTML report and country/cohort review tables under `data/runs/data_quality/<run_id>/`.
+An aggregate audit snapshot lives in `results/data_quality/summary.json`. This path runs no models
+and does not change the frozen data.
+
 ## Rules
 
 1. Branch per task, pull request, one reviewer. `main` always passes `python -m pytest`.
