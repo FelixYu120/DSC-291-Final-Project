@@ -3,6 +3,8 @@
 Read the [executed notebook walkthrough](../notebooks/data_quality_review.ipynb) for step-by-step
 explanations, pixel-selection diagrams, recorded results, optional local checks and reproduction commands.
 It runs without the database or image archive using committed aggregate evidence; detailed derivatives stay local.
+Sections 12–15 discuss three tabular-foundation-model papers and a step-by-step preparation plan, ending
+before fitting or scoring. These proposals preserve the current data and protected-evaluation restrictions.
 
 This work on `felix-branch` prepares a separate dataset. The original database, provider files,
 frozen labels and spatial splits remain unchanged. No model is trained or scored. The variant is a

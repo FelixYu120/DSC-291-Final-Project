@@ -9,6 +9,8 @@ zero: which files make it, where it comes from, how it is matched and split, and
 It explains the Kenya date and location checks, the stricter cloud screening, how a plot maps to satellite
 pixels, and what still needs improvement. Saved tables and diagrams are readable on GitHub. Run All uses
 the committed aggregate evidence and optional local read-only checks; it downloads nothing and trains no model.
+Sections 12–15 add the crop-yield TabPFN, original TabPFN and TabFM papers, their limits, and a numbered
+preparation plan with deliverables. Future predictor comparisons are documented but have not been started.
 
 **Question.** Within one smallholder cohort, which Sentinel-2 representation predicts field-level maize yield best,
 and how much of that skill survives in new villages, new districts and a new season? The plan is
