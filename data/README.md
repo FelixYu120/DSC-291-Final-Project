@@ -13,12 +13,13 @@ All linked releases below are tracked in Git. The shared database, chips and scr
 | [processed/zimbabwe_weather_v1/](processed/zimbabwe_weather_v1/) | Weather-enriched labels, monthly weather, climate normals, grid joins and retrieval ledger | [README.md](processed/zimbabwe_weather_v1/README.md) |
 | [runs/zimbabwe_weather_v1/](runs/zimbabwe_weather_v1/) | Imagery/weather model tables and full-weather comparisons | [RESULTS.md](runs/zimbabwe_weather_v1/RESULTS.md) |
 | [runs/zimbabwe_weather_compact_v1/](runs/zimbabwe_weather_compact_v1/) | Compact weather and predictor tables, comparisons and overfitting diagnostics | [RESULTS.md](runs/zimbabwe_weather_compact_v1/RESULTS.md) |
+| [runs/zimbabwe_multiyear_v1/](runs/zimbabwe_multiyear_v1/) | All-label imagery audit, eligible aggregation features, extra-Lacuna spatial permissions and expanded training comparisons | [RESULTS.md](runs/zimbabwe_multiyear_v1/RESULTS.md) |
 
 The releases include both usable and reserved/ineligible observations, identified by flags and split tables.
 Use `target_memberships.csv` and `source_spatial_permissions.csv` when reproducing the comparisons;
 do not treat every row in a combined table as training data.
 
-Latest follow-up: [runs/zimbabwe_aggregation_v1/](runs/zimbabwe_aggregation_v1/) holds the same-field temporal aggregation comparison, including raw monthly values, crop-date audits, variant predictors and [RESULTS.md](runs/zimbabwe_aggregation_v1/RESULTS.md).
+The [runs/zimbabwe_aggregation_v1/](runs/zimbabwe_aggregation_v1/) release holds the original same-field temporal aggregation comparison, including raw monthly values, crop-date audits, variant predictors and [RESULTS.md](runs/zimbabwe_aggregation_v1/RESULTS.md). Step 15 audits all 6,598 labels but excludes all 169 Lacuna 2022 fields and two 2024 fields for insufficient December–June imagery; no missing imagery is imputed.
 
 ## Sources and common inputs
 

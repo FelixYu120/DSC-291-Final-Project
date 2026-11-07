@@ -15,10 +15,11 @@ and tests whether rainfall and temperature improve prediction. Earlier Malawi/Ke
 | Find the cleaned or merged data | [Data directory](data/README.md) |
 | Find `RESULTS.md`, scores and predictions | [Results directory](results/README.md) |
 | Reproduce an existing experiment | [Reproduction guide](docs/zimbabwe/REPRODUCING.md) |
+| Check how the V0–V3 R² values were calculated | [R² audit and Claude review packet](docs/zimbabwe/R2_AUDIT.md) |
 
 The basic merge experiment uses **10 vegetation-index features with Ridge**, not MOSAIKS. Naive pooling hurts;
 source-aware adjustment removes most of that penalty, but adding 2024 has not established a reliable accuracy gain.
-The later weather and richer-feature experiments are reported separately. The latest [seasonal aggregation comparison](docs/zimbabwe/AGGREGATION_RESULTS.md) tests mean, crop-date preharvest mean, maximum, median and a modal estimate.
+The later weather and richer-feature experiments are reported separately. The [seasonal aggregation comparison](docs/zimbabwe/AGGREGATION_RESULTS.md) tests mean, crop-date preharvest mean, maximum, median and a modal estimate. The [expanded-training comparison](docs/zimbabwe/MULTIYEAR_RESULTS.md) audits 2022–2024 coverage and tests all eligible Lacuna training rows with and without 2024 on the same 2023 evaluation fields.
 
 ## Read or run the notebooks
 
@@ -46,7 +47,7 @@ the original build step would remove its Presto embeddings. See [scripts](script
 | [data/](data/README.md) | Source snapshots, cleaned exports, frozen splits and experiment releases |
 | [results/](results/README.md) | Index of all results plus aggregate quality/baseline evidence |
 | [notebooks/](notebooks/README.md) | Executed explanations and checks |
-| [scripts/](scripts/README.md) | Commands for steps 1–14, audits and reproduction |
+| [scripts/](scripts/README.md) | Commands for steps 1–15, audits and reproduction |
 | [configs/](configs/README.md) | Dataset fingerprints and experiment settings |
 | [src/cropyield/](src/cropyield/) | Data preparation, features, baselines and experiment implementation |
 | [sql/](sql/README.md) | Database schema and views |

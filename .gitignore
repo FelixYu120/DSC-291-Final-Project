@@ -16,6 +16,7 @@ data/runs/*
 !data/runs/zimbabwe_weather_v1/
 !data/runs/zimbabwe_weather_compact_v1/
 !data/runs/zimbabwe_aggregation_v1/
+!data/runs/zimbabwe_multiyear_v1/
 !data/runs/zimbabwe_weather_validation_v1.json
 !data/runs/zimbabwe_weather_compact_validation_v1.json
 !data/runs/zimbabwe_weather_compact_support_v1.csv

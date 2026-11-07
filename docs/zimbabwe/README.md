@@ -20,6 +20,8 @@ use the [recorded-code runner](REPRODUCING.md) to reproduce steps 9–13 on curr
 
 Step 14 adds [seasonal aggregation V0–V3](AGGREGATION_RESULTS.md): [script](../../scripts/step14_compare_zimbabwe_aggregation.py), [fixed protocol](AGGREGATION_PROTOCOL.md), [complete results](../../data/runs/zimbabwe_aggregation_v1/RESULTS.md). This new experiment runs directly from current main and compares each aggregation separately on bands and indices.
 
+Step 15 adds [expanded Lacuna/2024 training](MULTIYEAR_RESULTS.md): [script](../../scripts/step15_compare_zimbabwe_multiyear.py), [protocol](MULTIYEAR_PROTOCOL.md), [complete results](../../data/runs/zimbabwe_multiyear_v1/RESULTS.md). It audits all 6,598 labels, excludes fields with insufficient imagery, and keeps the same 1,504 evaluation fields. The [R² review packet](R2_AUDIT.md) explains the calculation and the difference between band and index scores.
+
 ## Choose the dataset you need
 
 | Purpose | File | Contents |
@@ -37,6 +39,8 @@ Do not train on every row of a candidate table: apply eligibility flags and the 
 The merge comparisons evaluate 1,504 Lacuna 2023 fields; 376 historical fold-0 fields remain excluded from fitting/scoring.
 
 The [aggregation release](../../data/runs/zimbabwe_aggregation_v1/) contains `observations.csv`, `monthly_observations.parquet`, `features.parquet`, an explicit `feature_dictionary.json` and `window_audit.csv`. It preserves the same candidate IDs and per-fit memberships.
+
+The [expanded-training release](../../data/runs/zimbabwe_multiyear_v1/) adds all-label eligibility and monthly coverage audits plus fold-specific permissions for the 217 additional Lacuna 2023 fields. Its eligible pools contain 2,097 Lacuna 2023 fields and 4,330 Zimbabwe 2024 fields before reserved/evaluation exclusions and spatial buffering. All 169 Lacuna 2022 fields are audited but excluded for inadequate common-window imagery.
 
 ## Find the evidence
 

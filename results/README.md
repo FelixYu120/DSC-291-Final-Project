@@ -12,7 +12,11 @@ under `data/runs/`; each report is named **`RESULTS.md`**. They are linked here 
 | Full weather feature set | [RESULTS.md](../data/runs/zimbabwe_weather_v1/RESULTS.md) | [metrics.csv](../data/runs/zimbabwe_weather_v1/metrics.csv) | [predictions.csv](../data/runs/zimbabwe_weather_v1/predictions.csv) |
 | Two/four weather features | [RESULTS.md](../data/runs/zimbabwe_weather_compact_v1/RESULTS.md) | [metrics.csv](../data/runs/zimbabwe_weather_compact_v1/metrics.csv) | [predictions.csv](../data/runs/zimbabwe_weather_compact_v1/predictions.csv) |
 
-Latest satellite follow-up: [aggregation V0–V3 results](../data/runs/zimbabwe_aggregation_v1/RESULTS.md), [scores](../data/runs/zimbabwe_aggregation_v1/metrics.csv), [predictions](../data/runs/zimbabwe_aggregation_v1/predictions.csv), and [short explanation](../docs/zimbabwe/AGGREGATION_RESULTS.md).
+Original satellite follow-up: [aggregation V0–V3 results](../data/runs/zimbabwe_aggregation_v1/RESULTS.md), [scores](../data/runs/zimbabwe_aggregation_v1/metrics.csv), [predictions](../data/runs/zimbabwe_aggregation_v1/predictions.csv), and [short explanation](../docs/zimbabwe/AGGREGATION_RESULTS.md).
+
+Latest comparison: [expanded Lacuna/2024 training results](../data/runs/zimbabwe_multiyear_v1/RESULTS.md), [scores](../data/runs/zimbabwe_multiyear_v1/metrics.csv), [predictions](../data/runs/zimbabwe_multiyear_v1/predictions.csv), and [coverage/results explanation](../docs/zimbabwe/MULTIYEAR_RESULTS.md). Evaluation remains the same 1,504 Lacuna 2023 fields; 2022 has insufficient imagery and is excluded.
+
+For the R² discrepancy review, use the [full calculation and Claude review packet](../docs/zimbabwe/R2_AUDIT.md), [independent recalculation](aggregation/r2_audit.csv), and [receipt](aggregation/r2_audit.json). These identify reflectance-band and vegetation-index models separately.
 
 The [current methods report](../docs/zimbabwe/METHODS.md) compares the experiments and explains the uncertainty.
 Within each release, `fold_metrics.csv` gives fold-level scores, `paired_differences.csv` gives paired uncertainty,

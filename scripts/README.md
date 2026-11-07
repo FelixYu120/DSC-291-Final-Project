@@ -53,6 +53,19 @@ python scripts/verify_zimbabwe_aggregation.py
 
 It compares V0/V3 mean, V1 crop-date preharvest mean, a common-calendar control, V2 max, V3 median and a continuous-mode estimate, separately for bands/indices and Lacuna-only/merged Ridge. Original memberships and source permissions are reused. Use a new `--output` path for any deliberately changed experiment. See the [protocol](../docs/zimbabwe/AGGREGATION_PROTOCOL.md) and [results](../docs/zimbabwe/AGGREGATION_RESULTS.md).
 
+## Expanded training comparison and R² audit: step 15
+
+The expanded-training comparison runs as a separate step 15:
+
+```bash
+python scripts/step15_compare_zimbabwe_multiyear.py --output data/runs/zimbabwe_multiyear_replay
+python scripts/verify_zimbabwe_multiyear.py
+python scripts/verify_multiyear_intervals.py
+python scripts/audit_zimbabwe_r2.py
+```
+
+The [step-15 protocol](../docs/zimbabwe/MULTIYEAR_PROTOCOL.md) preserves the original 2023 evaluation fields, screens all 2022–2024 imagery and buffers additional Lacuna training observations. The standalone R² audit reads committed prediction CSVs and requires no database or model fitting; its default verifies the original step-14 scores. Use `--release data/runs/zimbabwe_multiyear_v1 --output results/multiyear` for the expanded comparison.
+
 ## Quality review and earlier baselines
 
 The quality variant is separate from the frozen Zimbabwe experiments. Read the

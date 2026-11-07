@@ -7,8 +7,10 @@ For the current deliverable, start with the [Zimbabwe project guide](zimbabwe/RE
 | Topic | Document |
 |---|---|
 | Seasonal aggregation V0–V3 | [zimbabwe/AGGREGATION_RESULTS.md](zimbabwe/AGGREGATION_RESULTS.md), [protocol](zimbabwe/AGGREGATION_PROTOCOL.md) |
+| Expanded Lacuna/2024 training and 2022 imagery exclusions | [zimbabwe/MULTIYEAR_RESULTS.md](zimbabwe/MULTIYEAR_RESULTS.md), [protocol](zimbabwe/MULTIYEAR_PROTOCOL.md) |
+| R² calculation, exact scores and Claude review packet | [zimbabwe/R2_AUDIT.md](zimbabwe/R2_AUDIT.md) |
 | One-page basic Ridge summary | [zimbabwe/SUMMARY.md](zimbabwe/SUMMARY.md) |
-| Zimbabwe data, steps 8–13 and result locations | [zimbabwe/README.md](zimbabwe/README.md) |
+| Zimbabwe data, steps 8–15 and result locations | [zimbabwe/README.md](zimbabwe/README.md) |
 | Complete merge/weather methods and conclusions | [zimbabwe/METHODS.md](zimbabwe/METHODS.md) |
 | Initial merge comparison and compatibility fixes | [zimbabwe/MERGE_RESULTS.md](zimbabwe/MERGE_RESULTS.md) |
 | Why 2024 adds little; source quality and model diagnostics | [zimbabwe/TRANSFER_FINDINGS.md](zimbabwe/TRANSFER_FINDINGS.md) |

@@ -1,5 +1,7 @@
 # Satellite aggregation: preharvest means helped the compact band model
 
+For exact R² values, the calculation and a copyable external-review request, see the [R² audit](R2_AUDIT.md). For the later expanded training pools on these same evaluation fields, see [step 15](MULTIYEAR_RESULTS.md).
+
 **V1 improved the mean-only reflectance-band baseline, while median and mode were worse.** On the same 1,504 Lacuna
 fields, target-only Ridge RMSE fell from **1.7984 to 1.7503 t/ha** (2.68%). The paired difference was **−0.0481**, with
 95% spatial-group interval **[−0.0885, −0.0104]**. Adding 2024 still provided no clear gain.
