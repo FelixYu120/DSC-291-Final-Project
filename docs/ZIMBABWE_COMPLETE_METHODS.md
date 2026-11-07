@@ -199,6 +199,9 @@ A stronger causal or deployment claim needs independent seasons and farms, a pre
 
 ## Files and reproduction
 
+After integrating the earlier quality-review work into main, shared validation modules have stronger checks and new source hashes.
+Use the [recorded-code runner](ZIMBABWE_REPRODUCTION.md) for the published experiments; their original outputs and manifests remain unchanged.
+
 | Location | Contents |
 |---|---|
 | `data/processed/zimbabwe_midterm_v1/` | Lacuna audit, cleaned data and original splits |
@@ -214,12 +217,12 @@ For a GRU or another sequence model, explicitly order weather months October, No
 Pipeline: raw audit → harmonized labels and eligibility → frozen imagery/splits → weather snapshots and unit/season/grid conversion → feature tables → training-only transforms → inner tuning → outer predictions → paired metrics. Release manifests pin all inputs and outputs. Changed code/data requires a new output directory; never overwrite old results.
 
 ```bash
-python scripts/step11_add_zimbabwe_weather.py  # offline by default; uses saved snapshots
-python scripts/step12_compare_zimbabwe_weather.py
-python scripts/step13_compare_compact_weather.py
-python scripts/verify_zimbabwe_weather.py
-python scripts/verify_compact_weather.py
-python scripts/compare_compact_candidate.py  # exploratory benchmark check; no refitting
+python scripts/reproduce_zimbabwe.py weather  # offline; new output destination
+python scripts/reproduce_zimbabwe.py weather-models
+python scripts/reproduce_zimbabwe.py compact
+python scripts/reproduce_zimbabwe.py verify-weather
+python scripts/reproduce_zimbabwe.py verify-compact
+python scripts/reproduce_zimbabwe.py candidate  # exploratory benchmark check; no refitting
 ```
 
 To rebuild earlier stages, run step 8, then step 9, then step 10 using their pinned inputs. **Do not run step 6 on the team database:** it would remove the existing Presto rows. The required database SHA-256 is `e192b9d6021fdae020f9b08123b98648dc4b5274989635927c709a5607cdcd60`; frozen label SHA-256 is `49aae383c4489aa98e9e7fe8c31cda6bf1cd752adc8e9540cffdc147a5e0ef92`.

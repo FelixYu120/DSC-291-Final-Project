@@ -6,7 +6,7 @@ For the current Zimbabwe midterm deliverable, see [`ZIMBABWE_DATA_HANDOFF.md`](Z
 
 The user-authorized pooling extension uses `scripts/step9_compare_zimbabwe_merge.py`,
 `src/cropyield/experiments/zimbabwe_merge.py` and `configs/zimbabwe_merge_v1.json`. Its complete label catalog,
-audits, model inputs, nested splits, predictions and results live in `data/runs/zimbabwe_merge_v1/` (git-ignored).
+audits, model inputs, nested splits, predictions and results live in the tracked release `data/runs/zimbabwe_merge_v1/`.
 [`ZIMBABWE_MERGE_PROTOCOL.md`](ZIMBABWE_MERGE_PROTOCOL.md) supersedes the historical no-pooling/stretch
 restriction for this specific experiment. The pinned database, labels and splits stay unchanged.
 
@@ -26,23 +26,41 @@ The compact-weather follow-up uses `src/cropyield/experiments/zimbabwe_weather_c
 Its immutable results and 124/126-column feature matrices live in `data/runs/zimbabwe_weather_compact_v1/`;
 independent verification is in `scripts/verify_compact_weather.py`.
 
+After integrating the earlier baselines and quality review, main includes stronger shared validators. Use
+`scripts/reproduce_zimbabwe.py` to verify/replay the recorded Zimbabwe source revision with its original manifests;
+see `docs/ZIMBABWE_REPRODUCTION.md`. The baseline and quality-review packages run directly from current main.
+
 ## Layout
 
 `notebooks/data_guide_2_zimbabwe.ipynb` is the offline walkthrough of the Zimbabwe audit, merge, weather and compact-model
 experiments. `notebooks/README.md` gives the reading order; the original `data_guide.ipynb` remains the foundation guide.
 
 ```
-data/            raw/ metadata/ audit/ processed/ (labels, committed)   splits/ (frozen)   imagery/ features/ runs/ (git-ignored)
+data/            raw/ metadata/ audit/ processed/ splits/ and selected frozen runs/ tracked; imagery/features/scratch runs ignored
 scripts/         the data path in step order: get_all_data.py, then step1 to step13 (scripts/README.md)
 sql/             DuckDB schema, views and example queries (sql/README.md)
-src/cropyield/   data/  satellite/  features/  eval/  experiments/   one subpackage per pipeline stage
+src/cropyield/   data/  satellite/  features/  eval/  experiments/  baselines/   pipeline and evaluation packages
 configs/         the Sentinel-2 window file of the pilot, and the frozen scene list sentinel2_scenes_v1.parquet
 tests/           pytest
-notebooks/       data_guide.ipynb: the one guide to the data
+notebooks/       data_guide.ipynb; data_guide_2_zimbabwe.ipynb; data_quality_review.ipynb; reading order in README.md
 docs/            ROADMAP.md (plan), DATA.md, EVALUATION.md, RELATED_WORK.md, DECISIONS.md, STRUCTURE.md (this file)
 _parked/         what is not on the data path; MANIFEST.csv lists it, LANDING.md says how to take a file back
 requirements.txt the exact package versions; pyproject.toml names the packages
 ```
+
+The active modelling entry point is `scripts/run_baselines.py`, configured by
+`configs/spatial_baselines_v1.yaml`. `docs/BASELINES.md` explains it. Score tables and run metadata go to
+`results/spatial_baselines/<run_id>/`; field predictions stay in ignored `data/runs/spatial_baselines/<run_id>/`.
+
+The data-quality entry point is `scripts/audit_data_quality.py`; see `docs/DATA_QUALITY.md`.
+It writes a local HTML report and country/cohort review tables under `data/runs/data_quality/<run_id>/`.
+An aggregate audit snapshot lives in `results/data_quality/summary.json`. This path runs no models
+and does not change the frozen data.
+
+`docs/QUALITY_REMEDIATION.md` describes the separate reviewed variant. `review_kenya_records.py`,
+`review_clouds.py`, `review_point_areas.py` and `review_boundary_candidates.py` create local review
+outputs; `assemble_quality_variant.py` combines completed reviews into `KEN/`, `MWI/` and `ZWE/`
+cohort folders under a new `data/runs/quality_variant/` directory. These never replace the frozen inputs.
 
 ## Rules
 

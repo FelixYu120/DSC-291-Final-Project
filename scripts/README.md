@@ -11,13 +11,23 @@ splits; `verify_zimbabwe_weather.py` independently checks the release, units, jo
 Step 13 tests fixed two- and four-variable weather sets with the same folds and saved controls;
 `verify_compact_weather.py` reconstructs features, checks selection/accounting, replays intervals and a selected model.
 
+Start with `python scripts/audit_data_quality.py` for a current integrity review. This checks the stored data
+and writes review reports; it does not train a model. Read [the quality guide](../docs/DATA_QUALITY.md)
+before interpreting flags or starting an experiment. No data-building step is needed.
+The download/build commands below are only for deliberately obtaining chips or building another database.
+
+**Historical Zimbabwe reproduction after the merge:** use `python scripts/reproduce_zimbabwe.py verify-compact`
+or the other stages in [the reproduction guide](../docs/ZIMBABWE_REPRODUCTION.md). This runs the recorded source revision
+without weakening its input-hash checks. The direct step-9–13 and verifier entry points below describe that historical
+implementation; the stronger shared validators on current main have intentionally different source hashes.
+
 ```bash
 python scripts/get_all_data.py           # labels check and Sentinel-2 chips
 python scripts/step6_build_database.py   # data/cropyield.duckdb: every table plus the views
 python scripts/step7_check_data.py       # what the database holds, per cohort
 ```
 
-Each step reuses what is already on disk, so running it again is cheap. `get_all_data.py` defaults to the 48-record
+Downloads reuse what is already on disk; model-training stages can still take substantial time. `get_all_data.py` defaults to the 48-record
 pilot; `--scope all` takes every cohort, and `--batch i/n` runs one of n parallel slices. The download cells of
 [`notebooks/data_guide.ipynb`](../notebooks/data_guide.ipynb) start those slices for you, show a loading bar and then
 run step 6. `--status` shows the progress at any time. The SQL behind step 6 lives in [`sql/`](../sql/README.md).
@@ -26,6 +36,14 @@ run step 6. `--status` shows the progress at any time. The SQL behind step 6 liv
 
 | Script | What it does | When to run it |
 |---|---|---|
+| `reproduce_zimbabwe.py` | Extracts recorded source into a temporary directory, verifies the historical input/output hash chain, and replays steps 9–13 or their verifiers into a new destination. | For historical Zimbabwe reproduction from current main; stages and new-output rules are in the reproduction guide |
+| `review_kenya_records.py` | Reconcile Kenya dates/locations with raw workbook; write proposed date fields and duplicate-location evidence. | For the separate quality variant |
+| `review_clouds.py` | Read SCL pixels for frozen scenes; cache masks and create strict monthly/seasonal derivatives by country/cohort. | `plan` first, then `review`; no reflectance archive download or source edits |
+| `review_point_areas.py` | Create labelled buffer supports and measure their geometry against Malawi polygons under synthetic offsets. | For point-area sensitivity, not field-boundary recovery |
+| `review_boundary_candidates.py` | Fetch same-year FTW predictions by bounded HTTP range reads; report nearby/ambiguous matches. | Pilot first; predictions never replace source boundaries |
+| `assemble_quality_variant.py` | Combine completed reviews into separate country/cohort tables and an HTML report. | After reviews; see `docs/QUALITY_REMEDIATION.md` |
+| `audit_data_quality.py` | Reads the shared database and source labels; checks integrity and writes HTML/JSON summaries plus country/cohort review tables. Does not change inputs or run models. | First, after obtaining the team database; see `docs/DATA_QUALITY.md` |
+| `run_baselines.py` | R0/R1/A1 on the frozen spatial folds for Malawi, Kenya and Lacuna; saves predictions, tuning choices, metrics and provenance. | When intentionally running the baseline experiment, after reviewing data quality; see `docs/BASELINES.md` |
 | `get_all_data.py` | One command for the data steps: checks the label files, writes the window file and downloads the chips. | Only if you need the chips |
 | `step1_download_labels.py` | Downloads the original provider files into `data/raw/`. | Rarely: the labels are committed |
 | `step1b_download_zimbabwe2024_labels.py` | Downloads the Zimbabwe 2024 label files. | Rarely: the labels are committed |

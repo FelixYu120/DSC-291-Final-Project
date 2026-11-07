@@ -1,0 +1,25 @@
+[
+  {
+    "notebook": "notebooks/data_guide_2_zimbabwe.ipynb",
+    "code_cells": 26,
+    "all_passed": true,
+    "database_available_to_loader": false,
+    "model_replay_enabled_by_default": false,
+    "optional_model_replay_tested": true,
+    "database_access_forbidden_by_audit_hook": true,
+    "network_downloads": false,
+    "sha256": "26ed4eee825b3cc0dbcb5d73c4ad43214cafce9da0bac6928e5cb53e7a87e811"
+  },
+  {
+    "notebook": "notebooks/data_quality_review.ipynb",
+    "code_cells": 15,
+    "all_passed": true,
+    "database_available_to_loader": false,
+    "model_replay_enabled_by_default": false,
+    "optional_model_replay_tested": false,
+    "database_access_forbidden_by_audit_hook": true,
+    "network_downloads": false,
+    "sha256": "5ad0634a32a6d53e4b5b4763cc66212d980009b85441aeb8798c371827c0752b",
+    "archived_notebook_unchanged": true
+  }
+]

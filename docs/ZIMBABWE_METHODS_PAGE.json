@@ -3,10 +3,11 @@
   "url": "https://chatgpt.com/space/page_61fc048f13d081918467a88b670e9da4",
   "title": "Zimbabwe data merging weather enrichment and evaluation",
   "private": true,
-  "content_matches_repository_copy": true,
+  "content_matches_repository_copy": false,
   "native_blocks": 85,
   "main_words": 319,
   "total_words": 3771,
   "appendix_collapsed_by_default": true,
-  "visual_preview": "Not verified: browser preview requires login; content and appendix metadata verified through the Pages connector."
+  "visual_preview": "Not verified: browser preview requires login; content and appendix metadata verified through the Pages connector.",
+  "repository_update_note": "Repository reproduction instructions now use the recorded-code runner after main consolidation. The native Page retains the prior report snapshot; scientific results are unchanged."
 }
