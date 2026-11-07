@@ -28,6 +28,9 @@ independent verification is in `scripts/verify_compact_weather.py`.
 
 ## Layout
 
+`notebooks/data_guide_2_zimbabwe.ipynb` is the offline walkthrough of the Zimbabwe audit, merge, weather and compact-model
+experiments. `notebooks/README.md` gives the reading order; the original `data_guide.ipynb` remains the foundation guide.
+
 ```
 data/            raw/ metadata/ audit/ processed/ (labels, committed)   splits/ (frozen)   imagery/ features/ runs/ (git-ignored)
 scripts/         the data path in step order: get_all_data.py, then step1 to step13 (scripts/README.md)

@@ -5,6 +5,11 @@ Felix Yu, Florian Saewert, Liuan Lu, Pamely Zantou, Zida Jin. UCSD DSC 291, Fall
 **Start with the data guide: [`notebooks/data_guide.ipynb`](notebooks/data_guide.ipynb).** It teaches the data from
 zero: which files make it, where it comes from, how it is matched and split, and what X and Y look like.
 
+**Continue with [Data Guide 2: Zimbabwe](notebooks/data_guide_2_zimbabwe.ipynb).** It walks through cleaning,
+yield conversion, merging the two Zimbabwe seasons, spatial evaluation, weather provenance, model results and
+the compact-weather overfitting check. Its default run uses tracked artifacts offline, without the database or model retraining.
+See the [notebook index](notebooks/README.md) for the reading order.
+
 **Zimbabwe midterm handoff (November 7):** [`docs/ZIMBABWE_DATA_HANDOFF.md`](docs/ZIMBABWE_DATA_HANDOFF.md)
 documents the November 4 Zimbabwe focus, source checks, cleaned exports and explicit train/validation/historical-test
 roles. Reproduce the package with `python scripts/step8_build_zimbabwe_handoff.py`; it reads the team database without

@@ -1,0 +1,13 @@
+{
+  "notebook": "notebooks/data_guide_2_zimbabwe.ipynb",
+  "sha256": "277da01a56d9861f33800b8e2af68bde1b1d528b87868761efbfd6810b386713",
+  "cells": 54,
+  "code_cells": 26,
+  "default_execution": "passed in a fresh Jupyter kernel",
+  "default_model_fitting": false,
+  "database_access": "forbidden by a Python audit hook during verification",
+  "network_downloads": false,
+  "optional_model_replay": "376 predictions matched saved results within 1e-9 t/ha",
+  "figures_reviewed": 4,
+  "execution_errors": 0
+}
