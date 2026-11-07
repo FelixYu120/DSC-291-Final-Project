@@ -2,8 +2,14 @@
 
 Run everything from the repository root. The file names follow the data path, step by step.
 
-**With the team database you run none of these.** Labels and splits are frozen, and step 6 removes the Presto rows of the
-team database. Run them only to get the chips or to rebuild the data on purpose.
+**With the team database, steps 1–6 are unnecessary.** Labels and splits are frozen, and step 6 removes the Presto rows of the
+team database. Step 7 reads diagnostics; step 8 creates the verified Zimbabwe handoff through a read-only connection.
+Step 9 independently audits Zimbabwe 2024 and runs the user-requested pooled-data comparison, also read-only.
+Step 10 diagnoses transfer limits using the step-9 release, richer predictors, quality/relevance policies and controls.
+Step 11 caches NASA POWER weather and enriches all screened labels. Step 12 runs the weather comparison on unchanged
+splits; `verify_zimbabwe_weather.py` independently checks the release, units, joins, permissions, metrics and a model replay.
+Step 13 tests fixed two- and four-variable weather sets with the same folds and saved controls;
+`verify_compact_weather.py` reconstructs features, checks selection/accounting, replays intervals and a selected model.
 
 ```bash
 python scripts/get_all_data.py           # labels check and Sentinel-2 chips
@@ -29,5 +35,14 @@ run step 6. `--status` shows the progress at any time. The SQL behind step 6 liv
 | `step5_download_imagery.py` | The Sentinel-2 downloader. `get_all_data.py` calls it; run it alone only for special cases. | Called by `get_all_data.py` |
 | `step6_build_database.py` | Builds `data/cropyield.duckdb` from the labels, the chips and the MOSAIKS feature files that are already in `data/features/mosaiks/`. It leaves `presto_embeddings` empty. | After a download; never on the team database |
 | `step7_check_data.py` | Prints what the database holds for the model rows: coverage, clear share per month, feature ranges, haze, greenest month, signal per cohort-year. | After every database build |
+| `step8_build_zimbabwe_handoff.py` | Independently checks raw Zimbabwe labels against frozen data; exports cleaned labels, allowlisted seasonal/monthly features, explicit splits, dictionary, audit and hashes. | For the midterm data handoff; `--output` chooses a separate release directory |
+| `step9_compare_zimbabwe_merge.py` | Exports the complete harmonized Zimbabwe label catalog and compares Lacuna-only versus pooled training using nested spatial CV, common features, cohort adaptation and zero sensitivities. | For the merge experiment; fold 0 is never fit/scored; `--output` selects a new immutable release |
+| `step10_diagnose_zimbabwe_transfer.py` | Tests why pooling helps little: error decomposition, cut agreement, source learnability, monthly/Presto features, quality/relevance filtering, shuffled labels, matched subsets and learning curves. | Requires the step-9 release; nested method selection, historical fold-0 protection and separate immutable outputs |
+| `step11_add_zimbabwe_weather.py` | Downloads 1991–2024 NASA POWER MERRA-2 rain/temperature for 97 cells; exports 46 weather features on all 6,598 labels, monthly tables, normals, grid mapping and exact request provenance. | `--download-only` fills the cache; default build is offline; `--output` chooses another immutable release |
+| `step12_compare_zimbabwe_weather.py` | Tests nine weather models against four unchanged saved controls on the original target/source split permissions. | Requires steps 9–11 and the pinned database for hash verification; never fits/scores target fold 0 |
+| `verify_zimbabwe_weather.py` | Independently reconstructs weather features, checks source distances and identical controls, replays paired bootstrap intervals and a selected model. | After step 12; optional `--report PATH` saves the verification receipt |
+| `step13_compare_compact_weather.py` | Tests two/four fixed weather summaries across ten new arms, retains nine controls, and exports training gaps and spatial-group/weather-cell intervals. | Requires steps 9–12; same splits, no fold-0 fitting/scoring; `--output` chooses a new immutable release |
+| `verify_compact_weather.py` | Independently reconstructs early-season weather, checks all 19 arms and frozen splits, replays both bootstrap schemes and a selected merged tree. | After step 13; `--output PATH` selects the verification receipt |
+| `compare_compact_candidate.py` | Compares the best observed compact arm with existing benchmarks without refitting; reports spatial-group and weather-cell intervals. | After step 13; explicitly post-hoc, not the primary comparison |
 
 The main install (`python -m pip install -r requirements.txt`) covers everything.

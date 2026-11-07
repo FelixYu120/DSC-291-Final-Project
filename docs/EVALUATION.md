@@ -4,6 +4,30 @@ Answers the feedback "How will you measure generalization across time and space?
 fixed before the first model is trained. Evidence: semivariograms computed on the screened audit CSVs on
 29 October 2026, and arm R1 on the frozen folds and the `load_xy` rows, checked on 1 November 2026.
 
+**November 7 Zimbabwe handoff:** [`ZIMBABWE_DATA_HANDOFF.md`](ZIMBABWE_DATA_HANDOFF.md) defines explicit roles over
+these frozen folds: 2–4 train, 1 validation, 0 historical test. For `s1_cc2km`, counts are 1,128 / 376 / 376.
+This creates no new blind holdout: prior baselines have already evaluated these observations. The November 1 decision
+still prohibits scoring new model arms on fold 0 in any family. The derived `s2_region` partition has only two test
+Admin1 groups and three validation groups; it is a limited sensitivity check, not a precise national benchmark.
+
+**November 7 merge comparison:** the separately authorized [protocol](ZIMBABWE_MERGE_PROTOCOL.md) compares
+Lacuna-only with Lacuna + 2024 using outer folds 1–4 and grouped inner CV. It never fits or scores fold 0.
+All arms predict the same 1,504 target rows using the same common-window predictors, and every fit removes
+auxiliary observations within 2 km of its protected target fields. Report this as exploratory development
+evidence, with paired group-bootstrap intervals, not a newly blind test or a real-time 2023 forecast.
+
+**November 7 weather comparison:** [protocol](ZIMBABWE_WEATHER_PROTOCOL.md) adds monthly rainfall/temperature and
+historical anomalies to both training alternatives, preserving exact target memberships and source permissions.
+The primary comparison is pooled versus target-only weather-enhanced monthly trees. A paired interaction separates
+weather's overall benefit from its effect on the incremental value of 2024. Coarse weather cells can cross these
+2 km partitions; report cell overlap and do not interpret the result as unseen-weather-region generalization.
+
+**Compact weather follow-up:** [fixed protocol](ZIMBABWE_COMPACT_WEATHER_PROTOCOL.md) compares two and four
+seasonal weather summaries with the same imagery, memberships, source permissions and nine saved controls.
+Ten new arms use inner validation for selection. Training/outer error gaps and a 30-weather-cell bootstrap
+supplement the original 232-group intervals. The four-feature merged-tree versus target-tree comparison is
+primary; feature reduction also changes encoding, so it cannot isolate dimensionality as the sole cause.
+
 ## Why the protocol matters: location alone already "predicts" yield
 
 A kNN on coordinates only (10 neighbours, no imagery), out-of-fold R²:

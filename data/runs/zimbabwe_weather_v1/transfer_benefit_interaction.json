@@ -1,0 +1,9 @@
+{
+  "bootstrap_draws": 2000,
+  "ci_high": 0.057896391202558274,
+  "ci_low": 0.0025044515242818146,
+  "definition": "(pooled weather - target weather) - (pooled no weather - target no weather)",
+  "delta_rmse_t_ha": 0.027967371205837477,
+  "negative_means": "weather increased the benefit of merging",
+  "spatial_groups": 232
+}

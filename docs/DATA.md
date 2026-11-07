@@ -3,6 +3,29 @@
 Checked on 29 October 2026 against the raw provider files, the audit CSVs and `data/cropyield.duckdb`.
 Every model reads one table, `labels_v1`, built and frozen before the first fit. This file is its contract.
 
+**November 7 update:** the November 4 meeting selects Zimbabwe Lacuna for the midterm. The historical cohort roles
+below remain in the frozen snapshot. The current [Zimbabwe handoff](ZIMBABWE_DATA_HANDOFF.md) independently verifies
+2,269 raw maize rows, 2,266 screened labels and 1,880 primary 2023 rows. It also documents post-harvest imagery,
+explicit partition roles, and previously evaluated test data. The pinned database has 3 observed months for 101 of
+the 169 screened 2022 rows and 4 for the other 68; earlier descriptions of "no imagery" were too broad. The existing
+2022 exclusion policy is unchanged, and no claim is made that every satellite archive lacks 2022 data.
+
+**November 7 pooling extension:** Felix authorized a [Zimbabwe merge experiment](ZIMBABWE_MERGE_PROTOCOL.md).
+The full harmonized catalog has 2,266 Lacuna + 4,332 Zimbabwe 2024 labels. Its modeling comparison uses the
+unchanged 1,880 primary Lacuna 2023 population and 4,330 source rows with sufficient December–June imagery
+before fold-specific spatial buffering. Valid source zeros are retained; `include_primary` remains historical
+metadata, not the new source eligibility rule. The old no-pooling/parked decisions below describe the frozen baseline.
+
+**November 7 weather extension:** `data/processed/zimbabwe_weather_v1/` preserves the full 6,598-label catalog and
+adds 46 NASA POWER MERRA-2 weather predictors, with 1991–2020 normals, explicit 0.5° × 0.625° grid mapping,
+raw-response hashes and no missing weather rows. The [complete methods](ZIMBABWE_COMPLETE_METHODS.md) document
+units, seasons, cleaning, compatibility limits and all merge experiments. Existing labels/splits/database are unchanged.
+
+**Compact weather extension:** `data/runs/zimbabwe_weather_compact_v1/` exports the same 6,212 comparison
+candidates with fixed two/four-variable weather policies and 124/126-column model matrices. The four weather
+columns are January–March rainfall percent of normal and temperature anomaly, plus the same summaries for the
+preceding October–December. The full weather catalog is retained; choosing fewer predictors does not delete data.
+
 ## Short answers to the proposal feedback
 
 - **Do the cohorts measure yield the same way?** No. Cut size, number of cuts and moisture basis differ
@@ -13,11 +36,12 @@ Every model reads one table, `labels_v1`, built and frozen before the first fit.
   training is a stretch only (per-cohort standardised target, cohort indicator, still scored within
   cohort); a pooled R² is never reported, because differences between cohort means inflate it.
 
-- **Can we harmonize them anyway?** Not in physical units: the moisture basis is missing in most cohorts, and
-  no file lets us convert one cut size to another. Harmonization of the satellite side works without extra
-  steps: a model trained in one cohort ranks fields in another (X1, Spearman up to 0.40), with no rescaling and
-  no target label. The t/ha level does not carry over reliably. So we compare cohorts by rank, never by t/ha
-  ([`ROADMAP.md`](ROADMAP.md#2-the-absolute-minimum-baseline-b0)).
+- **Can we harmonize them anyway?** Numeric yield units can be harmonized: t/ha already accounts for cut
+  area, so differences in sample area or cut count do not require an extra multiplier. Unknown moisture or
+  grain/cob basis cannot be physically corrected from these files. Statistical cohort calibration and weighting
+  can still be tested against target-only training, with all accuracy metrics evaluated within the target cohort.
+  This is the purpose of the separately authorized Zimbabwe merge experiment. Historical transfer results
+  remain in [`ROADMAP.md`](ROADMAP.md#2-the-absolute-minimum-baseline-b0).
 
 ## How each cohort measures yield
 
@@ -35,9 +59,12 @@ Sources: Malawi metadata sheets and the 2023 sampling-frame methodology in `data
 workbook sheets *Variables* and *Description*; Lacuna GeoJSON properties and technical manual
 (`data/raw/zimbabwe/`); vision-guided `metadata.csv`.
 
-Why Zimbabwe 2024 is parked: all 1,874 zeros have zero wet *and* zero dry weight, and the zero share
-follows the visit month (13 % March, 30 % April, 66 % May, 92 % June, 100 % July). Most zeros are likely
-"already harvested or not measured", not crop failure. 2023/24 was also a declared drought year.
+Historical reason Zimbabwe 2024 was parked: all 1,874 zeros have zero wet *and* zero dry weight, and the zero
+share follows the visit month (13 % March, 30 % April, 66 % May, 92 % June, 100 % July). This association does
+**not** establish that most zeros mean "already harvested or not measured". The raw file has 723 separately
+missing labels, and the [source paper](https://arxiv.org/html/2511.12999v1) explicitly treats zero-inflated yields.
+The new experiment therefore keeps recorded zeros and reports positive-only/downweighted-zero sensitivities;
+neither visit timing nor the drought alone validates or invalidates an individual zero.
 
 ## Imagery status
 

@@ -5,6 +5,41 @@ Felix Yu, Florian Saewert, Liuan Lu, Pamely Zantou, Zida Jin. UCSD DSC 291, Fall
 **Start with the data guide: [`notebooks/data_guide.ipynb`](notebooks/data_guide.ipynb).** It teaches the data from
 zero: which files make it, where it comes from, how it is matched and split, and what X and Y look like.
 
+**Zimbabwe midterm handoff (November 7):** [`docs/ZIMBABWE_DATA_HANDOFF.md`](docs/ZIMBABWE_DATA_HANDOFF.md)
+documents the November 4 Zimbabwe focus, source checks, cleaned exports and explicit train/validation/historical-test
+roles. Reproduce the package with `python scripts/step8_build_zimbabwe_handoff.py`; it reads the team database without
+rebuilding it. The older cross-country plan below remains background, not the current midterm scope.
+
+**Zimbabwe merge experiment:** [`docs/ZIMBABWE_MERGE_PROTOCOL.md`](docs/ZIMBABWE_MERGE_PROTOCOL.md) records the
+compatibility fixes and Lacuna-only versus Lacuna + 2024 comparison. Run
+`python scripts/step9_compare_zimbabwe_merge.py` for the complete harmonized label catalog, audited features,
+nested spatial validation, predictions and report under `data/runs/zimbabwe_merge_v1/`. Fold 0 stays reserved.
+The [results and teammate explanation](docs/ZIMBABWE_MERGE_RESULTS.md) report all nine arms: naive pooling hurts;
+adapted pooling approximately matches Lacuna-only, with no established accuracy gain.
+
+**Why transfer helps little:** the [follow-up findings](docs/ZIMBABWE_TRANSFER_FINDINGS.md) separate source quality,
+population shift and model limitations. Step 10 tests 30 target arms plus source learnability: richer monthly models
+improve performance substantially, while the additional contribution from 2024 remains small and uncertain.
+Reproduce with `python scripts/step10_diagnose_zimbabwe_transfer.py`.
+
+**Zimbabwe weather and complete methods:** the [consolidated methods](docs/ZIMBABWE_COMPLETE_METHODS.md) explain
+both sources, cleaning, units, seasons, every merge method and the weather comparison. Step 11 adds 46 NASA POWER
+rainfall/temperature predictors to all 6,598 labels, with raw API snapshots and provenance. Step 12 compares
+Lacuna-only and merged models on the exact existing splits. The [weather protocol](docs/ZIMBABWE_WEATHER_PROTOCOL.md)
+was fixed before scoring; results and enriched comparison data are in `data/runs/zimbabwe_weather_v1/`.
+The weather experiment did not improve accuracy: monthly-tree RMSE changes from 1.6594 / 1.6578 (Lacuna / merged)
+to 1.6958 / 1.7221 with weather. Read the [methods Page](https://chatgpt.com/space/page_61fc048f13d081918467a88b670e9da4)
+for all arms, paired uncertainty, provenance and limitations.
+
+**Compact weather follow-up:** step 13 tests two/four fixed seasonal weather summaries using the same splits.
+Two-feature merged trees recover some of the 46-feature loss (RMSE 1.6740 versus 1.7221), but remain behind
+imagery-only merged trees (1.6578). Four-feature shared Ridge reaches 1.6554; its 0.0023 advantage over the best
+imagery-only result is uncertain. The [short report](docs/ZIMBABWE_COMPLETE_METHODS.md) puts the conclusion first
+and methods/provenance in an appendix. Results: `data/runs/zimbabwe_weather_compact_v1/`;
+reproduce with `python scripts/step13_compare_compact_weather.py` and check with
+`python scripts/verify_compact_weather.py`. The [compact protocol](docs/ZIMBABWE_COMPACT_WEATHER_PROTOCOL.md)
+defines the primary comparison; the observed best-arm benchmark checks are explicitly post-hoc.
+
 **Question.** Within one smallholder cohort, which Sentinel-2 representation predicts field-level maize yield best,
 and how much of that skill survives in new villages, new districts and a new season? The plan is
 [`docs/ROADMAP.md`](docs/ROADMAP.md).

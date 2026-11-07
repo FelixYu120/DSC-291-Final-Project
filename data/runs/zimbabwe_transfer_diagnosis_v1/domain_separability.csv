@@ -1,0 +1,5 @@
+feature_family,n,source_target_auc,cv_groups
+seasonal,5834,0.82435875387,1605
+monthly,5834,0.99563611739,1605
+presto,5834,0.999777498649,1605
+coordinates,5834,0.653991204363,1605

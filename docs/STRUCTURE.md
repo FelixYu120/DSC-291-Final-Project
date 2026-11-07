@@ -1,12 +1,38 @@
 # Project structure
 
+For the current Zimbabwe midterm deliverable, see [`ZIMBABWE_DATA_HANDOFF.md`](ZIMBABWE_DATA_HANDOFF.md).
+`scripts/step8_build_zimbabwe_handoff.py` and `src/cropyield/data/handoff.py` generate the audited release under
+`data/processed/zimbabwe_midterm_v1/`. Historical cohort roles below remain in the frozen data.
+
+The user-authorized pooling extension uses `scripts/step9_compare_zimbabwe_merge.py`,
+`src/cropyield/experiments/zimbabwe_merge.py` and `configs/zimbabwe_merge_v1.json`. Its complete label catalog,
+audits, model inputs, nested splits, predictions and results live in `data/runs/zimbabwe_merge_v1/` (git-ignored).
+[`ZIMBABWE_MERGE_PROTOCOL.md`](ZIMBABWE_MERGE_PROTOCOL.md) supersedes the historical no-pooling/stretch
+restriction for this specific experiment. The pinned database, labels and splits stay unchanged.
+
+The follow-up `scripts/step10_diagnose_zimbabwe_transfer.py` uses `src/cropyield/experiments/zimbabwe_diagnosis.py`
+and `configs/zimbabwe_transfer_diagnosis_v1.json` to investigate data quality and model limits. Its protocol is
+`docs/ZIMBABWE_TRANSFER_DIAGNOSIS_PROTOCOL.md`; results go to `data/runs/zimbabwe_transfer_diagnosis_v1/`.
+
+Weather enrichment uses `src/cropyield/data/weather.py` / step 11 and `configs/zimbabwe_weather_v1.json`.
+Raw NASA POWER snapshots live in `data/raw/nasa_power_zimbabwe_v1/`; derived all-label weather lives in
+`data/processed/zimbabwe_weather_v1/`. `src/cropyield/experiments/zimbabwe_weather.py` / step 12 writes the
+unchanged-split comparison to `data/runs/zimbabwe_weather_v1/`. The full explanation is
+[`ZIMBABWE_COMPLETE_METHODS.md`](ZIMBABWE_COMPLETE_METHODS.md); independent checks are in
+`scripts/verify_zimbabwe_weather.py`.
+
+The compact-weather follow-up uses `src/cropyield/experiments/zimbabwe_weather_compact.py` / step 13,
+`configs/zimbabwe_weather_compact_v1.json` and `docs/ZIMBABWE_COMPACT_WEATHER_PROTOCOL.md`.
+Its immutable results and 124/126-column feature matrices live in `data/runs/zimbabwe_weather_compact_v1/`;
+independent verification is in `scripts/verify_compact_weather.py`.
+
 ## Layout
 
 ```
 data/            raw/ metadata/ audit/ processed/ (labels, committed)   splits/ (frozen)   imagery/ features/ runs/ (git-ignored)
-scripts/         the data path in step order: get_all_data.py, then step1 to step7 (scripts/README.md)
+scripts/         the data path in step order: get_all_data.py, then step1 to step13 (scripts/README.md)
 sql/             DuckDB schema, views and example queries (sql/README.md)
-src/cropyield/   data/  satellite/  features/  eval/   one subpackage per pipeline stage
+src/cropyield/   data/  satellite/  features/  eval/  experiments/   one subpackage per pipeline stage
 configs/         the Sentinel-2 window file of the pilot, and the frozen scene list sentinel2_scenes_v1.parquet
 tests/           pytest
 notebooks/       data_guide.ipynb: the one guide to the data
