@@ -140,14 +140,14 @@ for the Lacuna 2023 target population under the methods we tested. Filtering noi
 
 ## Reproduce and inspect
 
-- [Protocol](ZIMBABWE_TRANSFER_DIAGNOSIS_PROTOCOL.md), specified before the follow-up models ran.
-- [Generated complete results](../data/runs/zimbabwe_transfer_diagnosis_v1/RESULTS.md), including all 30 arms and selections.
-- [Runner](../scripts/step10_diagnose_zimbabwe_transfer.py), [implementation](../src/cropyield/experiments/zimbabwe_diagnosis.py),
-  [config](../configs/zimbabwe_transfer_diagnosis_v1.json).
+- [Protocol](../ZIMBABWE_TRANSFER_DIAGNOSIS_PROTOCOL.md), specified before the follow-up models ran.
+- [Generated complete results](../../data/runs/zimbabwe_transfer_diagnosis_v1/RESULTS.md), including all 30 arms and selections.
+- [Runner](../../scripts/step10_diagnose_zimbabwe_transfer.py), [implementation](../../src/cropyield/experiments/zimbabwe_diagnosis.py),
+  [config](../../configs/zimbabwe_transfer_diagnosis_v1.json).
 - Outputs in `data/runs/zimbabwe_transfer_diagnosis_v1/`: predictors, quality flags, exact memberships/permissions,
   tuning, predictions, metrics, uncertainty, diagnostics and input/code/output hash manifest.
 
-Run `python scripts/step10_diagnose_zimbabwe_transfer.py` from the repository root with the first experiment and
+Run `python scripts/reproduce_zimbabwe.py diagnosis` from the repository root with the first experiment and
 pinned team database present. Inputs are read-only; existing releases are immutable. The full suite passed
 **162 tests, with 2 skipped**. Original seasonal baseline/adaptation predictions are reproduced independently within
 the runner. Output-level checks verify source exclusions, same evaluation IDs, inner-only method selection, metrics,

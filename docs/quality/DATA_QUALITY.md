@@ -35,7 +35,7 @@ and splits to resolve a finding.
 | `ZWE/zimbabwe_lacuna_2022_2023/record_review.csv` | Eligible Lacuna observations from 2023 |
 
 Full reports and record-level tables stay in the local, Git-ignored `data/runs/` folder. The committed
-[aggregate snapshot](../results/data_quality/summary.json) records the audit findings without publishing
+[aggregate snapshot](../../results/data_quality/summary.json) records the audit findings without publishing
 another copy of field coordinates or observation-level review files.
 
 **Exit status 0 means the implemented integrity checks passed. It does not certify scientific quality.**
@@ -115,7 +115,7 @@ preceded harvest.
 
 ## Decisions and questions requiring evidence
 
-The [decision log](DECISIONS.md) keeps core zero yields, the provider's Malawi yield and all frozen
+The [decision log](../DECISIONS.md) keeps core zero yields, the provider's Malawi yield and all frozen
 labels/splits unchanged. The original audit's 30 t/ha review threshold and the later `labels_v1`
 15 t/ha eligibility cap belong to different processing stages; neither is a newly fitted cutoff here.
 
@@ -131,7 +131,7 @@ boundaries. A promising review flag should lead to source-record or image inspec
 correction needs documented evidence and a separately versioned proposal; the review tables are not a
 cleaned replacement dataset.
 
-Implementation: [`scripts/audit_data_quality.py`](../scripts/audit_data_quality.py),
-[`src/cropyield/data/quality.py`](../src/cropyield/data/quality.py) and the source-label checks in
-[`src/cropyield/data/labels.py`](../src/cropyield/data/labels.py). The
-[data guide notebook](../notebooks/data_guide.ipynb) explains the original pipeline in detail.
+Implementation: [`scripts/audit_data_quality.py`](../../scripts/audit_data_quality.py),
+[`src/cropyield/data/quality.py`](../../src/cropyield/data/quality.py) and the source-label checks in
+[`src/cropyield/data/labels.py`](../../src/cropyield/data/labels.py). The
+[data guide notebook](../../notebooks/data_guide.ipynb) explains the original pipeline in detail.

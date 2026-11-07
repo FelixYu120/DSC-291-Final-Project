@@ -14,7 +14,7 @@ derived columns, and masks whole field-months under a stricter SCL policy. No mo
 - Boundaries: same-year FTW lookup found no candidate within 30 m for 203 flagged Kenya records,
   and candidates for only 4 of 260 Malawi polygons. No coordinate or field outline was replaced.
 
-See [the detailed explanation and commands](../../docs/QUALITY_REMEDIATION.md) and
+See [the detailed explanation and commands](../../docs/quality/QUALITY_REMEDIATION.md) and
 [the aggregate evidence](summary.json). Detailed local outputs and the readable HTML report are in
 `data/runs/quality_variant/felix-reviewed-v1/`, with `KEN/`, `MWI/` and `ZWE/` cohort folders.
 The SCL/mask cache remains separate under `data/runs/cloud_review/cache/`.

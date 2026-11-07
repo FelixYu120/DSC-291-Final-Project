@@ -6,7 +6,7 @@ but adding 2024 has **not demonstrated a meaningful accuracy improvement** over 
 
 This is an experiment about auxiliary training data, not a claim that every physical measurement ambiguity is solved.
 The complete 19-item problem/action/remaining-limitation register is in
-[`ZIMBABWE_MERGE_PROTOCOL.md`](ZIMBABWE_MERGE_PROTOCOL.md). It was specified before the run.
+[`ZIMBABWE_MERGE_PROTOCOL.md`](../ZIMBABWE_MERGE_PROTOCOL.md). It was specified before the run.
 
 ## The actual comparison
 
@@ -38,7 +38,7 @@ This is strong evidence that treating both sources as one interchangeable label 
 this task. The experiment does not identify whether the source difference comes from drought, management,
 sampling, measurement, or their combination.
 
-![Nine-arm comparison](../data/runs/zimbabwe_merge_v1/comparison.png)
+![Nine-arm comparison](../../data/runs/zimbabwe_merge_v1/comparison.png)
 
 ## How the merge works
 
@@ -98,7 +98,7 @@ make them disappear. Measurement-standardized future work would require provider
 
 ## Files for the team
 
-All generated experiment files are in [`data/runs/zimbabwe_merge_v1/`](../data/runs/zimbabwe_merge_v1/):
+All generated experiment files are in [`data/runs/zimbabwe_merge_v1/`](../../data/runs/zimbabwe_merge_v1):
 
 - `harmonized_labels.parquet`: **all 6,598 screened labels**, preserving metadata and comparison eligibility.
 - `combined_data.parquet` / `.csv`: **6,212 comparison candidates**, ten predictors, source/year, eligibility and target folds.
@@ -117,11 +117,11 @@ it was not assessed for this experiment, not because they necessarily have unusa
 From the repository root, with the pinned team database present:
 
 ```bash
-python scripts/step9_compare_zimbabwe_merge.py
+python scripts/reproduce_zimbabwe.py merge
 ```
 
-Code: [`src/cropyield/experiments/zimbabwe_merge.py`](../src/cropyield/experiments/zimbabwe_merge.py).
-Config: [`configs/zimbabwe_merge_v1.json`](../configs/zimbabwe_merge_v1.json).
+Code: [`src/cropyield/experiments/zimbabwe_merge.py`](../../src/cropyield/experiments/zimbabwe_merge.py).
+Config: [`configs/zimbabwe_merge_v1.json`](../../configs/zimbabwe_merge_v1.json).
 The runner refuses to overwrite a different release; use a new `--output` directory for intentional changes.
 The database, frozen labels and split hashes are unchanged. The full suite passed **155 tests, with 2 skipped**.
 Independent checks reproduced target-only Ridge predictions, recalculated metrics, verified all artifact/input hashes,

@@ -1,6 +1,6 @@
 # Spatial baseline results — 3 November 2026
 
-Run: [`spatial_baselines_v1-20261103T225758673365Z`](spatial_baselines_v1-20261103T225758673365Z/).
+Run: [`spatial_baselines_v1-20261103T225758673365Z`](spatial_baselines_v1-20261103T225758673365Z).
 Implementation commit: `d4b99d6`. The shared database, labels and existing `s1_cc2km` splits were verified
 before and after fitting. Each dataset has its own models and pooled held-out predictions.
 
@@ -49,7 +49,7 @@ python scripts/run_baselines.py
 
 A second full run produced **exactly identical predictions, scores, confidence intervals and selected
 alphas**. The project suite passed 157 tests, with two Windows-only tests skipped on macOS. The baseline
-code and new tests passed Ruff. See [`docs/BASELINES.md`](../../docs/BASELINES.md) for the code walkthrough.
+code and new tests passed Ruff. See [`docs/quality/BASELINES.md`](../../docs/quality/BASELINES.md) for the code walkthrough.
 
 ## Comparison with the archive
 

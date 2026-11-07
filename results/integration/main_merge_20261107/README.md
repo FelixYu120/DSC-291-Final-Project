@@ -10,7 +10,7 @@ Validation completed on the combined working tree:
 - Zimbabwe guide: all **26 code cells** passed in a fresh kernel with database access blocked;
   its optional one-model replay reproduced **376 predictions** within `1e-9` t/ha.
 - Quality-review notebook: all **15 code cells** passed with database access blocked and optional local
-  variant checks disabled. Its committed notebook is unchanged from the archived branch.
+  variant checks disabled. The notebook verified at this merge matched the archived branch; subsequent navigation-only edits preserve its code and outputs.
 - Full-weather and compact-weather independent verifiers passed using the recorded source revision.
   Each replay verified **329 recorded inputs and outputs before and after execution**.
 - Offline weather rebuild: all **13 output files** matched the original release byte for byte.
@@ -19,4 +19,4 @@ Validation completed on the combined working tree:
 The JSON receipts record notebook hashes, source revision and runner hash. The weather rebuild was written
 to a temporary directory; its file comparisons are preserved in `weather_rebuild_verification.json`.
 This verifies existing experiments and adds no new performance estimate or reserved-fold evaluation.
-See [reproduction instructions](../../../docs/ZIMBABWE_REPRODUCTION.md).
+See [reproduction instructions](../../../docs/zimbabwe/REPRODUCING.md).

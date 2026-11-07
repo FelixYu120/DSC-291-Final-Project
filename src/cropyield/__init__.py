@@ -5,7 +5,7 @@ One subpackage per pipeline stage:
     satellite  Sentinel-2 search, pixel reads, cloud masks, monthly composites
     features   seasonal indices
     eval       frozen splits
-See docs/STRUCTURE.md and docs/ROADMAP.md.
+See docs/README.md and docs/ROADMAP.md.
 """
 from pathlib import Path
 

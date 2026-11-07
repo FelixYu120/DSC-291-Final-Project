@@ -1,6 +1,6 @@
 # Reviewed data variant: Kenya dates, locations and clouds
 
-Read the [executed notebook walkthrough](../notebooks/data_quality_review.ipynb) for step-by-step
+Read the [executed notebook walkthrough](../../notebooks/data_quality_review.ipynb) for step-by-step
 explanations, pixel-selection diagrams, recorded results, optional local checks and reproduction commands.
 It runs without the database or image archive using committed aggregate evidence; detailed derivatives stay local.
 Sections 12–15 discuss three tabular-foundation-model papers and a step-by-step preparation plan, ending
@@ -167,5 +167,5 @@ decision; `core_usable_under_strict_cloud_rule` separately records the new image
 The full cloud run used source commit `2d8f2e3`. Subsequent formatting-only changes are documented
 in its separate provenance note; the exact run source and every mask/output hash are retained.
 
-The [recorded review summary](../results/quality_remediation/summary.json) contains aggregate evidence
+The [recorded review summary](../../results/quality_remediation/summary.json) contains aggregate evidence
 and validation. The assembled local report is `data/runs/quality_variant/felix-reviewed-v1/report.html`.

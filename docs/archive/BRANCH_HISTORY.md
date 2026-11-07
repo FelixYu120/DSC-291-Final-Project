@@ -9,7 +9,7 @@ spatial baselines, data-quality reviews, stronger label validation and foundatio
 histories. The archive tags remain as recovery references, and no development branches need to be restored.
 The spatial-baseline tip is an ancestor of the Felix tip and is included in that merge.
 
-Historical Zimbabwe manifests remain unchanged. Use the [recorded-code replay runner](ZIMBABWE_REPRODUCTION.md)
+Historical Zimbabwe manifests remain unchanged. Use the [recorded-code replay runner](../zimbabwe/REPRODUCING.md)
 when verifying or retraining those experiments: main now includes stronger shared validation modules with different hashes.
 
 | Previous branch | Previous tip | Preservation |

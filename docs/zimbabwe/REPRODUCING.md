@@ -52,7 +52,7 @@ The step-8 midterm handoff is separate: its output hashes remain intact, and the
 and evaluation documents predate the consolidated experiment commit. To generate a new handoff using current source and
 documentation, run step 8 with a new `--output` directory; do not replace the historical handoff manifest.
 
-The default [Zimbabwe notebook](../notebooks/data_guide_2_zimbabwe.ipynb) needs no database or historical checkout:
+The default [Zimbabwe notebook](../../notebooks/data_guide_2_zimbabwe.ipynb) needs no database or historical checkout:
 it reads the saved outputs and recomputes the displayed checks and scores. The historical replay is for full provenance
 verification or retraining, not a prerequisite for reading the notebook.
 

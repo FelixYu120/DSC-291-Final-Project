@@ -200,7 +200,7 @@ A stronger causal or deployment claim needs independent seasons and farms, a pre
 ## Files and reproduction
 
 After integrating the earlier quality-review work into main, shared validation modules have stronger checks and new source hashes.
-Use the [recorded-code runner](ZIMBABWE_REPRODUCTION.md) for the published experiments; their original outputs and manifests remain unchanged.
+Use the [recorded-code runner](REPRODUCING.md) for the published experiments; their original outputs and manifests remain unchanged.
 
 | Location | Contents |
 |---|---|

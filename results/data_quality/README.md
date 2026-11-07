@@ -33,7 +33,7 @@ python scripts/audit_data_quality.py
 ```
 
 The command creates a new timestamped report and runs no models. See
-[the quality guide](../../docs/DATA_QUALITY.md) for meanings and remaining questions.
+[the quality guide](../../docs/quality/DATA_QUALITY.md) for meanings and remaining questions.
 
 Validation: **200 data-pipeline tests passed, two Windows-only tests skipped**. The 35 dedicated
 quality tests also passed after the final report wording/coverage changes. Ruff passed; country

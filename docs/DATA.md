@@ -18,7 +18,7 @@ metadata, not the new source eligibility rule. The old no-pooling/parked decisio
 
 **November 7 weather extension:** `data/processed/zimbabwe_weather_v1/` preserves the full 6,598-label catalog and
 adds 46 NASA POWER MERRA-2 weather predictors, with 1991–2020 normals, explicit 0.5° × 0.625° grid mapping,
-raw-response hashes and no missing weather rows. The [complete methods](ZIMBABWE_COMPLETE_METHODS.md) document
+raw-response hashes and no missing weather rows. The [complete methods](zimbabwe/METHODS.md) document
 units, seasons, cleaning, compatibility limits and all merge experiments. Existing labels/splits/database are unchanged.
 
 **Compact weather extension:** `data/runs/zimbabwe_weather_compact_v1/` exports the same 6,212 comparison
