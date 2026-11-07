@@ -12,10 +12,14 @@ under `data/runs/`; each report is named **`RESULTS.md`**. They are linked here 
 | Full weather feature set | [RESULTS.md](../data/runs/zimbabwe_weather_v1/RESULTS.md) | [metrics.csv](../data/runs/zimbabwe_weather_v1/metrics.csv) | [predictions.csv](../data/runs/zimbabwe_weather_v1/predictions.csv) |
 | Two/four weather features | [RESULTS.md](../data/runs/zimbabwe_weather_compact_v1/RESULTS.md) | [metrics.csv](../data/runs/zimbabwe_weather_compact_v1/metrics.csv) | [predictions.csv](../data/runs/zimbabwe_weather_compact_v1/predictions.csv) |
 
+Latest satellite follow-up: [aggregation V0–V3 results](../data/runs/zimbabwe_aggregation_v1/RESULTS.md), [scores](../data/runs/zimbabwe_aggregation_v1/metrics.csv), [predictions](../data/runs/zimbabwe_aggregation_v1/predictions.csv), and [short explanation](../docs/zimbabwe/AGGREGATION_RESULTS.md).
+
 The [current methods report](../docs/zimbabwe/METHODS.md) compares the experiments and explains the uncertainty.
 Within each release, `fold_metrics.csv` gives fold-level scores, `paired_differences.csv` gives paired uncertainty,
 `selected_parameters.csv` / `tuning.csv` document model selection, and `manifest.json` records provenance.
 The basic merge comparison uses vegetation indices with Ridge; it is not a MOSAIKS/ordinary-linear-regression result.
+
+The aggregation [verification receipt](aggregation/verification.json) checks every feature variant, original split/permission files, model metrics and the primary confidence interval.
 
 ## Data quality, earlier baselines and verification
 

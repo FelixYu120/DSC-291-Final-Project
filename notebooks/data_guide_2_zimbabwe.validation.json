@@ -1,7 +1,7 @@
 {
   "notebook": "notebooks/data_guide_2_zimbabwe.ipynb",
-  "sha256": "a2a935074a626e20835775e2a373f3b7c17cef0227d4269c92666015a4e55d4f",
-  "cells": 54,
+  "sha256": "9990d350469cdd957ec2ca9391b9b5ea6ce06e1619822e956fc2c11b39b710b5",
+  "cells": 55,
   "code_cells": 26,
   "default_execution": "passed in a fresh Jupyter kernel",
   "default_model_fitting": false,
@@ -10,6 +10,6 @@
   "optional_model_replay": "376 predictions matched saved results within 1e-9 t/ha",
   "figures_reviewed": 4,
   "execution_errors": 0,
-  "navigation_update": "2026-11-07: documentation links updated; all code cells, execution counts and saved outputs identical to the executed main-merge notebook.",
+  "navigation_update": "2026-11-07: added a documentation-only link to the step-14 aggregation follow-up; all code cells and saved outputs remain identical to the executed main-merge notebook.",
   "code_cells_with_outputs_sha256": "679184a6c0f731b06334066398ba7bf7d3828ff8c8b2e07c0345ede50da99bc4"
 }

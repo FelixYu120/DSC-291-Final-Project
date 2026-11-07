@@ -10,6 +10,7 @@ do not edit a published configuration to make an old manifest pass.
 | [zimbabwe_transfer_diagnosis_v1.json](zimbabwe_transfer_diagnosis_v1.json) | Step 10 source-quality and representation diagnostics |
 | [zimbabwe_weather_v1.json](zimbabwe_weather_v1.json) | Steps 11–12 NASA POWER extraction and model comparison |
 | [zimbabwe_weather_compact_v1.json](zimbabwe_weather_compact_v1.json) | Step 13 compact weather comparison |
+| [zimbabwe_aggregation_v1.json](zimbabwe_aggregation_v1.json) | Step 14 temporal mean, crop-date preharvest mean, max, median and modal estimate |
 | [spatial_baselines_v1.yaml](spatial_baselines_v1.yaml) | Earlier within-cohort R0/R1/A1 baselines |
 | [team_database_v1.json](team_database_v1.json) | Expected shared database and label fingerprints |
 | [sentinel2_scenes_v1.parquet](sentinel2_scenes_v1.parquet) | Frozen team scene inventory |

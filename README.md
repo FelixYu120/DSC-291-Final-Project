@@ -18,7 +18,7 @@ and tests whether rainfall and temperature improve prediction. Earlier Malawi/Ke
 
 The basic merge experiment uses **10 vegetation-index features with Ridge**, not MOSAIKS. Naive pooling hurts;
 source-aware adjustment removes most of that penalty, but adding 2024 has not established a reliable accuracy gain.
-The later weather and richer-feature experiments are reported separately.
+The later weather and richer-feature experiments are reported separately. The latest [seasonal aggregation comparison](docs/zimbabwe/AGGREGATION_RESULTS.md) tests mean, crop-date preharvest mean, maximum, median and a modal estimate.
 
 ## Read or run the notebooks
 
@@ -46,7 +46,7 @@ the original build step would remove its Presto embeddings. See [scripts](script
 | [data/](data/README.md) | Source snapshots, cleaned exports, frozen splits and experiment releases |
 | [results/](results/README.md) | Index of all results plus aggregate quality/baseline evidence |
 | [notebooks/](notebooks/README.md) | Executed explanations and checks |
-| [scripts/](scripts/README.md) | Commands for steps 1–13, audits and reproduction |
+| [scripts/](scripts/README.md) | Commands for steps 1–14, audits and reproduction |
 | [configs/](configs/README.md) | Dataset fingerprints and experiment settings |
 | [src/cropyield/](src/cropyield/) | Data preparation, features, baselines and experiment implementation |
 | [sql/](sql/README.md) | Database schema and views |

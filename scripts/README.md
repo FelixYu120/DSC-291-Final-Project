@@ -42,6 +42,17 @@ experiments, so use the replay stage in the final column for steps 9–13. Model
 Step 11's original `--download-only` mode fills the weather cache; the published cache is already committed.
 The other replay stages use recorded upstream releases, not arbitrary newly generated replacements.
 
+## New seasonal aggregation comparison: step 14
+
+[step14_compare_zimbabwe_aggregation.py](step14_compare_zimbabwe_aggregation.py) runs from current main:
+
+```bash
+python scripts/step14_compare_zimbabwe_aggregation.py --output data/runs/zimbabwe_aggregation_replay
+python scripts/verify_zimbabwe_aggregation.py
+```
+
+It compares V0/V3 mean, V1 crop-date preharvest mean, a common-calendar control, V2 max, V3 median and a continuous-mode estimate, separately for bands/indices and Lacuna-only/merged Ridge. Original memberships and source permissions are reused. Use a new `--output` path for any deliberately changed experiment. See the [protocol](../docs/zimbabwe/AGGREGATION_PROTOCOL.md) and [results](../docs/zimbabwe/AGGREGATION_RESULTS.md).
+
 ## Quality review and earlier baselines
 
 The quality variant is separate from the frozen Zimbabwe experiments. Read the

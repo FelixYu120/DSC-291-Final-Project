@@ -1,0 +1,45 @@
+{
+  "all_unique_series": {
+    "bands_all_unique_series": 57496,
+    "indices_all_unique_series": 29168
+  },
+  "arms": 26,
+  "candidate_rows": 6212,
+  "missing_feature_rows_by_variant": {
+    "bands_v0_mean": 0,
+    "bands_v1_calendar_mean": 0,
+    "bands_v1_preharvest_mean": 0,
+    "bands_v2_max": 0,
+    "bands_v3_median": 0,
+    "bands_v3_mode": 0,
+    "indices_v0_mean": 0,
+    "indices_v1_calendar_mean": 0,
+    "indices_v1_preharvest_mean": 0,
+    "indices_v2_max": 0,
+    "indices_v3_median": 0,
+    "indices_v3_mode": 0,
+    "legacy_indices_mean_max": 0
+  },
+  "mode_tied_interval_series": {
+    "bands_mode_interval_tied_series": 316,
+    "indices_mode_interval_tied_series": 0
+  },
+  "preharvest_counts_development": {
+    "1": 2,
+    "2": 81,
+    "3": 338,
+    "4": 582,
+    "5": 319,
+    "6": 176,
+    "7": 6
+  },
+  "source_eligible": 4330,
+  "source_missing_harvest_dates": 4332,
+  "source_missing_plant_dates": 4332,
+  "target_calendar_postharvest_fields": 65,
+  "target_evaluation": 1504,
+  "target_preharvest_missing_fields": 0,
+  "target_preharvest_under_four_months": 421,
+  "target_preplant_fields_removed": 130,
+  "target_reserved": 376
+}

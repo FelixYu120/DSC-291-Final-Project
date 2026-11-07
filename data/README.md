@@ -18,6 +18,8 @@ The releases include both usable and reserved/ineligible observations, identifie
 Use `target_memberships.csv` and `source_spatial_permissions.csv` when reproducing the comparisons;
 do not treat every row in a combined table as training data.
 
+Latest follow-up: [runs/zimbabwe_aggregation_v1/](runs/zimbabwe_aggregation_v1/) holds the same-field temporal aggregation comparison, including raw monthly values, crop-date audits, variant predictors and [RESULTS.md](runs/zimbabwe_aggregation_v1/RESULTS.md).
+
 ## Sources and common inputs
 
 | Path | Purpose |

@@ -18,6 +18,8 @@ use the [recorded-code runner](REPRODUCING.md) to reproduce steps 9–13 on curr
 | 12 | Compare full-weather models using the same splits | [RESULTS.md](../../data/runs/zimbabwe_weather_v1/RESULTS.md) | [Script](../../scripts/step12_compare_zimbabwe_weather.py), [zimbabwe_weather.py](../../src/cropyield/experiments/zimbabwe_weather.py) |
 | 13 | Test two/four weather summaries and overfitting | [RESULTS.md](../../data/runs/zimbabwe_weather_compact_v1/RESULTS.md) | [Script](../../scripts/step13_compare_compact_weather.py), [zimbabwe_weather_compact.py](../../src/cropyield/experiments/zimbabwe_weather_compact.py) |
 
+Step 14 adds [seasonal aggregation V0–V3](AGGREGATION_RESULTS.md): [script](../../scripts/step14_compare_zimbabwe_aggregation.py), [fixed protocol](AGGREGATION_PROTOCOL.md), [complete results](../../data/runs/zimbabwe_aggregation_v1/RESULTS.md). This new experiment runs directly from current main and compares each aggregation separately on bands and indices.
+
 ## Choose the dataset you need
 
 | Purpose | File | Contents |
@@ -33,6 +35,8 @@ use the [recorded-code runner](REPRODUCING.md) to reproduce steps 9–13 on curr
 CSV is the inspection copy; Parquet preserves types. Join by `obs_id`, and by `(obs_id, month)` for monthly tables.
 Do not train on every row of a candidate table: apply eligibility flags and the recorded per-fit memberships/permissions.
 The merge comparisons evaluate 1,504 Lacuna 2023 fields; 376 historical fold-0 fields remain excluded from fitting/scoring.
+
+The [aggregation release](../../data/runs/zimbabwe_aggregation_v1/) contains `observations.csv`, `monthly_observations.parquet`, `features.parquet`, an explicit `feature_dictionary.json` and `window_audit.csv`. It preserves the same candidate IDs and per-fit memberships.
 
 ## Find the evidence
 

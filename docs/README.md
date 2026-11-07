@@ -6,6 +6,7 @@ For the current deliverable, start with the [Zimbabwe project guide](zimbabwe/RE
 
 | Topic | Document |
 |---|---|
+| Seasonal aggregation V0–V3 | [zimbabwe/AGGREGATION_RESULTS.md](zimbabwe/AGGREGATION_RESULTS.md), [protocol](zimbabwe/AGGREGATION_PROTOCOL.md) |
 | One-page basic Ridge summary | [zimbabwe/SUMMARY.md](zimbabwe/SUMMARY.md) |
 | Zimbabwe data, steps 8–13 and result locations | [zimbabwe/README.md](zimbabwe/README.md) |
 | Complete merge/weather methods and conclusions | [zimbabwe/METHODS.md](zimbabwe/METHODS.md) |
