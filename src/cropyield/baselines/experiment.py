@@ -163,7 +163,7 @@ def pooled_summary(table):
 def provenance(config_path, config, hashes):
     def git(*args):
         return subprocess.check_output(['git', *args], cwd=ROOT, text=True).strip()
-    sources = sorted((ROOT / 'src/cropyield').rglob('*.py')) + [ROOT / 'scripts/run_baselines.py']
+    sources = sorted((ROOT / 'src/cropyield').rglob('*.py')) + [ROOT / 'scripts/baselines/spatial_baselines.py']
     return {'git_commit': git('rev-parse', 'HEAD'), 'git_branch': git('branch', '--show-current'),
             'working_tree_dirty': bool(git('status', '--porcelain', '--untracked-files=all')),
             'source_sha256': {str(path.relative_to(ROOT)): sha256(path) for path in sources},

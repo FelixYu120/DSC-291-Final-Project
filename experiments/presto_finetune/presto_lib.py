@@ -22,7 +22,7 @@ import pandas as pd
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
-for path in (ROOT / "src", ROOT / "scripts"):
+for path in (ROOT / "src", ROOT / "scripts" / "baselines"):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
 
@@ -30,7 +30,7 @@ import torch  # noqa: E402
 
 import cropyield  # noqa: E402
 import cropyield.features  # noqa: E402
-import step8_run_baseline as step8  # noqa: E402
+import baseline_table as step8  # noqa: E402
 from cropyield.satellite.monthly import MonthlySeries, month_range  # noqa: E402
 
 PARKED = ROOT / "_parked"

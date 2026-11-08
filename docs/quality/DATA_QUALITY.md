@@ -10,14 +10,14 @@ From the repository root, after installing `requirements.txt` and placing the sh
 `data/cropyield.duckdb`:
 
 ```bash
-python scripts/audit_data_quality.py
+python scripts/quality/audit_data_quality.py
 ```
 
 Each run creates a new folder under `data/runs/data_quality/<UTC timestamp>/`. The command prints the
 path to `report.html`. To choose a readable folder name instead:
 
 ```bash
-python scripts/audit_data_quality.py --output data/runs/data_quality/my-review
+python scripts/quality/audit_data_quality.py --output data/runs/data_quality/my-review
 ```
 
 The destination must not exist. Repeating the default command creates another report, leaving earlier
@@ -131,7 +131,7 @@ boundaries. A promising review flag should lead to source-record or image inspec
 correction needs documented evidence and a separately versioned proposal; the review tables are not a
 cleaned replacement dataset.
 
-Implementation: [`scripts/audit_data_quality.py`](../../scripts/audit_data_quality.py),
+Implementation: [`scripts/quality/audit_data_quality.py`](../../scripts/quality/audit_data_quality.py),
 [`src/cropyield/data/quality.py`](../../src/cropyield/data/quality.py) and the source-label checks in
 [`src/cropyield/data/labels.py`](../../src/cropyield/data/labels.py). The
 [data guide notebook](../../notebooks/data_guide.ipynb) explains the original pipeline in detail.

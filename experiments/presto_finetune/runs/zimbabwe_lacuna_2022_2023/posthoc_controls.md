@@ -4,14 +4,14 @@ Not in PLAN.md. Written after the first scores were seen, so read them as explor
 
 X1 = Ridge on the 99 raw monthly inputs (10 bands + NDVI x 9 months, mean-filled + missing flags). X2 = frozen random-weights Presto + Ridge.
 
-| Arm | RMSE, t/ha | R2 | Rank inside clusters |
-|---|---:|---:|---:|
-| A1 | 1.785 | 0.191 | 0.299 |
-| R1 | 1.854 | 0.127 | -0.054 |
-| P0 | 1.657 | 0.302 | 0.358 |
-| P1 | 1.652 | 0.307 | 0.353 |
-| X1 | 1.626 | 0.328 | 0.350 |
-| X2 | 1.665 | 0.296 | 0.341 |
+| Arm | RMSE, t/ha | MAE, t/ha | Bias, t/ha | R2 | Rank inside clusters |
+|---|---:|---:|---:|---:|---:|
+| A1 | 1.785 | 1.449 | +0.081 | 0.191 | 0.299 |
+| R1 | 1.854 | 1.434 | -0.069 | 0.127 | -0.054 |
+| P0 | 1.657 | 1.303 | +0.067 | 0.302 | 0.358 |
+| P1 | 1.652 | 1.290 | +0.057 | 0.307 | 0.353 |
+| X1 | 1.626 | 1.268 | +0.080 | 0.328 | 0.350 |
+| X2 | 1.665 | 1.316 | +0.089 | 0.296 | 0.341 |
 
 | Pair | RMSE, a minus b | Rank, a minus b |
 |---|---|---|

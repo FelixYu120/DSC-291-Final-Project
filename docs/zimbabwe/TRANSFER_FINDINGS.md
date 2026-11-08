@@ -188,7 +188,7 @@ for the Lacuna 2023 target population under the methods we tested. Filtering noi
 - Outputs in `data/runs/zimbabwe_transfer_diagnosis_v1/`: predictors, quality flags, exact memberships/permissions,
   tuning, predictions, metrics, uncertainty, diagnostics and input/code/output hash manifest.
 
-Run `python scripts/reproduce_zimbabwe.py diagnosis` from the repository root with the first experiment and
+Run `python scripts/verification/reproduce_zimbabwe.py diagnosis` from the repository root with the first experiment and
 pinned team database present. Inputs are read-only; existing releases are immutable. The full suite passed
 **162 tests, with 2 skipped**. Original seasonal baseline/adaptation predictions are reproduced independently within
 the runner. Output-level checks verify source exclusions, same evaluation IDs, inner-only method selection, metrics,

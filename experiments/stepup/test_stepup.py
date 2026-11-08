@@ -3,6 +3,7 @@ import importlib.util
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import pytest
 
 spec = importlib.util.spec_from_file_location("stepup", Path(__file__).with_name("stepup.py"))
@@ -35,3 +36,11 @@ def test_pairwise_rank_model_learns_the_right_order():
     score, n_pairs = su.bradley_terry(X, y, clusters, X)
     assert n_pairs == 6 * 45                                   # all pairs inside each cluster of 10
     assert np.corrcoef(score, y)[0, 1] > 0.9
+
+
+def test_holm_family_keeps_every_scored_step_but_the_coordinates_baseline():
+    frame = pd.DataFrame({"step": ["S0 R0 training mean", "S1 R1 coordinates only (10 nearest fields)", "S2 GCVI peak",
+                                   "S5 A1: 5 indices, max + mean", "S10 Presto frozen embedding (128)",
+                                   "S11 10 bands monthly + Presto", "S12 MOSAIKS field + chip (v1, 2,048)"],
+                          "p_rank": [np.nan, 0.01, 0.02, np.nan, 0.03, 0.04, 0.05]})
+    assert su.holm_family(frame).tolist() == [False, False, True, False, True, True, True]

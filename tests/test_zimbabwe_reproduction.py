@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-SPEC = importlib.util.spec_from_file_location("zimbabwe_reproduction", Path(__file__).parents[1] / "scripts/reproduce_zimbabwe.py")
+SPEC = importlib.util.spec_from_file_location("zimbabwe_reproduction", Path(__file__).parents[1] / "scripts/verification/reproduce_zimbabwe.py")
 runner = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(runner)
 

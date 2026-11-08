@@ -41,7 +41,8 @@ def module(name: str, path: Path):
 tf = module("time_features", REPO / "experiments" / "time_features" / "time_features.py")   # loads step 8 too
 step8 = tf.step8
 from cropyield.baselines.models import Winsorize  # noqa: E402
-from cropyield.eval.scores import centred, group_draws, in_large_clusters, r2, rank_inside_clusters, rmse, spearman  # noqa: E402
+from cropyield.eval.scores import (bias, centred, group_draws, in_large_clusters, mae, r2, rank_inside_clusters,  # noqa: E402
+                                   rmse, spearman)
 
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
 SEED, SKIP = step8.SEED, ("0",)
@@ -184,6 +185,10 @@ def versus(yt, p, base, groups, cy, keep, rank_only) -> dict:
     return out
 
 
+def holm_family(frame: pd.DataFrame) -> pd.Series:
+    return frame["p_rank"].notna() & ~frame["step"].str.startswith("S1 ")
+
+
 def importance(X: pd.DataFrame, y: pd.Series, fields: pd.DataFrame, repeats: int = 5) -> pd.DataFrame:
     """Ridge on the monthly band curve: how much R2 and rank drop when one band (all months) or one month (all bands)
     is shuffled across the test fields of a fold. Model fixed per fold; shuffles use a fixed seed."""
@@ -259,11 +264,12 @@ def main() -> int:
             r |= {"cohort": cohort, "role": role, "rank_inside_clusters": rank_inside_clusters(yt, p, cy, step8.MIN_CLUSTER_FIELDS)}
             if not rank_only:
                 b, w, share = decompose(yt, p, cy)
-                r |= {"rmse": rmse(yt, p), "r2": r2(yt, p), "r2_between": b, "r2_within": w, "share_between": share}
+                r |= {"rmse": rmse(yt, p), "mae": mae(yt, p), "bias": bias(yt, p), "r2": r2(yt, p), "r2_between": b,
+                      "r2_within": w, "share_between": share}
             if not (r["step"].startswith("S5") and r["head"] == "Ridge") and not r["step"].startswith("S0"):
                 r |= versus(yt, p, base, groups, cy, keep, rank_only)
         frame = pd.DataFrame(rows)
-        tests = frame["p_rank"].notna() & ~frame["step"].str.startswith("S1")
+        tests = holm_family(frame)
         frame.loc[tests, "p_rank_holm"] = tf.holm(frame.loc[tests, "p_rank"])
         results.append(frame)
         imps.append(importance(steps["S7 10 bands, monthly curve"], y, fields).assign(cohort=cohort))

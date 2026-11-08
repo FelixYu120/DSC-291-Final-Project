@@ -258,12 +258,12 @@ For a GRU or another sequence model, explicitly order weather months October, No
 Pipeline: raw audit → harmonized labels and eligibility → frozen imagery/splits → weather snapshots and unit/season/grid conversion → feature tables → training-only transforms → inner tuning → outer predictions → paired metrics. Release manifests pin all inputs and outputs. Changed code/data requires a new output directory; never overwrite old results.
 
 ```bash
-python scripts/reproduce_zimbabwe.py weather  # offline; new output destination
-python scripts/reproduce_zimbabwe.py weather-models
-python scripts/reproduce_zimbabwe.py compact
-python scripts/reproduce_zimbabwe.py verify-weather
-python scripts/reproduce_zimbabwe.py verify-compact
-python scripts/reproduce_zimbabwe.py candidate  # exploratory benchmark check; no refitting
+python scripts/verification/reproduce_zimbabwe.py weather  # offline; new output destination
+python scripts/verification/reproduce_zimbabwe.py weather-models
+python scripts/verification/reproduce_zimbabwe.py compact
+python scripts/verification/reproduce_zimbabwe.py verify-weather
+python scripts/verification/reproduce_zimbabwe.py verify-compact
+python scripts/verification/reproduce_zimbabwe.py candidate  # exploratory benchmark check; no refitting
 ```
 
 To rebuild earlier stages, run step 8, then step 9, then step 10 using their pinned inputs. **Do not run step 6 on the team database:** it would remove the existing Presto rows. The required database SHA-256 is `e192b9d6021fdae020f9b08123b98648dc4b5274989635927c709a5607cdcd60`; frozen label SHA-256 is `49aae383c4489aa98e9e7fe8c31cda6bf1cd752adc8e9540cffdc147a5e0ef92`.

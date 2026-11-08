@@ -1,7 +1,21 @@
 # Results directory
 
-This page indexes the results across the repository. Zimbabwe experiment reports stay with their frozen datasets
-under `data/runs/`; each report is named **`RESULTS.md`**. They are linked here rather than duplicated or relocated.
+This page indexes the results across the repository. The v1 Zimbabwe reports stay with their frozen datasets under
+`data/runs/`; each report is named **`RESULTS.md`**. The v2 releases in `data/runs/*_v2/` are not tracked in Git, so
+`results/*_v2/` hold byte copies of their reports and scores; do not edit those copies.
+
+| Folder or file | What it holds | Written by | Status |
+|---|---|---|---|
+| [baseline_table.md](baseline_table.md), `baseline_scores.csv` | R0/R1/A1 on `s1_cc2km`, data v1, all five folds | `scripts/baselines/baseline_table.py` | history (scores fold 0) |
+| [v2/](v2/baseline_table.md) | R0/R1/A1 on data v2, folds 1–4; [v1 against v2 comparison](v2/data_v2_comparison.md) | `scripts/baselines/baseline_table.py --version 2`, `scripts/baselines/compare_data_v2.py` | current |
+| [merge_v2/](merge_v2/README.md), [weather_v2/](weather_v2/README.md), [aggregation_v2/](aggregation_v2/RESULTS.md), [multiyear_v2/](multiyear_v2/RESULTS.md) | Zimbabwe experiments, rule-compliant runs | steps 9–15, `scripts/verification/` | current |
+| `aggregation/`, `multiyear/` | R² audit and verification receipts of the v1 releases | `scripts/verification/` | history |
+| [data_quality/](data_quality/README.md), [quality_remediation/](quality_remediation/README.md) | Quality review evidence | `scripts/quality/` | reference |
+| [spatial_baselines/](spatial_baselines/README.md) | Earlier within-cohort baselines | `scripts/baselines/spatial_baselines.py` | history |
+| [integration/](integration/main_merge_20261107/README.md) | Receipts from consolidating the branches | merge checks of 7 Nov | reference |
+
+The Lacuna experiments of 7–8 Nov (step-up ladder, time features, Presto) keep their results next to their code in
+[experiments/](../experiments/), each with a README.
 
 ## Zimbabwe experiments
 

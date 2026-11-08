@@ -57,8 +57,8 @@ Configuration: [v2](../../configs/zimbabwe_aggregation_v2.json); protocol amendm
 
 ```bash
 python scripts/step14_compare_zimbabwe_aggregation.py --config configs/zimbabwe_aggregation_v2.json --output data/runs/zimbabwe_aggregation_v2
-python scripts/verify_zimbabwe_aggregation.py --release data/runs/zimbabwe_aggregation_v2 --report results/aggregation_v2/verification.json
-python scripts/audit_zimbabwe_r2.py --release data/runs/zimbabwe_aggregation_v2 --output results/aggregation_v2
+python scripts/verification/verify_zimbabwe_aggregation.py --release data/runs/zimbabwe_aggregation_v2 --report results/aggregation_v2/verification.json
+python scripts/verification/audit_zimbabwe_r2.py --release data/runs/zimbabwe_aggregation_v2 --output results/aggregation_v2
 ```
 
 Step 14 v2 takes about 3 minutes on one thread. The step 14 default config is now v2. To replay v1 with current code,
@@ -157,7 +157,7 @@ Replay v1 from the repository root with the pinned team database (the default co
 
 ```bash
 python scripts/step14_compare_zimbabwe_aggregation.py --config configs/zimbabwe_aggregation_v1.json --output data/runs/zimbabwe_aggregation_replay
-python scripts/verify_zimbabwe_aggregation.py
+python scripts/verification/verify_zimbabwe_aggregation.py
 ```
 
 Choose a new `--output` destination for each replay; the manifest also records the checkout revision. Earlier releases remain unchanged.

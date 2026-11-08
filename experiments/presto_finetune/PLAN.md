@@ -137,3 +137,5 @@ The rules above stay as they are. These notes change how to read the result, and
   the 4 folds scored here, so the Lacuna Presto result is not a fully fresh test of that hypothesis.
 - **Environment.** No package was installed. The shared `.venv` has no torch; the runs used the global Python
   3.12, which already had torch 2.14.1 (CPU) and the same versions of the other packages.
+- **8 Nov 2026, repository clean-up.** `scripts/step8_run_baseline.py` is now `scripts/baselines/baseline_table.py` (same code, one `ROOT` line changed). `presto_lib.py` imports it from there under the same name `step8`.
+  The rules above are unchanged.

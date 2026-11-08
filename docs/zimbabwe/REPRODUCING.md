@@ -8,9 +8,9 @@ The original experiment checks correctly reject that code mismatch. We preserve 
 Use the recorded-code runner for the published steps 9–13:
 
 ```bash
-python scripts/reproduce_zimbabwe.py verify-compact
-python scripts/reproduce_zimbabwe.py verify-weather
-python scripts/reproduce_zimbabwe.py candidate
+python scripts/verification/reproduce_zimbabwe.py verify-compact
+python scripts/verification/reproduce_zimbabwe.py verify-weather
+python scripts/verification/reproduce_zimbabwe.py candidate
 ```
 
 The runner extracts source, scripts, configurations and documentation from commit
@@ -40,7 +40,7 @@ To repeat model training, choose the corresponding stage. These runs can take su
 For example:
 
 ```bash
-python scripts/reproduce_zimbabwe.py compact --output data/runs/zimbabwe_compact_replay
+python scripts/verification/reproduce_zimbabwe.py compact --output data/runs/zimbabwe_compact_replay
 ```
 
 These stages replay the recorded version with its recorded upstream releases; they do not silently switch a later stage
@@ -58,3 +58,14 @@ verification or retraining, not a prerequisite for reading the notebook.
 
 Integration verification receipts are in `results/integration/main_merge_20261107/`. They document verification of the
 existing experiments, not new performance estimates or new use of the reserved target fold.
+
+## Replay of 8 November 2026
+
+An isolated copy of commit `af7eac7` (same machine, Python 3.12.10, same packages, same pinned inputs) reran the
+v2 stages. Steps 9 (merge), 10 (transfer diagnosis) and 12 (full weather) wrote new folders that are byte-identical
+to the saved `data/runs/zimbabwe_*_v2` releases (17/17, 27/27 and 23/23 files, manifests included). Step 11 (weather
+data, rebuilt offline from the cached NASA POWER responses) is identical too (14/14). Step 8, run from the team
+repository into a new folder, is identical in 17 of 18 files; its manifest differs only in `git_base_commit` and in
+the hash of `docs/DECISIONS.md`. Steps 13–15 were still running, and step 14 needs the saved
+`data/runs/zimbabwe_merge_v1` release as a frozen input (it was copied into the replay, not rebuilt). This replay
+says nothing about steps 1–7, another machine, or the Presto, step-up and time-feature numbers.

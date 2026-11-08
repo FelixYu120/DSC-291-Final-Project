@@ -29,8 +29,8 @@ v2 index-maximum scores are 0.178344 (Lacuna) and 0.179048 (+ 2024). None of the
 The label-free counterpart of the disputed 0.17 index "preharvest" score is the index calendar mean, 0.173661.
 
 ```bash
-python scripts/audit_zimbabwe_r2.py --release data/runs/zimbabwe_aggregation_v2 --output results/aggregation_v2
-python scripts/audit_zimbabwe_r2.py --release data/runs/zimbabwe_multiyear_v2 --output results/multiyear_v2
+python scripts/verification/audit_zimbabwe_r2.py --release data/runs/zimbabwe_aggregation_v2 --output results/aggregation_v2
+python scripts/verification/audit_zimbabwe_r2.py --release data/runs/zimbabwe_multiyear_v2 --output results/multiyear_v2
 ```
 
 The rest of this packet is the original v1 audit, kept unchanged for the record.
@@ -54,7 +54,7 @@ we cannot identify the remaining difference or say which implementation caused i
 An independent calculation using NumPy and `sklearn.metrics.r2_score`, with no
 imports from the experiment's scoring code, reproduced all 26 saved scores to
 within 1e-10. It also checked that every model uses identical evaluation IDs,
-folds and target values. See [audit script](../../scripts/audit_zimbabwe_r2.py),
+folds and target values. See [audit script](../../scripts/verification/audit_zimbabwe_r2.py),
 [numeric audit](../../results/aggregation/r2_audit.csv) and
 [verification receipt](../../results/aggregation/r2_audit.json).
 
@@ -256,7 +256,7 @@ OLS fits does not justify substituting it for held-out Ridge R².
 From the repository root, with the project dependencies installed:
 
 ```bash
-python scripts/audit_zimbabwe_r2.py
+python scripts/verification/audit_zimbabwe_r2.py
 ```
 
 This reads committed CSVs; it needs no database, downloads, retraining or API

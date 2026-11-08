@@ -1,0 +1,2 @@
+look,utc,commit,reason,arms,n_test,run
+1,20261108T162116Z,archive/felix-branch-2026-11-07-9-gaf7eac7d844cb7ddc4dcdc281d22fa894174edc8-dirty,First repeatable fold-0 scoring of the main Lacuna arms after the owner ruling of 8 Nov (fold 0 may be scored more than once; every look is logged),R0|R1|A1|V0|V1|V2|V3|L1|M1|M2|M2-pre|P0|X1,376,runs/20261108T162116Z

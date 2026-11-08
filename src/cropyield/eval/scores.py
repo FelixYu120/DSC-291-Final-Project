@@ -19,6 +19,14 @@ def rmse(y: np.ndarray, p: np.ndarray) -> float:
     return float(np.sqrt(np.mean((y - p) ** 2)))
 
 
+def mae(y: np.ndarray, p: np.ndarray) -> float:
+    return float(np.mean(np.abs(p - y)))
+
+
+def bias(y: np.ndarray, p: np.ndarray) -> float:
+    return float(np.mean(p - y))
+
+
 def r2(y: np.ndarray, p: np.ndarray) -> float:
     """1 - SSE/SST. Negative when the model is worse than predicting the test mean."""
     total = np.sum((y - y.mean()) ** 2)

@@ -3,7 +3,8 @@
 The database is rebuilt from scratch on every run. Labels come from the committed audit CSVs
 (cropyield.data.cohorts), imagery tables from the chip folders the downloader wrote under
 data/imagery/sentinel2, and the MOSAIKS tables from the parquet files under data/features/mosaiks
-when they exist. presto_embeddings stays empty: Presto is not on the data path.
+when they exist. presto_embeddings stays empty: Presto is not on the data path. (The v1 team copy
+holds Presto rows that a later process added, so this script refuses to overwrite a file with Presto rows.)
 One observation is one field in one season, keyed everywhere by ``obs_id = "<dataset>:<source_id>"``.
 
 The SQL lives in sql/ (read sql/README.md): schema.sql creates the tables, views.sql the views.

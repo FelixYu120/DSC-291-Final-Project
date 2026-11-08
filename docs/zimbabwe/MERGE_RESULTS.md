@@ -160,7 +160,7 @@ it was not assessed for this experiment, not because they necessarily have unusa
 From the repository root, with the pinned team database present:
 
 ```bash
-python scripts/reproduce_zimbabwe.py merge                                            # v1 replay, recorded code
+python scripts/verification/reproduce_zimbabwe.py merge                                            # v1 replay, recorded code
 python scripts/step9_compare_zimbabwe_merge.py --config configs/zimbabwe_merge_v2.json   # v2, current code
 ```
 

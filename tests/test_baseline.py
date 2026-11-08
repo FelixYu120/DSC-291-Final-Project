@@ -9,11 +9,11 @@ import pytest
 
 from cropyield.baselines.models import Winsorize, coordinates_knn, ridge_cv, train_mean
 from cropyield.data.labels import sha256
-from cropyield.eval.scores import (centred, group_draws, paired_difference_ci, r2, rank_inside_clusters, rmse,
-                                   spearman)
+from cropyield.eval.scores import (bias, centred, group_draws, mae, paired_difference_ci, r2, rank_inside_clusters,
+                                   rmse, spearman)
 
 ROOT = Path(__file__).resolve().parents[1]
-spec = importlib.util.spec_from_file_location("step8_run_baseline", ROOT / "scripts" / "step8_run_baseline.py")
+spec = importlib.util.spec_from_file_location("baseline_table", ROOT / "scripts" / "baselines" / "baseline_table.py")
 run_baseline = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(run_baseline)
 
@@ -27,6 +27,13 @@ RUN_OF_30_OCT = {("malawi_2023", "R0"): 1.54420, ("malawi_2023", "R1"): 1.62531,
 
 def test_rmse_by_hand():
     assert rmse(Y, P) == pytest.approx(2.0)
+
+
+def test_mae_and_bias_by_hand():
+    y, p = np.array([1.0, 2.0, 3.0, 4.0]), np.array([2.0, 2.0, 1.0, 6.0])
+    assert mae(y, p) == pytest.approx(1.25)
+    assert bias(y, p) == pytest.approx(0.25)
+    assert bias(y, y - 1.0) == pytest.approx(-1.0)
 
 
 def test_r2_is_zero_for_the_test_mean_and_negative_when_worse():

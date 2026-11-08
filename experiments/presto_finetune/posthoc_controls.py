@@ -88,8 +88,9 @@ def main(argv=None) -> int:
              "Not in PLAN.md. Written after the first scores were seen, so read them as exploration.", "",
              "X1 = Ridge on the 99 raw monthly inputs (10 bands + NDVI x 9 months, mean-filled + missing flags). "
              "X2 = frozen random-weights Presto + Ridge.", "",
-             "| Arm | RMSE, t/ha | R2 | Rank inside clusters |", "|---|---:|---:|---:|"]
-    lines += [f"| {r.arm} | {r.rmse:.3f} | {r.r2:.3f} | {r.rank_inside_clusters:.3f} |" for r in arms.itertuples()]
+             "| Arm | RMSE, t/ha | MAE, t/ha | Bias, t/ha | R2 | Rank inside clusters |", "|---|---:|---:|---:|---:|---:|"]
+    lines += [f"| {r.arm} | {r.rmse:.3f} | {r.mae:.3f} | {r.bias:+.3f} | {r.r2:.3f} | {r.rank_inside_clusters:.3f} |"
+              for r in arms.itertuples()]
     lines += ["", "| Pair | RMSE, a minus b | Rank, a minus b |", "|---|---|---|"]
     lines += [f"| {r.a} minus {r.b} | {run_cohort.interval(r.rmse_diff, r.rmse_low, r.rmse_high)} | "
               f"{run_cohort.interval(r.rank_diff, r.rank_low, r.rank_high)} |" for r in pairs.itertuples()]

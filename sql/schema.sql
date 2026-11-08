@@ -116,6 +116,8 @@ CREATE TABLE vegetation_indices (
 
 
 -- 7. presto_embeddings: one row per observation with an embedding.
+--    The build leaves it empty. The v1 team copy holds 11,364 rows that a later process added
+--    (build_info.presto_embeddings_built TRUE); that is why step 6 refuses a file with Presto rows.
 --    The build leaves this table empty: Presto is not on the data path.
 CREATE TABLE presto_embeddings (
     obs_id              VARCHAR NOT NULL,  -- key, see labels
@@ -130,7 +132,9 @@ CREATE TABLE mosaiks_monthly (
     obs_id              VARCHAR NOT NULL,  -- key, see labels
     month               VARCHAR NOT NULL,  -- 'YYYY-MM'
     chip                FLOAT[],           -- K features of the whole 64 x 64 chip; NULL when the month is missing
-    field               FLOAT[]            -- K features of the field pixels only; NULL when missing
+    field               FLOAT[]            -- K features of the field pixels only; NULL when the month is missing,
+                                           -- and in the v1 team copy also for 518 clear 1-pixel point months
+                                           -- (docs/DATASET.md, Q-32)
 );
 
 

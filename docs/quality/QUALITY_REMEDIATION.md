@@ -132,11 +132,11 @@ CC BY 4.0. Candidate geometries retain their source/year/score and remain separa
 Run from the repository root with the existing environment:
 
 ```bash
-python scripts/review_kenya_records.py
-python scripts/review_clouds.py plan
-python scripts/review_clouds.py review --scope all-retained --workers 8
-python scripts/review_point_areas.py
-python scripts/review_boundary_candidates.py --per-cohort-limit 2 --max-seconds 180
+python scripts/quality/review_kenya_records.py
+python scripts/quality/review_clouds.py plan
+python scripts/quality/review_clouds.py review --scope all-retained --workers 8
+python scripts/quality/review_point_areas.py
+python scripts/quality/review_boundary_candidates.py --per-cohort-limit 2 --max-seconds 180
 ```
 
 Use `--per-cohort-limit 0` for all 260 Malawi records and 203 repeated-coordinate Kenya records.
@@ -146,7 +146,7 @@ unevaluated; an empty candidate result never proves that no field exists.
 To assemble a complete local variant, use the exact directories printed by the completed reviews:
 
 ```bash
-python scripts/assemble_quality_variant.py \
+python scripts/quality/assemble_quality_variant.py \
   --kenya <kenya-review-directory>/KEN \
   --clouds <completed-all-retained-cloud-directory> \
   --point-areas <point-area-review-directory> \

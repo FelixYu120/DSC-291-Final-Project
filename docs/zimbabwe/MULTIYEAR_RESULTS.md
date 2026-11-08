@@ -54,9 +54,9 @@ protocol amendment in [MULTIYEAR_PROTOCOL.md](MULTIYEAR_PROTOCOL.md).
 
 ```bash
 python scripts/step15_compare_zimbabwe_multiyear.py --config configs/zimbabwe_multiyear_v2.json --output data/runs/zimbabwe_multiyear_v2
-python scripts/verify_zimbabwe_multiyear.py --release data/runs/zimbabwe_multiyear_v2 --report results/multiyear_v2/verification.json
-python scripts/verify_multiyear_intervals.py --release data/runs/zimbabwe_multiyear_v2 --output results/multiyear_v2/interval_verification.json
-python scripts/audit_zimbabwe_r2.py --release data/runs/zimbabwe_multiyear_v2 --output results/multiyear_v2
+python scripts/verification/verify_zimbabwe_multiyear.py --release data/runs/zimbabwe_multiyear_v2 --report results/multiyear_v2/verification.json
+python scripts/verification/verify_multiyear_intervals.py --release data/runs/zimbabwe_multiyear_v2 --output results/multiyear_v2/interval_verification.json
+python scripts/verification/audit_zimbabwe_r2.py --release data/runs/zimbabwe_multiyear_v2 --output results/multiyear_v2
 ```
 
 Step 15 v2 needs the step 14 v2 release first and takes under a minute. The step 15 default config is now v2; pass
@@ -142,6 +142,6 @@ The new [release directory](../../data/runs/zimbabwe_multiyear_v1/) contains:
 | [selected_parameters.csv](../../data/runs/zimbabwe_multiyear_v1/selected_parameters.csv), [paired_differences.csv](../../data/runs/zimbabwe_multiyear_v1/paired_differences.csv) | Model choices, source use and paired uncertainty |
 | [manifest.json](../../data/runs/zimbabwe_multiyear_v1/manifest.json), [PROTOCOL.md](../../data/runs/zimbabwe_multiyear_v1/PROTOCOL.md) | Input/output fingerprints, software and fixed design |
 
-Run `python scripts/step15_compare_zimbabwe_multiyear.py --output data/runs/zimbabwe_multiyear_replay` with the pinned team database and a new destination. Run `python scripts/verify_zimbabwe_multiyear.py --report results/multiyear/verification.json` to independently reconstruct features, check memberships/distances and replay the selected fits. Original releases and the shared database are unchanged.
+Run `python scripts/step15_compare_zimbabwe_multiyear.py --output data/runs/zimbabwe_multiyear_replay` with the pinned team database and a new destination. Run `python scripts/verification/verify_zimbabwe_multiyear.py --report results/multiyear/verification.json` to independently reconstruct features, check memberships/distances and replay the selected fits. Original releases and the shared database are unchanged.
 
-For the R² discrepancy with Claude, read the [detailed R² review packet](R2_AUDIT.md). The [standalone R² audit](../../scripts/audit_zimbabwe_r2.py) needs only committed CSVs; expanded results are recorded in [its receipt](../../results/multiyear/r2_audit.json). Scientific checks and paired interval reconstruction are recorded in [verification](../../results/multiyear/verification.json) and [interval verification](../../results/multiyear/interval_verification.json).
+For the R² discrepancy with Claude, read the [detailed R² review packet](R2_AUDIT.md). The [standalone R² audit](../../scripts/verification/audit_zimbabwe_r2.py) needs only committed CSVs; expanded results are recorded in [its receipt](../../results/multiyear/r2_audit.json). Scientific checks and paired interval reconstruction are recorded in [verification](../../results/multiyear/verification.json) and [interval verification](../../results/multiyear/interval_verification.json).

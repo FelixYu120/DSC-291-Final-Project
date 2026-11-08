@@ -21,8 +21,8 @@ import sklearn
 import torch
 
 import presto_lib as lib
-from cropyield.eval.scores import (centred, in_large_clusters, paired_difference_ci, r2, rank_inside_clusters,
-                                   rmse, spearman)
+from cropyield.eval.scores import (bias, centred, in_large_clusters, mae, paired_difference_ci, r2,
+                                   rank_inside_clusters, rmse, spearman)
 
 step8 = lib.step8
 ARMS = ("R0", "R1", "A1", "P0", "P0_noloc", "P1", "P1_noloc", "P2")
@@ -108,7 +108,7 @@ def cluster_years_of(fields: pd.DataFrame) -> np.ndarray:
 
 def arm_scores(y: np.ndarray, predicted: dict, fields: pd.DataFrame) -> pd.DataFrame:
     cluster_years = cluster_years_of(fields)
-    return pd.DataFrame([{"arm": arm, "rmse": rmse(y, p), "r2": r2(y, p),
+    return pd.DataFrame([{"arm": arm, "rmse": rmse(y, p), "mae": mae(y, p), "bias": bias(y, p), "r2": r2(y, p),
                           "rank_inside_clusters": rank_inside_clusters(y, p, cluster_years, MIN_CLUSTER_FIELDS)}
                          for arm, p in predicted.items()])
 
@@ -148,11 +148,11 @@ def table_text(cohort: str, n: int, clusters: int, arms: pd.DataFrame, pairs: pd
     lines = [f"# Presto fine-tune: {cohort}", "",
              f"Folds 1-4 of `s1_cc2km` ({n:,} fields, {clusters} clusters). Fold 0 trains but is never scored. "
              f"Paired cluster-bootstrap 95 % intervals, 2,000 draws, seed {lib.SEED}. Rules: PLAN.md.", "",
-             "| Arm | RMSE, t/ha | R2 | Rank inside clusters | RMSE minus A1 | Rank minus A1 | RMSE minus R1 | "
-             "Rank minus R1 | Wins vs A1 |", "|---|---:|---:|---:|---|---|---|---|---|"]
+             "| Arm | RMSE, t/ha | MAE, t/ha | Bias, t/ha | R2 | Rank inside clusters | RMSE minus A1 | Rank minus A1 | "
+             "RMSE minus R1 | Rank minus R1 | Wins vs A1 |", "|---|---:|---:|---:|---:|---:|---|---|---|---|---|"]
     for row in arms.itertuples():
         rank = "" if np.isnan(row.rank_inside_clusters) else f"{row.rank_inside_clusters:.3f}"
-        cells = [row.arm, f"{row.rmse:.3f}", f"{row.r2:.3f}", rank]
+        cells = [row.arm, f"{row.rmse:.3f}", f"{row.mae:.3f}", f"{row.bias:+.3f}", f"{row.r2:.3f}", rank]
         if row.arm in PRESTO_ARMS:
             a1, r1 = by.loc[(row.arm, "A1")], by.loc[(row.arm, "R1")]
             cells += [interval(a1.rmse_diff, a1.rmse_low, a1.rmse_high),

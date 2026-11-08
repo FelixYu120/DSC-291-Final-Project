@@ -276,7 +276,7 @@ def test_a_null_mosaiks_vector_element_is_corrupt_even_though_whole_missing_vect
 
 
 def test_cli_saves_failure_report_without_deduplicating_corrupt_database(monthly_db, tmp_path, monkeypatch):
-    script = ROOT / "scripts/audit_data_quality.py"
+    script = ROOT / "scripts/quality/audit_data_quality.py"
     spec = importlib.util.spec_from_file_location("quality_audit_failure_test", script)
     audit = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(audit)
@@ -317,7 +317,7 @@ def test_cli_saves_failure_report_without_deduplicating_corrupt_database(monthly
     for constant, filename in [("OAF_WORKBOOK", "oaf.xlsx"), ("LACUNA_GEOJSON", "lacuna.geojson"),
                                ("MALAWI_2023_ZIP", "malawi.zip")]:
         monkeypatch.setattr(audit, constant, write(f"data/raw/{filename}", "synthetic provider fixture"))
-    for relative in ["scripts/audit_data_quality.py", "src/cropyield/data/quality.py", "src/cropyield/data/labels.py"]:
+    for relative in ["scripts/quality/audit_data_quality.py", "src/cropyield/data/quality.py", "src/cropyield/data/labels.py"]:
         write(relative, (ROOT / relative).read_text())
 
     monkeypatch.setattr(audit, "ROOT", project)

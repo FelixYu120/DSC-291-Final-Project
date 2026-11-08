@@ -13,8 +13,8 @@ outside `include_primary`. Splits, buffer, feature sets, grids, seeds and bootst
 |---|---|---|
 | `full/` | `data/runs/zimbabwe_weather_v2` | `python scripts/step11_add_zimbabwe_weather.py --config configs/zimbabwe_weather_v2.json`, then `python scripts/step12_compare_zimbabwe_weather.py --config configs/zimbabwe_weather_v2.json` |
 | `compact/` | `data/runs/zimbabwe_weather_compact_v2` | `python scripts/step13_compare_compact_weather.py --config configs/zimbabwe_weather_compact_v2.json` |
-| `weather_verification.json` | independent checker | `python scripts/verify_zimbabwe_weather.py --config configs/zimbabwe_weather_v2.json --report results/weather_v2/weather_verification.json` |
-| `compact_verification.json`, `zimbabwe_weather_compact_support_v2.csv` | independent checker | `python scripts/verify_compact_weather.py --config configs/zimbabwe_weather_compact_v2.json --output results/weather_v2/compact_verification.json` |
-| `compact_candidate.csv` | post-hoc benchmark, no refit | `python scripts/compare_compact_candidate.py --config configs/zimbabwe_weather_compact_v2.json --output results/weather_v2/compact_candidate.csv` |
+| `weather_verification.json` | independent checker | `python scripts/verification/verify_zimbabwe_weather.py --config configs/zimbabwe_weather_v2.json --report results/weather_v2/weather_verification.json` |
+| `compact_verification.json`, `zimbabwe_weather_compact_support_v2.csv` | independent checker | `python scripts/verification/verify_compact_weather.py --config configs/zimbabwe_weather_compact_v2.json --output results/weather_v2/compact_verification.json` |
+| `compact_candidate.csv` | post-hoc benchmark, no refit | `python scripts/verification/compare_compact_candidate.py --config configs/zimbabwe_weather_compact_v2.json --output results/weather_v2/compact_candidate.csv` |
 
 The v1 versus v2 comparison is in `docs/zimbabwe/METHODS.md`. All results are exploratory and retrospective.

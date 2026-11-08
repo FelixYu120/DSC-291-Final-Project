@@ -1,24 +1,24 @@
 # Baseline result
 
 Ridge on the 10 season indices (A1) against the training mean (R0) and coordinates alone (R1). Each cohort has its own model.
-Split `s1_cc2km`: five folds, folds 1-4 scored, whole 2 km clusters held out. Seed 20261029. Commit `a95c12c8804635afaab154112487213231c04650-dirty`.
+Split `s1_cc2km`: five folds, folds 1-4 scored, whole 2 km clusters held out. Seed 20261029. Commit `archive/felix-branch-2026-11-07-9-gaf7eac7d844cb7ddc4dcdc281d22fa894174edc8-dirty`.
 
 Data v2: folds 1-4 only. Fold 0 is kept back for the end of the project; its fields still train.
 
-| Cohort | Fields | Clusters | Arm | RMSE, t/ha | R2 inside the cohort | Rank inside clusters |
-|---|---:|---:|---|---:|---:|---:|
-| malawi_2023 | 204 | 44 | R0 | 1.536 | -0.008 |  |
-| malawi_2023 | 204 | 44 | R1 | 1.634 | -0.142 | 0.048 |
-| malawi_2023 | 204 | 44 | A1 | 1.406 | 0.154 | 0.425 |
-| kenya_oaf_2019_2020 | 3,181 | 680 | R0 | 1.723 | -0.003 |  |
-| kenya_oaf_2019_2020 | 3,181 | 680 | R1 | 1.529 | 0.211 | 0.026 |
-| kenya_oaf_2019_2020 | 3,181 | 680 | A1 | 1.674 | 0.054 | 0.127 |
-| zimbabwe_lacuna_2022_2023 | 1,504 | 232 | R0 | 1.992 | -0.008 |  |
-| zimbabwe_lacuna_2022_2023 | 1,504 | 232 | R1 | 1.854 | 0.127 | -0.054 |
-| zimbabwe_lacuna_2022_2023 | 1,504 | 232 | A1 | 1.785 | 0.191 | 0.299 |
-| malawi_2022 | 423 | 78 | R0 | 2.071 | -0.082 |  |
-| malawi_2022 | 423 | 78 | R1 | 1.624 | 0.335 | -0.072 |
-| malawi_2022 | 423 | 78 | A1 | 1.551 | 0.393 | 0.299 |
+| Cohort | Fields | Clusters | Arm | RMSE, t/ha | MAE, t/ha | Bias, t/ha | R2 inside the cohort | Rank inside clusters |
+|---|---:|---:|---|---:|---:|---:|---:|---:|
+| malawi_2023 | 204 | 44 | R0 | 1.536 | 1.223 | -0.018 | -0.008 |  |
+| malawi_2023 | 204 | 44 | R1 | 1.634 | 1.282 | -0.000 | -0.142 | 0.048 |
+| malawi_2023 | 204 | 44 | A1 | 1.406 | 1.103 | -0.043 | 0.154 | 0.425 |
+| kenya_oaf_2019_2020 | 3,181 | 680 | R0 | 1.723 | 1.343 | -0.011 | -0.003 |  |
+| kenya_oaf_2019_2020 | 3,181 | 680 | R1 | 1.529 | 1.185 | -0.008 | 0.211 | 0.026 |
+| kenya_oaf_2019_2020 | 3,181 | 680 | A1 | 1.674 | 1.307 | -0.011 | 0.054 | 0.127 |
+| zimbabwe_lacuna_2022_2023 | 1,504 | 232 | R0 | 1.992 | 1.640 | +0.140 | -0.008 |  |
+| zimbabwe_lacuna_2022_2023 | 1,504 | 232 | R1 | 1.854 | 1.434 | -0.069 | 0.127 | -0.054 |
+| zimbabwe_lacuna_2022_2023 | 1,504 | 232 | A1 | 1.785 | 1.449 | +0.081 | 0.191 | 0.299 |
+| malawi_2022 | 423 | 78 | R0 | 2.071 | 1.700 | -0.095 | -0.082 |  |
+| malawi_2022 | 423 | 78 | R1 | 1.624 | 1.174 | -0.087 | 0.335 | -0.072 |
+| malawi_2022 | 423 | 78 | A1 | 1.551 | 1.191 | -0.015 | 0.393 | 0.299 |
 
 | Cohort | A1 minus R0, RMSE | A1 minus R1, RMSE | A1 minus R1, rank | Against coordinates |
 |---|---|---|---|---|
@@ -33,6 +33,7 @@ Kenya A1, R2 inside each year: 2019: 0.077, 2020: 0.020.
 
 - Each cohort stands alone. Yield definitions differ, so never compare t/ha or R2 across cohorts. Malawi 2022 and Malawi 2023 come from different crop cuts: never pool them or compare their t/ha.
 - A win needs a paired interval that excludes 0. The primary comparison is A1 minus R1 on RMSE, per cohort.
+- MAE is the mean absolute error. Bias is the mean of prediction minus yield: above 0 means the arm predicts too high.
 - A cluster is a chain of fields with gaps under 2 km, measured point to point. It is not a surveyed village.
 - R1 is coordinates with 10 neighbours. It is one measure of place, not the best one.
 - Rank inside clusters takes out the mean of each cluster and year, on clusters of at least 3 fields. This removes most of place, not all.

@@ -19,13 +19,13 @@ tonnes per hectare (t/ha), converted once from the frozen labels' kg/ha.
 From the repository root, after the README setup and obtaining `data/cropyield.duckdb`:
 
 ```bash
-python scripts/run_baselines.py
+python scripts/baselines/spatial_baselines.py
 ```
 
 On macOS, the existing project environment can also be used without activation:
 
 ```bash
-.venv/bin/python scripts/run_baselines.py
+.venv/bin/python scripts/baselines/spatial_baselines.py
 ```
 
 The default configuration is `configs/spatial_baselines_v1.yaml`. A saved experiment configuration

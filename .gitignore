@@ -39,3 +39,12 @@ _parked/local/
 
 # Added 2026-11-08: TensorBoard logs of the Presto runs (large, rebuilt by the runs).
 experiments/presto_finetune/tensorboard/
+
+# Added 2026-11-08: Presto debug checkpoints and every TensorBoard event file (rebuilt by the runs or the exporter),
+# and the footprint pixel windows (features, 28.6 MB, rebuilt by experiments/footprint/windows.py).
+experiments/presto_debug/runs/**/checkpoint.pt
+experiments/presto_debug/runs/**/tensorboard/
+experiments/presto_debug/runs/latest/comparison/
+experiments/presto_debug/runs/comparison_archive/
+events.out.tfevents.*
+experiments/footprint/windows.parquet

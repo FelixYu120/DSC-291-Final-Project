@@ -215,7 +215,7 @@ def test_the_database_build_refuses_a_file_that_holds_presto_rows(tmp_path):
 
 # --- step 9: the pre-registered v1 / v2 comparison ----------------------------------------------
 
-step9 = script("step9_compare_data_v2.py", "step9_v2_test")
+step9 = script("baselines/compare_data_v2.py", "compare_data_v2_test")
 
 
 def paired_fields(n_clusters: int = 12, size: int = 5) -> pd.DataFrame:
