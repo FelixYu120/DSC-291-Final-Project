@@ -1,0 +1,4 @@
+season_year,include_primary,records,zero_yields,yield_min_kg_ha,yield_median_kg_ha,yield_mean_kg_ha,yield_max_kg_ha
+2022,False,169,0,53.125,1460,2457.22485207,8833.75
+2023,False,217,0,9.375,3117.5,3200.24020737,12157.5
+2023,True,1880,28,0,3019.1875,3345.97905585,12430

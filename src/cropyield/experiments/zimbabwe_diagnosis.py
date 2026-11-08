@@ -25,11 +25,21 @@ from cropyield.data.handoff import csv_write, json_write, publish_release, requi
 from cropyield.data.labels import sha256
 from cropyield.data.xy import FEATURES
 from cropyield.eval.splits import connected_clusters, unit_xyz
-from cropyield.experiments.zimbabwe_merge import purge_source, score_predictions
+from cropyield.experiments.zimbabwe_merge import (
+    purge_source,
+    require_training_rows,
+    score_predictions,
+    training_rows,
+)
 
 CONFIG = ROOT / "configs/zimbabwe_transfer_diagnosis_v1.json"
 OUTPUT = ROOT / "data/runs/zimbabwe_transfer_diagnosis_v1"
 PRIOR = ROOT / "data/runs/zimbabwe_merge_v1"
+
+
+def prior_run(config: dict) -> Path:
+    """Merge release whose rows, memberships and source permissions this diagnosis inherits (v1 by default)."""
+    return ROOT / config.get("merge_run", "data/runs/zimbabwe_merge_v1")
 INDICES = ["ndvi", "gcvi", "mtci", "ndvi705", "ndvi740"]
 BANDS = ["b02", "b03", "b04", "b05", "b06", "b07", "b08", "b8a", "b11", "b12"]
 
@@ -54,13 +64,16 @@ class TrainingTransform:
 
 
 def load_data(config):
-    old = json.loads((PRIOR / "manifest.json").read_text())
+    prior = prior_run(config)
+    old = json.loads((prior / "manifest.json").read_text())
     for name, entry in old["outputs"].items():
-        require(sha256(PRIOR / name) == entry["sha256"], f"Prior output hash changed: {name}")
+        require(sha256(prior / name) == entry["sha256"], f"Prior output hash changed: {name}")
     for name, value in old["inputs"].items():
         require(sha256(ROOT / name) == value, f"Prior input changed: {name}")
-    rows = pd.read_parquet(PRIOR / "combined_data.parquet").set_index("obs_id").sort_index()
-    audit = pd.read_csv(PRIOR / "source_2024_audit.csv").set_index("obs_id")
+    require(training_rows(old["config"]) == training_rows(config), "Prior merge run uses a different training-row rule")
+    rows = pd.read_parquet(prior / "combined_data.parquet").set_index("obs_id").sort_index()
+    require_training_rows(rows, config, "Prior combined table")
+    audit = pd.read_csv(prior / "source_2024_audit.csv").set_index("obs_id")
     cuts = audit[["box1_yield_t_ha", "box2_yield_t_ha"]]
     audit["relative_cut_difference"] = (cuts.iloc[:, 0] - cuts.iloc[:, 1]).abs() / cuts.mean(axis=1).replace(0, np.nan)
     both_zero = cuts.eq(0).all(axis=1)
@@ -91,8 +104,8 @@ def load_data(config):
                 "presto": presto.reindex(rows.index),
                 "coordinates": pd.DataFrame(unit_xyz(rows.lat.to_numpy(), rows.lon.to_numpy()), index=rows.index)}
     require(np.isfinite(features["presto"]).all().all(), "Nonfinite pretrained embeddings")
-    memberships = pd.read_csv(PRIOR / "target_memberships.csv", dtype={"group_id": str})
-    permissions = pd.read_csv(PRIOR / "source_spatial_permissions.csv")
+    memberships = pd.read_csv(prior / "target_memberships.csv", dtype={"group_id": str})
+    permissions = pd.read_csv(prior / "source_spatial_permissions.csv")
     reserved = set(rows[rows.domain.eq("lacuna") & rows.fold.eq(0)].index)
     require(reserved.isdisjoint(memberships[memberships.role.ne("reserved")].obs_id), "Reserved target used")
     return rows, audit, features, memberships, permissions
@@ -136,7 +149,8 @@ def source_mask(source, policy, seed):
         for zero in [False, True]:
             eligible = np.flatnonzero(source.yield_t_ha.eq(0).to_numpy() == zero)
             count = int((source.quality_subset & source.yield_t_ha.eq(0).eq(zero)).sum())
-            mask[rng.choice(eligible, count, replace=False)] = True
+            if count:  # an include_primary pool has no zeros; drawing nothing must not touch the RNG
+                mask[rng.choice(eligible, count, replace=False)] = True
         return mask
     return np.ones(len(source), bool)
 
@@ -241,6 +255,7 @@ def run_target_models(rows, features, membership, permission, config):
             require(rows.loc[fit_ids].fold.ne(0).all() and rows.loc[val_ids].fold.ne(0).all(), "Fold zero exposure")
             require(set(rows.loc[fit_ids].group_id).isdisjoint(rows.loc[val_ids].group_id), "Target spatial group leakage")
             require(allowed.minimum_distance_to_protected_km.ge(config["buffer_km"]).all(), "Source buffer failure")
+            require_training_rows(rows.loc[fit_ids + allowed.obs_id.tolist()], config, f"Fit pool {outer}/{inner}")
             index.append((fit_ids, allowed.obs_id.tolist(), val_ids))
             if inner:
                 truths.append(rows.loc[val_ids].yield_t_ha.to_numpy())
@@ -321,7 +336,7 @@ def paired_metrics(predictions, config):
     return pd.DataFrame(metrics), pd.DataFrame(folds), pd.DataFrame(differences)
 
 
-def quality_and_error_audit(rows, audit, features):
+def quality_and_error_audit(rows, audit, features, prior=PRIOR):
     summaries, correlations = [], []
     for name, part in rows[rows.domain.ne("lacuna") | rows.fold.ne(0)].groupby("domain"):
         y = part.yield_t_ha
@@ -344,7 +359,7 @@ def quality_and_error_audit(rows, audit, features):
                "positive_exactly_equal_cuts": int(positive.box1_yield_t_ha.eq(positive.box2_yield_t_ha).sum()),
                "missing_labels": int(audit.yield_t_ha.isna().sum()),
                "recorded_zeros": int(audit[audit.label_eligible].yield_t_ha.eq(0).sum())}
-    old_predictions = pd.read_csv(PRIOR / "predictions.csv")
+    old_predictions = pd.read_csv(prior / "predictions.csv")
     decomposition = []
     for method, part in old_predictions.groupby("method"):
         e = part.prediction_t_ha - part.yield_t_ha
@@ -384,6 +399,7 @@ def source_predictability(rows, features, config):
     protected = pd.concat([rows.loc[original_reserved], rows[rows.domain.eq("lacuna") & rows.fold.eq(0)]])
     source, distances = purge_source(rows[rows.domain.eq("zimbabwe_2024") & rows.feature_eligible], protected, config["buffer_km"])
     source = source.copy()
+    require_training_rows(source, config, "Source learnability pool")
     source["group_id"] = connected_clusters(source.lat.to_numpy(), source.lon.to_numpy(), 2.).astype(str)
     require(set(original_reserved).isdisjoint(source.index), "Source fold zero exposed")
     outputs, selections, assignment = [], [], []
@@ -417,8 +433,10 @@ def source_predictability(rows, features, config):
     predictions = pd.concat(outputs, ignore_index=True)
     results = []
     for name, part in predictions.groupby("method"):
+        # Zero/positive ranking is undefined for an include_primary pool, which holds no zeros.
+        both = part.yield_t_ha.gt(0).nunique() == 2
         results.append({"method": name, "n": len(part), **score_predictions(part.yield_t_ha.to_numpy(), part.prediction_t_ha.to_numpy()),
-                        "nonzero_auc": roc_auc_score(part.yield_t_ha.gt(0), part.prediction_t_ha)})
+                        "nonzero_auc": roc_auc_score(part.yield_t_ha.gt(0), part.prediction_t_ha) if both else np.nan})
     info = {"original_source_reserved_n": len(original_reserved), "source_diagnostic_n": len(source),
             "source_diagnostic_groups": source.group_id.nunique(), "source_zero_share": source.yield_t_ha.eq(0).mean(),
             "source_excluded_by_reserved_buffer": int((distances < config["buffer_km"]).sum())}
@@ -464,15 +482,23 @@ def plot_diagnosis(path, metrics, differences, decomposition, source_metrics):
     plt.close(fig)
 
 
-def write_results(path, metrics, differences, quality, shifts, source_metrics, selected, summary):
+def write_results(path, metrics, differences, quality, shifts, source_metrics, selected, summary, config=None):
+    config = config or {}
+    legacy = training_rows(config) == "all_screened"
+    title = "Why pooling Zimbabwe data added little: diagnostic results" if legacy else "Zimbabwe transfer diagnosis: results"
+    rule_text = "" if legacy else f"""
+Training rows follow `labels_v1.include_primary` (config `training_rows`). Rows, memberships and source permissions
+come from `{config.get('merge_run')}`, so the 2024 pool holds no recorded zeros. The source-quality statistics
+below still describe all screened 2024 records, zeros included; they are data checks, not training rows.
+"""
     primary = differences[differences.primary_comparison].iloc[0]
     rows = [f"| {r.method} | {r.rmse_t_ha:.4f} | {r.mae_t_ha:.4f} | {r.r2:.3f} | {r.reference} |" for _, r in metrics.iterrows()]
     source_rows = [f"| {r.method} | {r.rmse_t_ha:.4f} | {r.r2:.3f} | {r.spearman:.3f} | {r.nonzero_auc:.3f} |" for _, r in source_metrics.iterrows()]
     selector_rows = [f"| {int(r.outer_fold)} | {r.method} | {r.chosen_method} | {int(r.source_used)} |"
                      for _, r in selected[selected.method.isin(["target_selector", "transfer_selector"])].iterrows()]
     shift_text = ", ".join(f"{r.feature_family}: {r.source_target_auc:.3f}" for _, r in shifts.iterrows())
-    text = f"""# Why pooling Zimbabwe data added little: diagnostic results
-
+    text = f"""# {title}
+{rule_text}
 ## Primary nested comparison
 
 Transfer selector minus target-only selector ΔRMSE: **{primary.delta_rmse_t_ha:+.4f} t/ha**;
@@ -538,7 +564,7 @@ Common-window monthly features contain 122 predictors (10 seasonal statistics, 1
 missing-scene masks). Presto uses 128 existing frozen whole-window embeddings; it has different window/mask conventions
 and is not an otherwise identical monthly representation. No new imagery was downloaded and the database was read-only.
 
-Run `python scripts/step10_diagnose_zimbabwe_transfer.py` from the repository root. Input/code/config/output hashes
+Run `python scripts/step10_diagnose_zimbabwe_transfer.py{"" if legacy else " --config configs/" + config.get("experiment", "") + ".json"}` from the repository root. Input/code/config/output hashes
 and library versions are in `manifest.json`. Use a new `--output` directory for intentional changes.
 
 Files include: `quality_summary.json`, `cohort_summary.csv`, `feature_correlations.csv`, `domain_separability.csv`,
@@ -552,11 +578,11 @@ Files include: `quality_summary.json`, `cohort_summary.csv`, `feature_correlatio
     path.write_text(text, encoding="utf-8")
 
 
-def input_hashes(config_path):
-    paths = [CONFIG, Path(__file__), ROOT / "scripts/step10_diagnose_zimbabwe_transfer.py",
+def input_hashes(config_path, prior=PRIOR):
+    paths = [Path(__file__), ROOT / "scripts/step10_diagnose_zimbabwe_transfer.py",
              ROOT / "docs/ZIMBABWE_TRANSFER_DIAGNOSIS_PROTOCOL.md", ROOT / "data/cropyield.duckdb",
              ROOT / "data/splits/zimbabwe_2024__s1_cc2km.csv", ROOT / "requirements.txt"]
-    paths += list(PRIOR.iterdir())
+    paths += list(prior.iterdir())
     paths += [ROOT / p for p in ["src/cropyield/experiments/zimbabwe_merge.py", "src/cropyield/eval/splits.py",
                                "src/cropyield/data/xy.py", "src/cropyield/data/handoff.py", "src/cropyield/data/labels.py"]]
     paths.append(config_path)
@@ -566,17 +592,18 @@ def input_hashes(config_path):
 def run_diagnosis(output=OUTPUT, config_path=CONFIG):
     config = json.loads(config_path.read_text())
     require(config["target_folds"] == [1, 2, 3, 4] and config["reserved_fold"] == 0, "Reserved folds cannot change")
-    before = input_hashes(config_path)
+    prior = prior_run(config)
+    before = input_hashes(config_path, prior)
     rows, audit, features, membership, permission = load_data(config)
     with threadpool_limits(limits=1):
-        cohorts, feature_correlations, quality, decomposition = quality_and_error_audit(rows, audit, features)
+        cohorts, feature_correlations, quality, decomposition = quality_and_error_audit(rows, audit, features, prior)
         shifts = domain_separability(rows, features)
         print("Quality and distribution audit complete", flush=True)
         predictions, tuning, selected, accounting = run_target_models(rows, features, membership, permission, config)
         metrics, folds, differences = paired_metrics(predictions, config)
         source_predictions, source_metrics, source_selected, source_splits, summary = source_predictability(rows, features, config)
     # The seasonal controls must independently reproduce the original experiment's predictions.
-    prior_predictions = pd.read_csv(PRIOR / "predictions.csv")
+    prior_predictions = pd.read_csv(prior / "predictions.csv")
     for current, old in [("seasonal_target", "lacuna_only"), ("seasonal_adaptive", "pooled_adaptive")]:
         a = predictions[predictions.method.eq(current)].set_index("obs_id").prediction_t_ha.sort_index()
         b = prior_predictions[prior_predictions.method.eq(old)].set_index("obs_id").prediction_t_ha.sort_index()
@@ -597,9 +624,9 @@ def run_diagnosis(output=OUTPUT, config_path=CONFIG):
         json_write(quality, staged / "quality_summary.json")
         json_write(summary, staged / "source_diagnostic_summary.json")
         (staged / "PROTOCOL.md").write_text((ROOT / "docs/ZIMBABWE_TRANSFER_DIAGNOSIS_PROTOCOL.md").read_text(), encoding="utf-8")
-        write_results(staged / "RESULTS.md", metrics, differences, quality, shifts, source_metrics, selected, summary)
+        write_results(staged / "RESULTS.md", metrics, differences, quality, shifts, source_metrics, selected, summary, config)
         plot_diagnosis(staged / "diagnosis.png", metrics, differences, decomposition, source_metrics)
-        require(before == input_hashes(config_path), "Inputs changed during the run")
+        require(before == input_hashes(config_path, prior), "Inputs changed during the run")
         manifest = {"config": config, "inputs": before, "python": platform.python_version(),
                     "versions": {name: importlib.metadata.version(name) for name in ["numpy", "pandas", "scipy", "scikit-learn", "duckdb", "pyarrow", "matplotlib"]},
                     "outputs": {p.name: {"sha256": sha256(p), "bytes": p.stat().st_size} for p in sorted(staged.iterdir())}}

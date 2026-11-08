@@ -249,3 +249,84 @@ def test_evaluation_rejects_duplicates_missing_fields_and_reserved_fold(corrupti
         predictions.loc[0, "outer_fold"] = 0
     with pytest.raises((AssertionError, ValueError), match="evaluation membership"):
         evaluate(predictions, evaluation_config())
+
+
+# ---- v2 team rules: include_primary pools, label-free eligibility, identical arms ----
+
+import json  # noqa: E402
+from pathlib import Path  # noqa: E402
+
+from cropyield.experiments.zimbabwe_aggregation import BANDS, INDICES, aggregate_monthly  # noqa: E402
+from cropyield.experiments.zimbabwe_multiyear import arm_identity, training_pool  # noqa: E402
+
+
+@pytest.fixture
+def config_v2():
+    path = Path(__file__).parents[1] / "configs/zimbabwe_multiyear_v2.json"
+    return json.loads(path.read_text())
+
+
+def test_v2_config_uses_calendar_comparison_and_v2_controls(config_v2):
+    assert config_v2["window_anchor"] == "calendar" and config_v2["training_rows"] == "include_primary"
+    assert "preharvest" not in config_v2["primary_method"] + config_v2["primary_reference"]
+    assert "v1_preharvest_mean" not in config_v2["variants"]
+    assert config_v2["controls_release"].endswith("zimbabwe_aggregation_v2")
+
+
+def test_v2_pools_admit_only_include_primary_rows(config, config_v2):
+    rows, membership, source_permission = spatial_inputs()
+    v2 = {**config, "training_rows": "include_primary"}
+    # v1 keeps the published broader pools.
+    _, v1_fits = build_permissions(rows, membership, source_permission, config)
+    assert {"near_train", "source"} <= set(v1_fits.obs_id)
+    permissions, fits = build_permissions(rows, membership, source_permission, v2)
+    assert permissions.empty
+    trained = fits[fits.role.ne("query")]
+    assert rows.loc[trained.obs_id, "include_primary"].all()
+    assert not {"near_train", "near_inner", "far_extra", "source"} & set(fits.obs_id)
+    # A primary 2024 row stays available under the rule.
+    rows.loc["source", "include_primary"] = True
+    _, fits = build_permissions(rows, membership, source_permission, v2)
+    assert "source" in set(fits[fits.role.eq("source_allowed")].obs_id)
+    assert training_pool(rows, v2).loc["far_extra"] == np.False_
+
+
+@pytest.mark.parametrize("role", ["fit", "source"])
+def test_v2_model_context_rejects_non_primary_training_rows(model_context, config_v2, role):
+    rows, x, fit, source, query = model_context
+    rows["include_primary"] = True
+    make_context(rows, x, fit, source, query, config=config_v2)
+    rows.loc[(fit if role == "fit" else source)[0], "include_primary"] = False
+    with pytest.raises(ValueError, match="include_primary"):
+        make_context(rows, x, fit, source, query, config=config_v2)
+
+
+def test_v2_eligibility_does_not_depend_on_crop_dates(config_v2):
+    rows = pd.DataFrame({"season_year": [2023, 2023], "domain": ["lacuna", "lacuna"],
+                         "plant_date": pd.to_datetime(["2023-03-20", None]),
+                         "harvest_date": pd.to_datetime(["2023-03-25", None])},
+                        index=pd.Index(["late_dates", "no_dates"], name="obs_id"))
+    monthly = pd.DataFrame([{"obs_id": obs_id, "month": f"{2022 + (m != 12)}-{m:02}", "missing": False,
+                             "acquired": pd.Timestamp(2022 + (m != 12), m, 15), **{c: float(m) for c in BANDS + INDICES}}
+                            for obs_id in rows.index for m in [12, 1, 2, 3, 4, 5, 6]])
+    features, audit = aggregate_monthly(monthly, rows, config_v2)
+    eligible, _ = build_eligibility(rows, features, audit, config_v2)
+    # Under v1 the 20–25 March crop-date window is empty for "late_dates", so v1 drops it.
+    v1 = {**config_v2, "window_anchor": "crop_dates", "variants": config_v2["variants"] + ["v1_preharvest_mean"]}
+    v1_features, v1_audit = aggregate_monthly(monthly, rows, v1)
+    v1_eligible, _ = build_eligibility(rows, v1_features, v1_audit, v1)
+    assert eligible.all() and not v1_eligible.loc["late_dates"]
+    moved = rows.assign(plant_date=pd.NaT, harvest_date=pd.NaT)
+    again, _ = build_eligibility(moved, *aggregate_monthly(monthly, moved, config_v2), config_v2)
+    pd.testing.assert_series_equal(eligible, again)
+
+
+def test_arm_identity_marks_only_true_twins():
+    base = pd.DataFrame({"obs_id": ["a", "b"], "prediction_t_ha": [1.0, 2.0]})
+    controls = pd.concat([base.assign(method="bands_v0_mean_target"), base.assign(method="bands_v0_mean_merged")])
+    new = pd.concat([base.assign(method="bands_v0_mean_all_lacuna"),
+                     base.assign(method="bands_v0_mean_all_zimbabwe", prediction_t_ha=[1.0, 2.5])])
+    identity = arm_identity(new, controls, 1e-9).set_index("method")
+    assert identity.loc["bands_v0_mean_all_lacuna", "identical_to"] == "bands_v0_mean_target"
+    assert identity.loc["bands_v0_mean_all_zimbabwe", "identical_to"] == ""
+    assert identity.loc["bands_v0_mean_all_zimbabwe", "max_abs_prediction_difference_t_ha"] == pytest.approx(.5)

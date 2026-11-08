@@ -10,17 +10,19 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+from cropyield.experiments.zimbabwe_merge import default_output
 from cropyield.experiments.zimbabwe_weather import verify_release
-from cropyield.experiments.zimbabwe_weather_compact import CONFIG, OUTPUT
+from cropyield.experiments.zimbabwe_weather_compact import CONFIG
 
 
-def compare():
-    verify_release(OUTPUT)
-    config = json.loads(CONFIG.read_text())
-    p = pd.read_csv(OUTPUT / "predictions.csv", dtype={"group_id": str})
+def compare(config_path=CONFIG):
+    config = json.loads(Path(config_path).read_text())
+    output = default_output(config)
+    verify_release(output)
+    p = pd.read_csv(output / "predictions.csv", dtype={"group_id": str})
     wide = p.pivot(index="obs_id", columns="method", values="prediction_t_ha").sort_index()
     truth = p[p.method.eq("monthly_tree_target")].set_index("obs_id").loc[wide.index]
-    weather = pd.read_parquet(OUTPUT / "compact_weather.parquet").loc[wide.index]
+    weather = pd.read_parquet(output / "compact_weather.parquet").loc[wide.index]
     errors = (wide - truth.yield_t_ha.to_numpy()[:, None])**2
     point = np.sqrt(errors.mean())
     method = "compact4_shared"
@@ -43,6 +45,12 @@ def compare():
 
 
 if __name__ == "__main__":
-    comparisons = compare()
-    comparisons.to_csv(ROOT / "data/runs/zimbabwe_weather_compact_candidate_v1.csv", index=False)
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--config", type=Path, default=CONFIG)
+    parser.add_argument("--output", type=Path, default=ROOT / "data/runs/zimbabwe_weather_compact_candidate_v1.csv")
+    args = parser.parse_args()
+    comparisons = compare(args.config.resolve())
+    comparisons.to_csv(args.output, index=False)
     print(comparisons.to_string(index=False))

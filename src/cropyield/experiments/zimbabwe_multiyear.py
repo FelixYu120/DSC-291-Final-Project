@@ -1,4 +1,14 @@
-"""Audit all Zimbabwe years; compare broader training pools on frozen Lacuna targets."""
+"""Audit all Zimbabwe years; compare broader training pools on frozen Lacuna targets.
+
+Config switches (absent = published v1 behaviour), shared with step 14:
+
+- ``window_anchor: calendar`` drops the survey crop-date window, so crop dates can no longer change
+  features, eligibility or the prespecified comparison.
+- ``training_rows: include_primary`` limits every pool to ``labels_v1.include_primary`` rows. The extra
+  Lacuna rows and the 2024 zeros then leave the pools; arms that become identical to a step 14 control
+  are marked ``identical_to`` in ``arm_identity.csv`` and ``method_metadata.csv``.
+- ``controls_release`` names the step 14 release whose arms are the frozen controls.
+"""
 from __future__ import annotations
 
 import importlib.metadata
@@ -18,16 +28,40 @@ from cropyield import ROOT
 from cropyield.data.handoff import csv_write, json_write, publish_release, require, verify_inputs
 from cropyield.data.labels import sha256
 from cropyield.data.xy import FEATURES
-from cropyield.experiments.zimbabwe_aggregation import VARIANTS, aggregate_monthly
+from cropyield.experiments.zimbabwe_aggregation import (
+    CALENDAR_VARIANTS,
+    CROP_DATE_VARIANT,
+    VARIANTS,
+    aggregate_monthly,
+    default_output,
+    model_variants,
+    require_training_rows,
+    training_rows,
+    window_anchor,
+)
 from cropyield.experiments.zimbabwe_diagnosis import BANDS, INDICES, TrainingTransform
 from cropyield.experiments.zimbabwe_merge import predict_model, purge_source, score_predictions
 
-CONFIG = ROOT / "configs/zimbabwe_multiyear_v1.json"
-OUTPUT = ROOT / "data/runs/zimbabwe_multiyear_v1"
+CONFIG = ROOT / "configs/zimbabwe_multiyear_v2.json"
+OUTPUT = ROOT / "data/runs/zimbabwe_multiyear_v2"
 PROTOCOL = ROOT / "docs/zimbabwe/MULTIYEAR_PROTOCOL.md"
 PRIOR = ROOT / "data/runs/zimbabwe_merge_v1"
-CONTROLS = ROOT / "data/runs/zimbabwe_aggregation_v1"
 NEW_TRAINING = ["all_lacuna", "all_zimbabwe"]
+TWINS = {"all_lacuna": "target", "all_zimbabwe": "merged"}
+EXTRA_LACUNA = {"all_screened": 217, "include_primary": 0}
+
+
+def controls_release(config):
+    """Step 14 release that supplies the frozen control arms (v1 default)."""
+    return ROOT / config.get("controls_release", "data/runs/zimbabwe_aggregation_v1")
+
+
+def training_pool(rows, config):
+    """Rows that may enter any fit: imagery-eligible, and include_primary under the team rule."""
+    pool = rows.model_eligible.astype(bool)
+    if training_rows(config) == "include_primary":
+        pool &= rows.include_primary.eq(True)
+    return pool
 
 
 def verify_release(path):
@@ -58,10 +92,14 @@ def build_eligibility(rows, features, audit, config):
 
 def load_inputs(config):
     verify_inputs(ROOT, ROOT / "data/cropyield.duckdb")
+    controls = controls_release(config)
     verify_release(PRIOR)
-    verify_release(CONTROLS)
+    verify_release(controls)
     rows = pd.read_parquet(PRIOR / "harmonized_labels.parquet").set_index("obs_id").sort_index()
     require(len(rows) == 6598 and rows.index.is_unique, "Screened Zimbabwe catalog changed")
+    labels = pd.read_parquet(ROOT / "data/processed/labels_v1.parquet").set_index("obs_id")
+    require(rows.include_primary.eq(labels.loc[rows.index, "include_primary"]).all(),
+            "Harmonized include_primary differs from labels_v1")
     require(np.isfinite(rows[["lat", "lon", "yield_t_ha"]].to_numpy(float)).all(), "Invalid screened labels")
     rows["fold"] = rows.fold.fillna(-1).astype(int)
     rows["group_id"] = rows.group_id.fillna("extra_lacuna").astype(str)
@@ -86,9 +124,9 @@ def load_inputs(config):
     rows["observed_common_season_months"] = audit.n_season
     membership = pd.read_csv(PRIOR / "target_memberships.csv", dtype={"group_id": str})
     permission = pd.read_csv(PRIOR / "source_spatial_permissions.csv")
-    require((PRIOR / "target_memberships.csv").read_bytes() == (CONTROLS / "target_memberships.csv").read_bytes(),
+    require((PRIOR / "target_memberships.csv").read_bytes() == (controls / "target_memberships.csv").read_bytes(),
             "Step 14 target membership differs")
-    require((PRIOR / "source_spatial_permissions.csv").read_bytes() == (CONTROLS / "source_spatial_permissions.csv").read_bytes(),
+    require((PRIOR / "source_spatial_permissions.csv").read_bytes() == (controls / "source_spatial_permissions.csv").read_bytes(),
             "Step 14 source permission differs")
     primary = rows.domain.eq("lacuna") & rows.include_primary
     require(primary.sum() == 1880 and rows.loc[primary, "model_eligible"].all(), "Primary population changed")
@@ -98,13 +136,18 @@ def load_inputs(config):
     for (domain, year), (count, allowed) in expected.items():
         part = rows[rows.domain.eq(domain) & rows.season_year.eq(year)]
         require(len(part) == count and int(part.model_eligible.sum()) == allowed, f"Coverage changed: {domain}/{year}")
+    if training_rows(config) == "include_primary":
+        rows["label_exclusion_reason"] = labels.loc[rows.index, "exclusion_reason"]
+        rows["training_pool"] = training_pool(rows, config)
     return rows, features, audit, eligibility, monthly, membership, permission
 
 
 def build_permissions(rows, membership, source_permission, config):
     """Recheck frozen source buffers and derive allowed extras for each nested split."""
-    extras = rows[rows.domain.eq("lacuna") & ~rows.include_primary & rows.model_eligible]
-    source = rows[rows.domain.eq("zimbabwe_2024") & rows.model_eligible]
+    pool = training_pool(rows, config)
+    include_primary_only = training_rows(config) == "include_primary"
+    extras = rows[rows.domain.eq("lacuna") & ~rows.include_primary & pool]
+    source = rows[rows.domain.eq("zimbabwe_2024") & pool]
     reserved = rows[rows.domain.eq("lacuna") & rows.fold.eq(config["reserved_fold"])]
     require(len(reserved) > 0, "Reserved targets missing")
     records, fitting = [], []
@@ -128,6 +171,10 @@ def build_permissions(rows, membership, source_permission, config):
                                          "allowed_by_spatial_rule": distances >= config["auxiliary_buffer_km"]}))
             _, source_distances = purge_source(source, protected, config["auxiliary_buffer_km"])
             frozen = source_permission[source_permission.outer_fold.eq(outer) & source_permission.inner_fold.eq(inner)]
+            if include_primary_only:
+                # Distances depend on coordinates only; dropping excluded rows leaves every decision intact.
+                require(set(source.index) <= set(frozen.obs_id), "Frozen source permissions lack primary rows")
+                frozen = frozen[frozen.obs_id.isin(source.index)]
             require(frozen.obs_id.is_unique and set(frozen.obs_id) == set(source.index), "Frozen source population changed")
             aligned = frozen.set_index("obs_id").loc[source.index]
             np.testing.assert_allclose(aligned.minimum_distance_to_protected_km, source_distances, atol=1e-8, rtol=0,
@@ -135,6 +182,7 @@ def build_permissions(rows, membership, source_permission, config):
             require(np.array_equal(aligned.allowed_by_spatial_rule, source_distances >= config["auxiliary_buffer_km"]),
                     "Frozen source permission changed")
             source_ids = frozen.loc[frozen.allowed_by_spatial_rule, "obs_id"].tolist()
+            require_training_rows(rows, fit_ids + allowed.index.tolist() + source_ids, config)
             for role, ids in [("primary_fit", fit_ids), ("extra_lacuna_fit", allowed.index.tolist()),
                               ("source_allowed", source_ids), ("query", query_ids)]:
                 fitting.append(pd.DataFrame({"obs_id": ids, "outer_fold": outer, "inner_fold": inner,
@@ -142,8 +190,10 @@ def build_permissions(rows, membership, source_permission, config):
     return pd.concat(records, ignore_index=True), pd.concat(fitting, ignore_index=True)
 
 
-def make_context(rows, x, fit_ids, source_ids, query_ids):
+def make_context(rows, x, fit_ids, source_ids, query_ids, config=None):
     """Build training-only transforms after rejecting all unavailable predictors."""
+    if config is not None:
+        require_training_rows(rows, list(fit_ids) + list(source_ids), config)
     require(set(fit_ids).isdisjoint(query_ids), "Query/training overlap")
     require(set(source_ids).isdisjoint(fit_ids + query_ids), "Source overlaps target")
     require(rows.loc[fit_ids + query_ids].domain.eq("lacuna").all(), "Invalid Lacuna context")
@@ -173,7 +223,7 @@ def run_models(rows, features, fitting, config):
     for outer in config["target_folds"]:
         ids = [split_ids(fitting, outer, inner) for inner in range(4)]
         for feature_name, x in features.items():
-            contexts = [make_context(rows, x, *item[:3]) for item in ids]
+            contexts = [make_context(rows, x, *item[:3], config=config) for item in ids]
             truth = np.concatenate([rows.loc[item[2]].yield_t_ha.to_numpy(float) for item in ids[1:]])
             for training in config["training_sets"]:
                 method = f"{feature_name}_{training}"
@@ -338,7 +388,8 @@ def write_report(path, metrics, contrasts, summary):
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
-def input_hashes(config_path):
+def input_hashes(config_path, config=None):
+    config = config or {}
     paths = ["data/cropyield.duckdb", "data/processed/labels_v1.parquet", "configs/team_database_v1.json",
              "configs/zimbabwe_merge_v1.json", "configs/zimbabwe_aggregation_v1.json", "data/splits/manifest.json",
              "data/splits/zimbabwe_lacuna_2022_2023__s1_cc2km.csv", "data/splits/zimbabwe_lacuna_2022_2023__s2_region.csv",
@@ -350,25 +401,55 @@ def input_hashes(config_path):
              "src/cropyield/experiments/zimbabwe_aggregation.py", "src/cropyield/experiments/zimbabwe_multiyear.py",
              "scripts/step15_compare_zimbabwe_multiyear.py", "docs/zimbabwe/MULTIYEAR_PROTOCOL.md",
              "docs/zimbabwe/AGGREGATION_PROTOCOL.md", "requirements.txt", "pyproject.toml"]
-    for release in [PRIOR, CONTROLS]:
+    if "controls_config" in config:
+        paths.append(config["controls_config"])
+    for release in [PRIOR, controls_release(config)]:
         paths += [str(path.relative_to(ROOT)) for path in release.iterdir() if path.is_file()]
     paths.append(str(config_path.relative_to(ROOT)) if config_path.is_relative_to(ROOT) else str(config_path))
     return {name: sha256(ROOT / name) for name in sorted(set(paths))}
 
 
-def run_experiment(output=OUTPUT, config_path=CONFIG):
+def arm_identity(new_predictions, controls, tolerance):
+    """Compare each new arm with the step 14 control trained on the same rows under the team rule."""
+    records = []
+    for method in new_predictions.method.unique():
+        feature, training = method_parts(method)
+        twin = f"{feature}_{TWINS[training]}"
+        a = new_predictions[new_predictions.method.eq(method)].set_index("obs_id").sort_index()
+        b = controls[controls.method.eq(twin)].set_index("obs_id").sort_index()
+        require(a.index.equals(b.index), f"Twin evaluation IDs differ: {method}")
+        difference = float(np.abs(a.prediction_t_ha.to_numpy(float) - b.prediction_t_ha.to_numpy(float)).max())
+        records.append({"method": method, "twin_control": twin, "max_abs_prediction_difference_t_ha": difference,
+                        "identical": difference <= tolerance, "identical_to": twin if difference <= tolerance else ""})
+    return pd.DataFrame(records)
+
+
+def run_experiment(output=None, config_path=CONFIG):
     config = json.loads(config_path.read_text())
+    output = default_output(config) if output is None else output
+    anchor, rule = window_anchor(config), training_rows(config)
+    v2 = rule == "include_primary" or anchor == "calendar"
+    require(not v2 or (rule == "include_primary" and anchor == "calendar"), "v2 releases apply both team rules together")
+    controls_dir = controls_release(config)
     require(config["target_folds"] == [1, 2, 3, 4] and config["reserved_fold"] == 0, "Preserve frozen splits")
-    require(config["variants"] == VARIANTS and config["feature_families"] == ["bands", "indices"], "Unexpected features")
+    expected_variants = CALENDAR_VARIANTS if v2 else VARIANTS
+    require(config["variants"] == expected_variants and config["feature_families"] == ["bands", "indices"], "Unexpected features")
+    if v2:
+        require(CROP_DATE_VARIANT not in config["primary_method"] + config["primary_reference"],
+                "A crop-date window cannot be a headline comparison")
+        control_config = json.loads((ROOT / config["controls_config"]).read_text())
+        require(window_anchor(control_config) == anchor and training_rows(control_config) == rule
+                and default_output(control_config) == controls_dir, "Controls were not produced under the same team rules")
     require(config["training_sets"] == NEW_TRAINING and config["minimum_clear_months"] == 4, "Unexpected training design")
     require(config["auxiliary_buffer_km"] == 2.0, "Preserve 2 km source buffering")
-    before = input_hashes(config_path)
+    before = input_hashes(config_path, config)
     rows, features, audit, eligibility, monthly, membership, permission = load_inputs(config)
     extra_permission, fitting = build_permissions(rows, membership, permission, config)
-    require(extra_permission.obs_id.nunique() == 217, "Eligible additional Lacuna population changed")
-    controls = pd.read_csv(CONTROLS / "predictions.csv", dtype={"group_id": str})
+    require(extra_permission.obs_id.nunique() == EXTRA_LACUNA[rule], "Eligible additional Lacuna population changed")
+    controls = pd.read_csv(controls_dir / "predictions.csv", dtype={"group_id": str})
     expected_controls = {f"{feature}_{training}" for feature in features for training in ["target", "merged"]}
-    require(set(controls.method) == expected_controls and len(controls) == 26 * 1504, "Historical controls changed")
+    n_controls = len(expected_controls)
+    require(set(controls.method) == expected_controls and len(controls) == n_controls * 1504, "Historical controls changed")
     # Historical CSVs contain 12 significant decimal digits. Preserve their outcomes exactly
     # across all new predictions so identity checks and paired scores have one frozen truth.
     frozen_truth = controls.drop_duplicates("obs_id").set_index("obs_id").yield_t_ha
@@ -377,20 +458,29 @@ def run_experiment(output=OUTPUT, config_path=CONFIG):
         new_predictions, selected, tuning, gaps = run_models(rows, features, fitting, config)
         new_predictions["yield_t_ha"] = new_predictions.obs_id.map(frozen_truth)
         predictions = pd.concat([controls, new_predictions], ignore_index=True)
-        require(predictions.method.nunique() == 52, "Wrong number of comparison arms")
+        require(predictions.method.nunique() == 2 * n_controls, "Wrong number of comparison arms")
         metrics, folds, contrasts = evaluate(predictions, config)
-    old_selected = pd.read_csv(CONTROLS / "selected_parameters.csv")
+    old_selected = pd.read_csv(controls_dir / "selected_parameters.csv")
     old_selected["primary_target_fit"] = old_selected.target_fit
     old_selected["extra_lacuna_fit"] = 0
     old_selected["origin"] = "frozen_step14_control"
     selected = pd.concat([old_selected, selected], ignore_index=True)
-    old_tuning = pd.read_csv(CONTROLS / "tuning.csv").assign(origin="frozen_step14_control")
+    old_tuning = pd.read_csv(controls_dir / "tuning.csv").assign(origin="frozen_step14_control")
     tuning = pd.concat([old_tuning, tuning], ignore_index=True)
     coverage = rows.reset_index().groupby(["domain", "cohort", "season_year"], as_index=False).agg(
         catalog_rows=("obs_id", "size"), model_eligible_rows=("model_eligible", "sum"),
         minimum_observed_months=("observed_common_season_months", "min"),
         maximum_observed_months=("observed_common_season_months", "max"))
     coverage["excluded_rows"] = coverage.catalog_rows - coverage.model_eligible_rows
+    if v2:
+        identity = arm_identity(new_predictions, controls, config["identity_tolerance_t_ha"])
+        twins = identity.set_index("method").identical_to
+        pool = rows.reset_index().groupby(["domain", "cohort", "season_year"]).training_pool.sum()
+        coverage["training_pool_rows"] = [int(pool.loc[tuple(key)]) for key in coverage[["domain", "cohort", "season_year"]].to_numpy()]
+        coverage["excluded_not_include_primary"] = coverage.model_eligible_rows - coverage.training_pool_rows
+        return publish_v2(output, config, config_path, before, rows, features, audit, eligibility, monthly, coverage,
+                          extra_permission, fitting, predictions, selected, tuning, gaps, metrics,
+                          folds, contrasts, identity, twins, controls_dir)
     metadata = []
     for method in predictions.method.unique():
         feature, training = method_parts(method)
@@ -418,7 +508,7 @@ def run_experiment(output=OUTPUT, config_path=CONFIG):
             csv_write(table, stage / f"{name}.csv")
         for name in ["target_memberships.csv", "source_spatial_permissions.csv"]:
             (stage / name).write_bytes((PRIOR / name).read_bytes())
-        (stage / "historical_control_predictions.csv").write_bytes((CONTROLS / "predictions.csv").read_bytes())
+        (stage / "historical_control_predictions.csv").write_bytes((controls_dir / "predictions.csv").read_bytes())
         dictionary = {name: [f"{name}__{column}" for column in frame] for name, frame in features.items()}
         pd.concat([frame.set_axis(dictionary[name], axis=1) for name, frame in features.items()], axis=1).to_parquet(stage / "features.parquet", index=True)
         monthly.to_parquet(stage / "monthly_observations.parquet", index=False)
@@ -436,5 +526,119 @@ def run_experiment(output=OUTPUT, config_path=CONFIG):
         json_write(manifest, stage / "manifest.json")
         publish_release(stage, output)
     print(metrics.round(5).to_string(index=False), flush=True)
+    print(contrasts[contrasts.primary_comparison].to_string(index=False), flush=True)
+    return summary
+
+
+def summary_v2(rows, coverage, extra_permission, identity, n_controls, config):
+    pool = rows.training_pool
+    dropped = rows.model_eligible & ~pool
+    return {"catalog_rows": len(rows), "window_anchor": window_anchor(config), "training_rows": training_rows(config),
+            "requested_lacuna_years": [2022, 2023], "requested_zimbabwe_years": [2022, 2023, 2024],
+            "imagery_eligible_by_year": {str(k): int(v) for k, v in rows.groupby("season_year").model_eligible.sum().items()},
+            "training_pool_by_domain": {str(k): int(v) for k, v in rows[pool].groupby("domain").size().items()},
+            "imagery_eligible_but_not_include_primary": {str(k): int(v) for k, v in
+                                                         rows.loc[dropped, "label_exclusion_reason"].value_counts().items()},
+            "eligible_extra_lacuna": int(extra_permission.obs_id.nunique()),
+            "target_evaluation": 1504, "target_reserved": 376, "historical_control_arms": n_controls,
+            "new_arms": len(identity), "arms": n_controls + len(identity),
+            "new_arms_identical_to_a_control": int(identity.identical.sum()),
+            "imagery_imputation": False, "model_variants": model_variants(config), "coverage": coverage.to_dict("records"),
+            "extra_lacuna_outer_fit_counts": {str(outer): int(extra_permission[extra_permission.outer_fold.eq(outer)
+                 & extra_permission.inner_fold.eq(0)].allowed_by_spatial_rule.sum()) for outer in config["target_folds"]}}
+
+
+def write_report_v2(path, metrics, contrasts, summary, identity, config):
+    scores = metrics.set_index("method")
+    pairs = contrasts.set_index(["method", "reference"])
+    primary = contrasts[contrasts.primary_comparison].iloc[0]
+    twins = identity.set_index("method")
+    names = {"v0_mean": "V0 / V3 mean", "v1_calendar_mean": "V1 calendar mean (Dec–Mar)", "v2_max": "V2 maximum",
+             "v3_median": "V3 median", "v3_mode": "V3 modal estimate"}
+    drop = summary["imagery_eligible_but_not_include_primary"]
+    lines = [f"# Broader Zimbabwe training ({config['experiment']}): results", "",
+             "All scores use the same 1,504 original Lacuna 2023 development fields and unchanged nested spatial folds. "
+             "RMSE is in t/ha (lower is better); R² is pooled out-of-fold (higher is better). Fold 0 remains reserved.", "",
+             "## Team-rule changes from v1", "",
+             "- **Label-free windows.** The crop-date window is gone; survey dates no longer affect any feature, the eligibility rule "
+             "or the prespecified comparison, which now uses the December–March calendar mean.",
+             "- **Training rows follow `labels_v1.include_primary`.** Imagery-eligible rows that leave the pools: "
+             + ", ".join(f"{v:,} `{k}`" for k, v in drop.items()) + ". "
+             f"All 169 Lacuna 2022 rows were already imagery-ineligible. Extra Lacuna rows left: **{summary['eligible_extra_lacuna']}**.", "",
+             f"**Result of the rule fix: {summary['new_arms_identical_to_a_control']} of {summary['new_arms']} new arms are identical "
+             "to a step 14 v2 control.** All-Lacuna now trains on exactly the primary Lacuna fit rows (= step 14 `_target`); "
+             "full-Zimbabwe trains on those plus the include_primary 2024 rows (= step 14 `_merged`). Under the team rules there is "
+             "no broader training pool to test. `arm_identity.csv` gives the largest prediction difference per arm.", "",
+             f"Prespecified ten-band calendar comparison, full-Zimbabwe minus all-Lacuna: RMSE difference **{primary.delta_rmse_t_ha:+.4f}** "
+             f"(95% spatial-group interval **[{primary.ci_low:+.4f}, {primary.ci_high:+.4f}]**); R² difference **{primary.delta_r2:+.4f}** "
+             f"(interval [{primary.r2_ci_low:+.4f}, {primary.r2_ci_high:+.4f}]).", "",
+             "| Predictors | Aggregation | All-Lacuna RMSE | R² | Full-Zimbabwe RMSE | R² | Identical to |",
+             "|---|---|---:|---:|---:|---:|---|"]
+    features = [(f"{family}_{variant}", label, names[variant]) for family, label in [("bands", "10 bands"), ("indices", "5 indices")]
+                for variant in model_variants(config)] + [("legacy_indices_mean_max", "10 index features", "Legacy mean + maximum")]
+    for feature, label, name in features:
+        a, b = scores.loc[f"{feature}_all_lacuna"], scores.loc[f"{feature}_all_zimbabwe"]
+        same = " / ".join(t for t in [twins.loc[f"{feature}_all_lacuna", "identical_to"],
+                                      twins.loc[f"{feature}_all_zimbabwe", "identical_to"]] if t)
+        lines.append(f"| {label} | {name} | {a.rmse_t_ha:.4f} | {a.r2:.4f} | {b.rmse_t_ha:.4f} | {b.r2:.4f} | {same or '—'} |")
+    calendar = pairs.loc[("bands_v1_calendar_mean_all_lacuna", "bands_v0_mean_all_lacuna")]
+    lines += ["", f"Ten-band calendar mean minus V0 mean, all-Lacuna: **{calendar.delta_rmse_t_ha:+.4f}** "
+              f"(interval [{calendar.ci_low:+.4f}, {calendar.ci_high:+.4f}]).", "",
+              "R² = 1 − SSE/SST over all 1,504 out-of-fold predictions together; `metrics.csv` includes SSE and SST. "
+              "Intervals resample 232 spatial groups 2,000 times and condition on the saved predictions. Many comparisons were made; "
+              "the best observed score is not a confirmed winner.", "",
+              "Files: `coverage_summary.csv` (with `training_pool_rows`), `eligibility_audit.csv`, `observations.csv` (with `training_pool`), "
+              "`fit_memberships.csv`, `extra_lacuna_spatial_permissions.csv` (empty under the rule), `arm_identity.csv`, `method_metadata.csv`, "
+              "`predictions.csv`, `metrics.csv`, `fold_metrics.csv`, `paired_differences.csv`, `selected_parameters.csv`, `tuning.csv`, "
+              "`PROTOCOL.md`, `manifest.json`.", ""]
+    path.write_text("\n".join(lines), encoding="utf-8")
+
+
+def publish_v2(output, config, config_path, before, rows, features, audit, eligibility, monthly, coverage,
+               extra_permission, fitting, predictions, selected, tuning, gaps, metrics,
+               folds, contrasts, identity, twins, controls_path):
+    n_controls = predictions.method.nunique() - len(identity)
+    metadata = []
+    for method in predictions.method.unique():
+        feature, training = method_parts(method)
+        new = training in NEW_TRAINING
+        metadata.append({"method": method, "feature_set": feature, "training_population": training,
+                         "n_features": features[feature].shape[1],
+                         "origin": "new_expanded_training" if new else "frozen_step14_control",
+                         "eligible_lacuna_years": "2023", "eligible_source_years": "2024" if training in ["merged", "all_zimbabwe"] else "",
+                         "training_rows": training_rows(config), "evaluation_year": 2023, "evaluation_n": 1504,
+                         "identical_to": twins.loc[method] if new else ""})
+    summary = summary_v2(rows, coverage, extra_permission, identity, n_controls, config)
+    with tempfile.TemporaryDirectory(prefix="zimbabwe-multiyear-") as temporary:
+        stage = Path(temporary)
+        tables = {"observations": rows.reset_index(), "window_audit": audit.reset_index(), "eligibility_audit": eligibility,
+                  "coverage_summary": coverage, "extra_lacuna_spatial_permissions": extra_permission,
+                  "fit_memberships": fitting, "method_metadata": pd.DataFrame(metadata), "arm_identity": identity,
+                  "predictions": predictions, "selected_parameters": selected, "tuning": tuning,
+                  "training_outer_diagnostics": gaps, "metrics": metrics, "fold_metrics": folds, "paired_differences": contrasts}
+        for name, table in tables.items():
+            csv_write(table, stage / f"{name}.csv")
+        for name in ["target_memberships.csv", "source_spatial_permissions.csv"]:
+            (stage / name).write_bytes((PRIOR / name).read_bytes())
+        (stage / "historical_control_predictions.csv").write_bytes((controls_path / "predictions.csv").read_bytes())
+        dictionary = {name: [f"{name}__{column}" for column in frame] for name, frame in features.items()}
+        pd.concat([frame.set_axis(dictionary[name], axis=1) for name, frame in features.items()], axis=1).to_parquet(
+            stage / "features.parquet", index=True)
+        monthly.to_parquet(stage / "monthly_observations.parquet", index=False)
+        json_write(dictionary, stage / "feature_dictionary.json")
+        json_write(summary, stage / "data_summary.json")
+        json_write(config, stage / "config.json")
+        (stage / "PROTOCOL.md").write_bytes(PROTOCOL.read_bytes())
+        write_report_v2(stage / "RESULTS.md", metrics, contrasts, summary, identity, config)
+        require(before == input_hashes(config_path, config), "Inputs changed during run")
+        manifest = {"config": config, "inputs": before,
+                    "base_git_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
+                    "source_hashes_record_actual_working_tree": True, "python": platform.python_version(),
+                    "versions": {name: importlib.metadata.version(name) for name in ["numpy", "pandas", "scipy", "scikit-learn", "duckdb", "pyarrow"]},
+                    "outputs": {path.name: {"sha256": sha256(path), "bytes": path.stat().st_size} for path in sorted(stage.iterdir())}}
+        json_write(manifest, stage / "manifest.json")
+        publish_release(stage, output)
+    print(metrics.round(5).to_string(index=False), flush=True)
+    print(identity.to_string(index=False), flush=True)
     print(contrasts[contrasts.primary_comparison].to_string(index=False), flush=True)
     return summary

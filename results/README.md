@@ -5,6 +5,11 @@ under `data/runs/`; each report is named **`RESULTS.md`**. They are linked here 
 
 ## Zimbabwe experiments
 
+**Use the v2 results (8 Nov).** They follow the team rules (`include_primary` training rows, label-free calendar
+windows, folds 1–4 cross-validated): [merge and diagnosis](merge_v2/README.md), [weather](weather_v2/README.md),
+[aggregation](aggregation_v2/RESULTS.md), [expanded training](multiyear_v2/RESULTS.md). The v1 table below is kept as
+history; see `docs/DECISIONS.md` (8 Nov) for what each v1 run broke.
+
 | Experiment | Readable report | Scores | Predictions |
 |---|---|---|---|
 | Basic features: Lacuna-only vs merged | [RESULTS.md](../data/runs/zimbabwe_merge_v1/RESULTS.md) · [explanation](../docs/zimbabwe/MERGE_RESULTS.md) | [metrics.csv](../data/runs/zimbabwe_merge_v1/metrics.csv) | [predictions.csv](../data/runs/zimbabwe_merge_v1/predictions.csv) |

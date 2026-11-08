@@ -17,11 +17,12 @@ and tests whether rainfall and temperature improve prediction. Earlier Malawi/Ke
 | Reproduce an existing experiment | [Reproduction guide](docs/zimbabwe/REPRODUCING.md) |
 | Check how the V0–V3 R² values were calculated | [R² audit and Claude review packet](docs/zimbabwe/R2_AUDIT.md) |
 | Read the whole dataset: structure, cleaning, quality register, splits | [Dataset guide](docs/DATASET.md) |
+| Use the rule-compliant Zimbabwe runs (8 Nov, v2) | [v2 runs and commands](docs/zimbabwe/README.md#rule-compliant-v2-runs-8-nov-2026) |
 | See the R0/R1/A1 baseline table (folds 1–4) | [Baseline table](results/baseline_table.md), [data v2](results/v2/baseline_table.md) |
 
 The basic merge experiment uses **10 vegetation-index features with Ridge**, not MOSAIKS. Naive pooling hurts;
 source-aware adjustment removes most of that penalty, but adding 2024 has not established a reliable accuracy gain.
-The later weather and richer-feature experiments are reported separately. The [seasonal aggregation comparison](docs/zimbabwe/AGGREGATION_RESULTS.md) tests mean, crop-date preharvest mean, maximum, median and a modal estimate. The [expanded-training comparison](docs/zimbabwe/MULTIYEAR_RESULTS.md) audits 2022–2024 coverage and tests all eligible Lacuna training rows with and without 2024 on the same 2023 evaluation fields.
+The later weather and richer-feature experiments are reported separately. The [seasonal aggregation comparison](docs/zimbabwe/AGGREGATION_RESULTS.md) tests mean, a December–March calendar mean, maximum, median and a modal estimate (v2; the v1 crop-date window broke the label-free rule). The [expanded-training comparison](docs/zimbabwe/MULTIYEAR_RESULTS.md) audits 2022–2024 coverage and shows that under `include_primary` the broader pools equal the step 14 pools, with and without 2024 on the same 2023 evaluation fields.
 
 ## Read or run the notebooks
 

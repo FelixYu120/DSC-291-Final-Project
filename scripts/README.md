@@ -21,7 +21,24 @@ These commands require the shared team database. The Zimbabwe notebook's default
 The recorded-code runner requires full Git history, verifies original inputs/outputs and writes a new destination.
 See [reproduction details](../docs/zimbabwe/REPRODUCING.md). Do not rebuild the shared database: step 6 would remove its Presto embeddings.
 
-## Zimbabwe pipeline: steps 8–13
+## Rule-compliant v2 runs (8 Nov 2026)
+
+New work uses the v2 configs. Steps 8, 14 and 15 default to v2; steps 9–13 still default to their v1 config, so
+pass the v2 config. Run them in this order; each writes `data/runs/<experiment>/` and refuses to overwrite a
+different release.
+
+```bash
+python scripts/step8_build_zimbabwe_handoff.py                                                     # v2 is the default
+python scripts/step9_compare_zimbabwe_merge.py --config configs/zimbabwe_merge_v2.json
+python scripts/step10_diagnose_zimbabwe_transfer.py --config configs/zimbabwe_transfer_diagnosis_v2.json
+python scripts/step11_add_zimbabwe_weather.py --config configs/zimbabwe_weather_v2.json
+python scripts/step12_compare_zimbabwe_weather.py --config configs/zimbabwe_weather_v2.json
+python scripts/step13_compare_compact_weather.py --config configs/zimbabwe_weather_compact_v2.json
+python scripts/step14_compare_zimbabwe_aggregation.py                                              # v2 is the default
+python scripts/step15_compare_zimbabwe_multiyear.py                                                # v2 is the default
+```
+
+## Zimbabwe pipeline: steps 8–13 (v1, 7 Nov)
 
 The stage files remain the implementation entry points. Current main has newer shared validators than the published
 experiments, so use the replay stage in the final column for steps 9–13. Model-training stages can take substantial time.

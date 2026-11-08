@@ -1,0 +1,33 @@
+{
+  "common_window": "December through June of each agricultural season",
+  "feature_names": [
+    "ndvi_season_max",
+    "ndvi_season_mean",
+    "gcvi_season_max",
+    "gcvi_season_mean",
+    "mtci_season_max",
+    "mtci_season_mean",
+    "ndvi705_season_max",
+    "ndvi705_season_mean",
+    "ndvi740_season_max",
+    "ndvi740_season_mean"
+  ],
+  "harmonized_labels": 6598,
+  "lacuna_screened_labels": 2266,
+  "raw_2024_maize": 5055,
+  "raw_2024_missing_yield": 723,
+  "source_excluded_by_training_rule": 1874,
+  "source_exclusion_reasons": {
+    "zimbabwe_2024_zero_likely_not_measured": 1874
+  },
+  "source_feature_eligible": 2456,
+  "source_labels": 2458,
+  "source_screened_labels": 4332,
+  "source_screened_zeros": 1874,
+  "source_single_cut": 42,
+  "source_zeros": 0,
+  "target_evaluation": 1504,
+  "target_primary": 1880,
+  "target_reserved": 376,
+  "training_rows": "include_primary"
+}

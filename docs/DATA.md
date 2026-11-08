@@ -13,8 +13,8 @@ the 169 screened 2022 rows and 4 for the other 68; earlier descriptions of "no i
 **November 7 pooling extension:** Felix authorized a [Zimbabwe merge experiment](ZIMBABWE_MERGE_PROTOCOL.md).
 The full harmonized catalog has 2,266 Lacuna + 4,332 Zimbabwe 2024 labels. Its modeling comparison uses the
 unchanged 1,880 primary Lacuna 2023 population and 4,330 source rows with sufficient December–June imagery
-before fold-specific spatial buffering. Valid source zeros are retained; `include_primary` remains historical
-metadata, not the new source eligibility rule. The old no-pooling/parked decisions below describe the frozen baseline.
+before fold-specific spatial buffering. v1 kept the 1,874 source zeros, which broke the training-row rule;
+v2 (`data/runs/zimbabwe_merge_v2/`, 8 Nov) trains only on `include_primary` rows (2,458; 2,456 with imagery). The old no-pooling/parked decisions below describe the frozen baseline.
 
 **November 7 weather extension:** `data/processed/zimbabwe_weather_v1/` preserves the full 6,598-label catalog and
 adds 46 NASA POWER MERRA-2 weather predictors, with 1991–2020 normals, explicit 0.5° × 0.625° grid mapping,

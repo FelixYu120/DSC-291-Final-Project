@@ -1,0 +1,87 @@
+{
+  "arms": 44,
+  "catalog_rows": 6598,
+  "coverage": [
+    {
+      "catalog_rows": 169,
+      "cohort": "zimbabwe_lacuna_2022_2023",
+      "domain": "lacuna",
+      "excluded_not_include_primary": 0,
+      "excluded_rows": 169,
+      "maximum_observed_months": 2,
+      "minimum_observed_months": 1,
+      "model_eligible_rows": 0,
+      "season_year": 2022,
+      "training_pool_rows": 0
+    },
+    {
+      "catalog_rows": 2097,
+      "cohort": "zimbabwe_lacuna_2022_2023",
+      "domain": "lacuna",
+      "excluded_not_include_primary": 217,
+      "excluded_rows": 0,
+      "maximum_observed_months": 7,
+      "minimum_observed_months": 4,
+      "model_eligible_rows": 2097,
+      "season_year": 2023,
+      "training_pool_rows": 1880
+    },
+    {
+      "catalog_rows": 4332,
+      "cohort": "zimbabwe_2024",
+      "domain": "zimbabwe_2024",
+      "excluded_not_include_primary": 1874,
+      "excluded_rows": 2,
+      "maximum_observed_months": 7,
+      "minimum_observed_months": 3,
+      "model_eligible_rows": 4330,
+      "season_year": 2024,
+      "training_pool_rows": 2456
+    }
+  ],
+  "eligible_extra_lacuna": 0,
+  "extra_lacuna_outer_fit_counts": {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0
+  },
+  "historical_control_arms": 22,
+  "imagery_eligible_but_not_include_primary": {
+    "lacuna_intercropped": 212,
+    "lacuna_irrigated": 5,
+    "zimbabwe_2024_zero_likely_not_measured": 1874
+  },
+  "imagery_eligible_by_year": {
+    "2022": 0,
+    "2023": 2097,
+    "2024": 4330
+  },
+  "imagery_imputation": false,
+  "model_variants": [
+    "v0_mean",
+    "v1_calendar_mean",
+    "v2_max",
+    "v3_median",
+    "v3_mode"
+  ],
+  "new_arms": 22,
+  "new_arms_identical_to_a_control": 22,
+  "requested_lacuna_years": [
+    2022,
+    2023
+  ],
+  "requested_zimbabwe_years": [
+    2022,
+    2023,
+    2024
+  ],
+  "target_evaluation": 1504,
+  "target_reserved": 376,
+  "training_pool_by_domain": {
+    "lacuna": 1880,
+    "zimbabwe_2024": 2456
+  },
+  "training_rows": "include_primary",
+  "window_anchor": "calendar"
+}

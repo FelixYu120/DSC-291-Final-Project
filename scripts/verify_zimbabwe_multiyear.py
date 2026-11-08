@@ -4,6 +4,12 @@ No experiment implementation is imported. Feature windows, eligibility, spherica
 distances, scores, and selected Ridge predictions are recomputed from exports.
 Spearman alone permits 5e-6 error because twelve-significant-digit CSV rounding
 can create rank ties. R², RMSE and the other continuous scores remain strict.
+
+Under the team-rule v2 config (``window_anchor: calendar``, ``training_rows: include_primary``)
+it also checks that no crop date is read for features or eligibility, that every fitted row is
+``labels_v1.include_primary`` (read from the frozen labels), and that each new arm marked
+``identical_to`` equals its step 14 control. Code/doc/config inputs that differ in the working tree
+are accepted only if the recorded bytes exist in Git history for this release or differ by CRLF only.
 """
 
 from __future__ import annotations
@@ -11,6 +17,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 import numpy as np
@@ -45,6 +52,31 @@ def close(actual, expected, label, atol=1e-9, rtol=0):
         np.asarray(actual, float), np.asarray(expected, float),
         atol=atol, rtol=rtol, equal_nan=True, err_msg=label,
     )
+
+
+def release_commits(release):
+    try:
+        relative = (release / "manifest.json").relative_to(ROOT).as_posix()
+        return subprocess.run(["git", "-C", str(ROOT), "log", "--all", "--format=%H", "--", relative],
+                              capture_output=True, text=True, check=True).stdout.split()
+    except (ValueError, OSError, subprocess.CalledProcessError):
+        return []
+
+
+def input_source(name, expected, commits):
+    """Where the recorded input bytes were found; data files must match the working tree."""
+    path = ROOT / name
+    if path.is_file() and sha(path) == expected:
+        return "working_tree"
+    if name.startswith("data/"):
+        return None
+    if path.is_file() and hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest() == expected:
+        return "working_tree_crlf_checkout"
+    for commit in commits:
+        blob = subprocess.run(["git", "-C", str(ROOT), "show", f"{commit}:{name}"], capture_output=True)
+        if blob.returncode == 0 and hashlib.sha256(blob.stdout).hexdigest() == expected:
+            return "recorded_git_history"
+    return None
 
 
 def independent_mode(values):
@@ -82,34 +114,39 @@ def reconstruct_features(out, observations, config, dictionary):
     require(not monthly.duplicated(["obs_id", "month"]).any(), "Duplicate monthly key")
     require(set(monthly.obs_id) == set(observations.index), "Monthly IDs differ from catalog")
     require(monthly.groupby("obs_id").size().eq(7).all(), "Incomplete December–June spine")
-    frame = monthly.merge(observations[["season_year", "plant_date", "harvest_date"]],
+    crop_dates = config.get("window_anchor", "crop_dates") == "crop_dates"
+    variants = config.get("variants", ["v0_mean", "v1_preharvest_mean", "v1_calendar_mean", "v2_max", "v3_median", "v3_mode"])
+    frame = monthly.merge(observations[["season_year", "plant_date", "harvest_date"] if crop_dates else ["season_year"]],
                           left_on="obs_id", right_index=True, validate="many_to_one")
     frame["acquired"] = pd.to_datetime(frame.acquired)
     start = pd.to_datetime((frame.season_year - 1).astype(str) + "-12-01")
     end = pd.to_datetime(frame.season_year.astype(str) + "-07-01")
     cutoff = pd.to_datetime(frame.season_year.astype(str) + "-" + config["calendar_cutoff_month_day"])
-    planted = pd.to_datetime(frame.plant_date)
-    harvested = pd.to_datetime(frame.harvest_date)
     finite = np.isfinite(frame[BANDS + INDICES].to_numpy(float)).all(axis=1)
     require(np.array_equal(finite, ~frame.missing.astype(bool)), "Monthly missing flags differ from complete finite values")
     require(frame.loc[finite, "acquired"].notna().all(), "Available imagery lacks acquisition date")
     valid = finite & ~frame.missing.astype(bool) & frame.acquired.ge(start) & frame.acquired.lt(end)
     require(np.array_equal(valid, finite), "Available imagery falls outside the common season")
-    lower = planted.where(planted.notna() & planted.gt(start), start)
-    upper = harvested.fillna(cutoff)
-    preharvest = valid & frame.acquired.ge(lower) & frame.acquired.lt(upper)
     calendar = valid & frame.acquired.lt(cutoff)
-    masks = {"season": valid, "preharvest": preharvest, "calendar": calendar}
+    masks = {"season": valid, "calendar": calendar}
+    if crop_dates:
+        planted = pd.to_datetime(frame.plant_date)
+        harvested = pd.to_datetime(frame.harvest_date)
+        lower = planted.where(planted.notna() & planted.gt(start), start)
+        upper = harvested.fillna(cutoff)
+        masks["preharvest"] = valid & frame.acquired.ge(lower) & frame.acquired.lt(upper)
     counts = pd.DataFrame(index=observations.index)
     for scope, mask in masks.items():
         counts[f"n_{scope}"] = frame.loc[mask].groupby("obs_id").size().reindex(counts.index, fill_value=0)
     saved_audit = pd.read_csv(out / "window_audit.csv").set_index("obs_id").loc[counts.index]
     close(saved_audit[counts.columns], counts, "Monthly window counts", atol=0)
     definitions = {
-        "v0_mean": (valid, "mean"), "v1_preharvest_mean": (preharvest, "mean"),
-        "v1_calendar_mean": (calendar, "mean"), "v2_max": (valid, "max"),
+        "v0_mean": (valid, "mean"), "v1_calendar_mean": (calendar, "mean"), "v2_max": (valid, "max"),
         "v3_median": (valid, "median"), "v3_mode": (valid, independent_mode),
     }
+    if crop_dates:
+        definitions["v1_preharvest_mean"] = (masks["preharvest"], "mean")
+    definitions = {name: definitions[name] for name in variants}
     expected = {}
     for variant, (mask, stat) in definitions.items():
         grouped = frame.loc[mask].groupby("obs_id")[BANDS + INDICES].agg(stat).reindex(counts.index)
@@ -167,12 +204,22 @@ def independent_prediction(x, observations, fit_ids, source_ids, query_ids, alph
 
 
 def verify(out):
-    prior = ROOT / "data/runs/zimbabwe_aggregation_v1"
     original = ROOT / "data/runs/zimbabwe_merge_v1"
     manifest = json.loads((out / "manifest.json").read_text())
     config = manifest["config"]
+    prior = ROOT / config.get("controls_release", "data/runs/zimbabwe_aggregation_v1")
+    anchor = config.get("window_anchor", "crop_dates")
+    rule = config.get("training_rows", "all_screened")
+    require(anchor in {"crop_dates", "calendar"} and rule in {"all_screened", "include_primary"}, "Unknown team-rule switch")
+    if anchor == "calendar":
+        require("v1_preharvest_mean" not in config["variants"], "Crop-date window is a model candidate")
+        require("preharvest" not in config["primary_method"] + config["primary_reference"], "Crop-date headline comparison")
+    commits = release_commits(out)
+    input_sources = {}
     for name, expected in manifest["inputs"].items():
-        require(sha(ROOT / name) == expected, f"Input hash differs: {name}")
+        found = input_source(name, expected, commits)
+        require(found is not None, f"Input hash differs: {name}")
+        input_sources[found] = input_sources.get(found, 0) + 1
     for name, expected in manifest["outputs"].items():
         require(sha(out / name) == expected["sha256"], f"Output hash differs: {name}")
         require((out / name).stat().st_size == expected["bytes"], f"Output size differs: {name}")
@@ -224,8 +271,12 @@ def verify(out):
     primary_ids = set(old_obs.index[old_obs.domain.eq("lacuna")])
     evaluation_ids = set(old_obs.index[old_obs.domain.eq("lacuna") & old_obs.fold.isin([1, 2, 3, 4])])
     reserved_ids = old_obs.index[old_obs.domain.eq("lacuna") & old_obs.fold.eq(0)].tolist()
-    extra_ids = set(observations.index[eligible & observations.cohort.eq("zimbabwe_lacuna_2022_2023")]) - primary_ids
-    require(len(evaluation_ids) == 1504 and len(reserved_ids) == 376 and len(extra_ids) == 217, "Unexpected population")
+    primary_flag = frozen_labels.include_primary.reindex(observations.index).fillna(False).astype(bool)
+    pool = eligible & (primary_flag if rule == "include_primary" else True)
+    extra_ids = set(observations.index[pool & observations.cohort.eq("zimbabwe_lacuna_2022_2023")]) - primary_ids
+    expected_extra = 217 if rule == "all_screened" else 0
+    require(len(evaluation_ids) == 1504 and len(reserved_ids) == 376 and len(extra_ids) == expected_extra, "Unexpected population")
+    require(primary_flag.loc[list(primary_ids)].all(), "Primary Lacuna rows outside include_primary")
     require(set(extra_permission.obs_id) == extra_ids, "Extra permissions differ from eligible supplementary Lacuna")
     require(not extra_permission.duplicated(["obs_id", "outer_fold", "inner_fold"]).any(), "Duplicate extra permission")
     require(not fit_membership.duplicated(["obs_id", "outer_fold", "inner_fold"]).any(), "Duplicate fit membership")
@@ -241,34 +292,43 @@ def verify(out):
             source = source_permission[source_permission.outer_fold.eq(outer)
                                        & source_permission.inner_fold.eq(inner)
                                        & source_permission.allowed_by_spatial_rule].obs_id.tolist()
+            if rule == "include_primary":
+                source = [obs_id for obs_id in source if pool.loc[obs_id]]
             permission = extra_permission[extra_permission.outer_fold.eq(outer) & extra_permission.inner_fold.eq(inner)]
             require(set(permission.obs_id) == extra_ids, f"Incomplete extra permissions: {outer}/{inner}")
             # Frozen label coordinates retain precision that the observation CSV
             # rounds away; their agreement with the exported coordinates is checked above.
             tree = BallTree(np.radians(labels.loc[protected, ["lat", "lon"]].to_numpy()), metric="haversine")
-            distance = tree.query(np.radians(labels.loc[permission.obs_id, ["lat", "lon"]].to_numpy()), k=1)[0][:, 0] * EARTH_RADIUS_KM
+            distance = (tree.query(np.radians(labels.loc[permission.obs_id, ["lat", "lon"]].to_numpy()), k=1)[0][:, 0]
+                        * EARTH_RADIUS_KM if len(permission) else np.array([]))
             close(permission.minimum_distance_to_protected_km, distance, f"Haversine buffer: {outer}/{inner}", atol=1e-8)
             allowed = distance >= config["auxiliary_buffer_km"]
             require(np.array_equal(permission.allowed_by_spatial_rule, allowed), f"Wrong extra spatial permission: {outer}/{inner}")
             extra = permission.loc[permission.allowed_by_spatial_rule, "obs_id"].tolist()
             fits = fit_membership[fit_membership.outer_fold.eq(outer) & fit_membership.inner_fold.eq(inner)]
-            require(set(fits.role) == {"primary_fit", "extra_lacuna_fit", "source_allowed", "query"}, "Unknown fit role")
+            require({"primary_fit", "source_allowed", "query"} <= set(fits.role)
+                    <= {"primary_fit", "extra_lacuna_fit", "source_allowed", "query"}, "Unknown fit role")
             expected_roles = {"primary_fit": original_fit, "extra_lacuna_fit": extra, "source_allowed": source, "query": query}
             for role, expected in expected_roles.items():
                 actual = fits[fits.role.eq(role)].sort_values("position").obs_id.tolist()
                 require(actual == expected, f"Fit membership/order differs: {outer}/{inner}/{role}")
             require(eligible.loc[original_fit + extra + source + query].all(), "Ineligible field included in a model")
+            if rule == "include_primary":
+                require(primary_flag.loc[original_fit + extra + source].all(), "Fit holds rows outside labels_v1.include_primary")
             require(set(original_fit + extra + source).isdisjoint(protected), "Protected observation included in fit")
             split_ids[outer, inner] = (original_fit + extra, source, query)
             extra_counts[f"{outer}/{inner}"] = len(extra)
     pred = pd.read_csv(out / "predictions.csv", dtype={"group_id": str})
     metrics = pd.read_csv(out / "metrics.csv").set_index("method")
     folds = pd.read_csv(out / "fold_metrics.csv").set_index(["method", "fold"])
-    require(pred.method.nunique() == 52 and set(metrics.index) == set(pred.method), "Expected 52 arms")
+    n_arms = 4 * len(dictionary)
+    require(pred.method.nunique() == n_arms and set(metrics.index) == set(pred.method), f"Expected {n_arms} arms")
+    if anchor == "calendar":
+        require(not any("preharvest" in name for name in list(dictionary) + list(pred.method)), "Crop-date feature in a model")
     expected_methods = {f"{name}_{training}" for name in dictionary
                         for training in ["target", "merged", "all_lacuna", "all_zimbabwe"]}
     require(set(pred.method) == expected_methods, "Unexpected comparison methods")
-    require(len(pred) == 52 * 1504 and np.isfinite(pred.prediction_t_ha).all(), "Wrong prediction population")
+    require(len(pred) == n_arms * 1504 and np.isfinite(pred.prediction_t_ha).all(), "Wrong prediction population")
     maximum_spearman_error = 0.0
     for method, part in pred.groupby("method"):
         require(part.obs_id.is_unique and set(part.obs_id) == evaluation_ids, f"Evaluation IDs differ: {method}")
@@ -296,7 +356,7 @@ def verify(out):
                 if score == "spearman":
                     maximum_spearman_error = max(maximum_spearman_error, abs(float(folds.loc[(method, outer), score]) - expected))
     controls = pd.read_csv(prior / "predictions.csv", dtype={"group_id": str})
-    require(controls.method.nunique() == 26, "Unexpected step14 controls")
+    require(controls.method.nunique() == 2 * len(dictionary), "Unexpected step14 controls")
     for method, part in controls.groupby("method"):
         actual = pred[pred.method.eq(method)].set_index("obs_id").sort_index()
         expected = part.set_index("obs_id").sort_index()
@@ -313,7 +373,7 @@ def verify(out):
     maximum_spearman_error = max(maximum_spearman_error, float(old_spearman_error.max()))
     selections = pd.read_csv(out / "selected_parameters.csv")
     tuning = pd.read_csv(out / "tuning.csv")
-    require(len(selections) == 52 * 4 and not selections.duplicated(["method", "outer_fold"]).any(), "Wrong selections")
+    require(len(selections) == n_arms * 4 and not selections.duplicated(["method", "outer_fold"]).any(), "Wrong selections")
     replayed = 0
     largest_replay_error = 0.0
     for selected in selections.itertuples():
@@ -340,19 +400,38 @@ def verify(out):
         close(saved.prediction_t_ha, estimated, f"Independent Ridge replay: {selected.method}/{selected.outer_fold}", atol=1e-8)
         largest_replay_error = max(largest_replay_error, float(np.abs(saved.prediction_t_ha.to_numpy() - estimated).max()))
         replayed += 1
-    require(replayed == 104, "Expected 104 new selected fits")
+    require(replayed == 2 * len(dictionary) * 4, f"Expected {2 * len(dictionary) * 4} new selected fits")
+    identity = {}
+    if rule == "include_primary":
+        # Under the team rule both broader pools collapse to step 14 rows; check each marked twin directly.
+        recorded = pd.read_csv(out / "arm_identity.csv", keep_default_na=False).set_index("method")
+        tolerance = config["identity_tolerance_t_ha"]
+        for method in recorded.index:
+            twin = method.replace("_all_lacuna", "_target").replace("_all_zimbabwe", "_merged")
+            a = pred[pred.method.eq(method)].set_index("obs_id").prediction_t_ha.sort_index()
+            b = pred[pred.method.eq(twin)].set_index("obs_id").prediction_t_ha.sort_index()
+            difference = float(np.abs(a - b).max())
+            require(recorded.loc[method, "twin_control"] == twin, f"Wrong twin: {method}")
+            require(bool(recorded.loc[method, "identical"]) == (difference <= tolerance), f"Identity flag differs: {method}")
+            require(recorded.loc[method, "identical_to"] == (twin if difference <= tolerance else ""), f"identical_to differs: {method}")
+            identity[method] = difference
+        metadata = pd.read_csv(out / "method_metadata.csv", keep_default_na=False).set_index("method")
+        require(all(metadata.loc[m, "identical_to"] == recorded.loc[m, "identical_to"] for m in recorded.index), "Metadata identity differs")
     return {
-        "all_checks_passed": True, "catalog_rows": len(observations), "model_arms": 52,
-        "predictions": len(pred), "same_evaluation_ids_per_arm": 1504,
+        "all_checks_passed": True, "catalog_rows": len(observations), "model_arms": n_arms,
+        "predictions": len(pred), "same_evaluation_ids_per_arm": 1504, "model_arms_checked": n_arms,
         "eligible_by_harvest_year": {str(k): int(v) for k, v in eligible.groupby(observations.season_year).sum().items()},
         "feature_sets_independently_reconstructed": len(dictionary),
         "extra_lacuna_permissions_checked": len(extra_permission), "extra_lacuna_allowed_by_split": extra_counts,
         "original_memberships_and_source_permissions": "byte-identical",
-        "step14_control_arms": "26 prediction tables exactly preserved; continuous metrics within 1e-10; Spearman within 5e-6",
+        "step14_control_arms": f"{2 * len(dictionary)} prediction tables exactly preserved; continuous metrics within 1e-10; Spearman within 5e-6",
         "spearman_csv_tie_tolerance": SPEARMAN_TOLERANCE,
         "maximum_observed_spearman_error": maximum_spearman_error,
         "selected_fits_independently_replayed": replayed, "maximum_prediction_replay_error": largest_replay_error,
-        "input_hashes": len(manifest["inputs"]), "output_hashes": len(manifest["outputs"]),
+        "input_hashes": len(manifest["inputs"]), "input_sources": input_sources, "output_hashes": len(manifest["outputs"]),
+        "window_anchor": anchor, "training_rows": rule, "controls_release": str(prior.relative_to(ROOT).as_posix()),
+        "new_arms_identical_to_control": sum(v <= config.get("identity_tolerance_t_ha", 0) for v in identity.values()),
+        "maximum_identity_difference_t_ha": max(identity.values(), default=None),
         "verifier_sha256": sha(Path(__file__)), "manifest_sha256": sha(out / "manifest.json"),
     }
 

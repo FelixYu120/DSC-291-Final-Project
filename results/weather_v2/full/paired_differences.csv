@@ -1,0 +1,15 @@
+method,reference,delta_rmse_t_ha,ci_low,ci_high,primary_comparison
+weather_tree_transfer,weather_tree_target,0.0206329502474,-0.004421070702,0.0442613337774,True
+monthly_tree_transfer,monthly_tree_target,0.0176036091983,-0.0072189382866,0.0450291279032,False
+weather_tree_target,monthly_tree_target,0.0363990520649,-0.0229912406224,0.0936962837846,False
+weather_tree_transfer,monthly_tree_transfer,0.0394283931141,-0.0287310503861,0.11367501779,False
+weather_target,monthly_target,0.0517169663382,0.00420329486221,0.0967155804502,False
+weather_adaptive,monthly_adaptive,0.0516629499747,0.00601405860141,0.0963388593578,False
+weather_only_target,monthly_target,0.212907288689,0.112217863838,0.32140764166,False
+weather_adaptive,weather_target,-0.00571776591963,-0.0121985640842,0.000482938871921,False
+weather_shared,weather_target,0.0107718695613,-0.00847950149671,0.0314008851862,False
+interactions_adaptive,interactions_target,-0.00698051030678,-0.0140086494363,-0.000523529753717,False
+interactions_shared,interactions_target,0.0143466718666,-0.00725750318445,0.041519259773,False
+interactions_target,weather_target,-0.0112187102978,-0.0270037105407,0.00136608313691,False
+interactions_adaptive,weather_adaptive,-0.012481454685,-0.0279119562763,0.000476751373686,False
+interactions_shared,weather_shared,-0.00764390799254,-0.0248008461787,0.00832335292724,False

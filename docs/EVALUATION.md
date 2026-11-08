@@ -4,11 +4,15 @@ Answers the feedback "How will you measure generalization across time and space?
 fixed before the first model is trained. Evidence: semivariograms computed on the screened audit CSVs on
 29 October 2026, and arm R1 on the frozen folds and the `load_xy` rows, checked on 1 November 2026.
 
-**November 7 Zimbabwe handoff:** [`ZIMBABWE_DATA_HANDOFF.md`](ZIMBABWE_DATA_HANDOFF.md) defines explicit roles over
-these frozen folds: 2–4 train, 1 validation, 0 historical test. For `s1_cc2km`, counts are 1,128 / 376 / 376.
-This creates no new blind holdout: prior baselines have already evaluated these observations. The November 1 decision
-still prohibits scoring new model arms on fold 0 in any family. The derived `s2_region` partition has only two test
-Admin1 groups and three validation groups; it is a limited sensitivity check, not a precise national benchmark.
+**The team scoring rule (8 Nov 2026):** cross-validate over folds 1–4 of `s1_cc2km` (fit on three folds, predict the
+fourth) and score the pooled out-of-fold predictions; fold 0 is held back for one pre-registered final test. Training
+rows follow `labels_v1.include_primary`; survey dates (planting, harvest, crop-cut) are never inputs or window anchors.
+The Zimbabwe handoff release v2 (`data/processed/zimbabwe_midterm_v2`, [`ZIMBABWE_DATA_HANDOFF.md`](ZIMBABWE_DATA_HANDOFF.md))
+labels folds 1–4 `cv` (1,504 rows) and fold 0 `holdout` (376). Release v1 (7 Nov) labelled the same folds 2–4 train,
+1 validation, 0 test (1,128 / 376 / 376); that labelling is not the team rule, and v1 stays published only for the
+experiments that cite it. Fold 0 is not a new blind holdout: R0, R1, R2 and A1 were scored on it (1 Nov ruling). The
+`s2_region` family has only two Admin1 groups in fold 0 and three in fold 1; it is a limited sensitivity check, not a
+precise national benchmark.
 
 **November 7 merge comparison:** the separately authorized [protocol](ZIMBABWE_MERGE_PROTOCOL.md) compares
 Lacuna-only with Lacuna + 2024 using outer folds 1–4 and grouped inner CV. It never fits or scores fold 0.

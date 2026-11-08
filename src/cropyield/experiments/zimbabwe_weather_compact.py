@@ -15,18 +15,19 @@ from threadpoolctl import threadpool_limits
 from cropyield import ROOT
 from cropyield.data.handoff import csv_write, json_write, publish_release, require
 from cropyield.data.labels import sha256
-from cropyield.experiments.zimbabwe_merge import score_predictions
+from cropyield.experiments.zimbabwe_merge import (
+    require_training_rows,
+    score_predictions,
+    training_rows,
+)
 from cropyield.experiments.zimbabwe_weather import (
-    DIAGNOSIS,
-    PRIOR,
-    WEATHER,
     load_weather_experiment,
     make_context,
     parameter_grid,
     predict,
+    release_paths,
     verify_release,
 )
-from cropyield.experiments.zimbabwe_weather import OUTPUT as FULL_WEATHER
 
 CONFIG = ROOT / "configs/zimbabwe_weather_compact_v1.json"
 PROTOCOL = ROOT / "docs/ZIMBABWE_COMPACT_WEATHER_PROTOCOL.md"
@@ -50,16 +51,19 @@ def early_weather(cell_months):
 
 
 def load_compact(config):
-    verify_release(FULL_WEATHER)
-    rows,old_features,membership,permission,_ = load_weather_experiment()
-    extra = early_weather(pd.read_parquet(WEATHER/"weather_cell_months.parquet"))
+    paths = release_paths(config)
+    verify_release(paths["weather_run"])
+    upstream = json.loads((paths["weather_run"]/"manifest.json").read_text())["config"]
+    require(training_rows(upstream)==training_rows(config),"Full-weather run uses a different training-row rule")
+    rows,old_features,membership,permission,_ = load_weather_experiment(config)
+    extra = early_weather(pd.read_parquet(paths["weather"]/"weather_cell_months.parquet"))
     keys = ["weather_grid_id","season_year"]
     compact = rows.reset_index().merge(extra,on=keys,validate="many_to_one").set_index("obs_id").reindex(rows.index)
     imagery = old_features["weather"].loc[:,~old_features["weather"].columns.str.startswith("wx_")]
     features = {name:pd.concat([imagery,compact[columns]],axis=1) for name,columns in config["feature_sets"].items()}
     require(all(len(x.columns)==122+len(config["feature_sets"][name]) for name,x in features.items()),"Wrong feature count")
     require(np.isfinite(compact[config["feature_sets"]["compact4"]]).all().all(),"Missing compact weather")
-    controls = pd.read_csv(FULL_WEATHER/"predictions.csv",dtype={"group_id":str})
+    controls = pd.read_csv(paths["weather_run"]/"predictions.csv",dtype={"group_id":str})
     controls = controls[controls.method.isin(CONTROL_NAMES)].copy()
     return compact,features,{"monthly":imagery,"weather":old_features["weather"]},membership,permission,controls
 
@@ -89,11 +93,13 @@ def fit_indices(rows,membership,permission,outer,config):
         require(set(rows.loc[fit].group_id).isdisjoint(rows.loc[val].group_id),"Target spatial group overlap")
         require(allowed.minimum_distance_to_protected_km.ge(config["buffer_km"]).all(),"Source buffer violation")
         require(rows.loc[allowed.obs_id].feature_eligible.all(),"Imagery-ineligible source")
+        require_training_rows(rows.loc[fit+allowed.obs_id.tolist()],config,f"Fit pool {outer}/{inner}")
         index.append((fit,allowed.obs_id.tolist(),val))
     return index
 
 
 def run_models(rows,features,old_features,membership,permission,controls,config):
+    paths = release_paths(config)
     predictions,tuning,selected,accounting,gaps = [],[],[],[],[]
     for outer in config["target_folds"]:
         index = fit_indices(rows,membership,permission,outer,config)
@@ -139,7 +145,7 @@ def run_models(rows,features,old_features,membership,permission,controls,config)
                                    "source_ids_sha256":hashlib.sha256("|".join(context["source_ids"]).encode()).hexdigest()})
             print(f"compact fold {outer} {spec['name']}: inner RMSE {np.sqrt(loss):.4f}; {best}",flush=True)
         # Replay old selected trees only for training-error diagnostics. Original saved OOF predictions remain controls.
-        for family,directory in [("monthly",DIAGNOSIS),("weather",FULL_WEATHER)]:
+        for family,directory in [("monthly",paths["diagnosis"]),("weather",paths["weather_run"])]:
             choices = pd.read_csv(directory/"selected_parameters.csv")
             fit,source,val = index[0]
             data = make_context(rows,old_features[family],fit,source,val+fit)
@@ -226,9 +232,10 @@ def evaluate(predictions,rows,config):
     return pd.DataFrame(metrics),pd.DataFrame(folds),pd.DataFrame(differences),pd.DataFrame(interactions),pd.DataFrame(decomposition)
 
 
-def input_hashes():
-    paths = {CONFIG,PROTOCOL,Path(__file__),ROOT/"scripts/step13_compare_compact_weather.py",ROOT/"requirements.txt"}
-    for directory in [PRIOR,DIAGNOSIS,WEATHER,FULL_WEATHER]:
+def input_hashes(config_path=CONFIG,upstream=None):
+    upstream = upstream or release_paths()
+    paths = {config_path,PROTOCOL,Path(__file__),ROOT/"scripts/step13_compare_compact_weather.py",ROOT/"requirements.txt"}
+    for directory in [upstream["merge"],upstream["diagnosis"],upstream["weather"],upstream["weather_run"]]:
         paths.update(p for p in directory.iterdir() if p.is_file())
         paths.update(ROOT/name for name in json.loads((directory/"manifest.json").read_text())["inputs"])
     return {str(p.relative_to(ROOT)):sha256(p) for p in paths}
@@ -255,10 +262,11 @@ def plot_results(path,metrics):
     plt.close(fig)
 
 
-def run_experiment(output=OUTPUT):
-    config = json.loads(CONFIG.read_text())
+def run_experiment(output=OUTPUT,config_path=CONFIG):
+    config = json.loads(config_path.read_text())
     require(config["target_folds"]==[1,2,3,4] and config["reserved_fold"]==0,"Reserved folds cannot change")
-    before = input_hashes()
+    upstream = release_paths(config)
+    before = input_hashes(config_path,upstream)
     rows,features,old_features,membership,permission,controls = load_compact(config)
     structure,correlations = feature_structure(rows,old_features,config)
     print(structure.to_string(index=False),flush=True)
@@ -275,7 +283,7 @@ def run_experiment(output=OUTPUT):
         for name,table in tables.items():
             csv_write(table,stage/f"{name}.csv")
         for name in ["target_memberships.csv","source_spatial_permissions.csv"]:
-            (stage/name).write_bytes((PRIOR/name).read_bytes())
+            (stage/name).write_bytes((upstream["merge"]/name).read_bytes())
         compact = rows[["domain","season_year","weather_grid_id","fold","feature_eligible",*config["feature_sets"]["compact4"]]]
         compact.to_parquet(stage/"compact_weather.parquet",index=True)
         csv_write(compact.reset_index(),stage/"compact_weather.csv")
@@ -283,7 +291,9 @@ def run_experiment(output=OUTPUT):
             x.to_parquet(stage/f"features_{name}.parquet",index=True)
         json_write({name:list(x.columns) for name,x in features.items()},stage/"feature_dictionary.json")
         (stage/"PROTOCOL.md").write_text(PROTOCOL.read_text())
-        text = ["# Compact weather results","","Same 1,504 evaluation fields; exploratory. Lower RMSE is better.","",
+        rule = [] if training_rows(config)=="all_screened" else [
+            f"Training rows follow `labels_v1.include_primary` (config `training_rows`); rows and source permissions come from `{config.get('merge_run')}`.",""]
+        text = ["# Compact weather results","","Same 1,504 evaluation fields; exploratory. Lower RMSE is better.","",*rule,
                 "| Method | RMSE t/ha | MAE t/ha | R² |","|---|---:|---:|---:|"]
         text += [f"| {r.method} | {r.rmse_t_ha:.6f} | {r.mae_t_ha:.6f} | {r.r2:.6f} |" for r in metrics.itertuples()]
         main = differences[differences.primary_comparison].iloc[0]
@@ -292,7 +302,7 @@ def run_experiment(output=OUTPUT):
                  "","![Compact weather comparison](compact_weather_comparison.png)",""]
         (stage/"RESULTS.md").write_text("\n".join(text))
         plot_results(stage/"compact_weather_comparison.png",metrics)
-        require(before==input_hashes(),"Inputs changed during compact experiment")
+        require(before==input_hashes(config_path,upstream),"Inputs changed during compact experiment")
         json_write({"config":config,"inputs":before,"python":platform.python_version(),
                     "versions":{name:importlib.metadata.version(name) for name in ["numpy","pandas","scipy","scikit-learn","pyarrow","matplotlib"]},
                     "outputs":{p.name:{"sha256":sha256(p),"bytes":p.stat().st_size} for p in sorted(stage.iterdir())}},stage/"manifest.json")

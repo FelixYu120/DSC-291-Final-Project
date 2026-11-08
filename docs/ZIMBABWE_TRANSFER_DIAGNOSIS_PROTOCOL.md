@@ -76,3 +76,17 @@ may have different predictors/outcome relationships, or source information may d
 teach. Conversely, improving with richer target-only features does not show source labels helped. Without matched
 reference measurements, this study cannot identify a field's true measurement error, separate provider effects from
 the 2024 season, or declare source zeros invalid. Conclusions must distinguish these explanations explicitly.
+
+## v2 amendment (8 November 2026): training rows follow `include_primary`
+
+v1 inherited the v1 merge pool, which trained on all 4,332 screened 2024 rows, the 1,874 recorded zeros included.
+The team excludes those zeros (`labels_v1.include_primary`). `configs/zimbabwe_transfer_diagnosis_v2.json` sets
+`"training_rows": "include_primary"` and `"merge_run": "data/runs/zimbabwe_merge_v2"`. It inherits rows, memberships
+and source permissions from the v2 merge, checks that the merge used the same rule, and stops if any fit pool
+(target fit, allowed source, source learnability pool) holds a row outside `include_primary`. Output:
+`data/runs/zimbabwe_transfer_diagnosis_v2/`. Without the key, the code keeps the v1 behaviour.
+
+Under v2 the 2024 pool holds no zeros. The matched random subsets then match only the quality-subset size, and the
+within-2024 zero/positive ranking AUC is not defined (reported as missing). The two-cut and recorded-zero counts in
+the quality summary still describe the full screened 2024 audit; they are data checks, not training rows.
+All other design choices, seeds and grids are unchanged. No survey date is a model input or window anchor.

@@ -1,5 +1,30 @@
 # Seasonal aggregation V0–V3: protocol
 
+## v2 amendment: team rules (8 November 2026, before any v2 score)
+
+The v1 release (`configs/zimbabwe_aggregation_v1.json`) broke two team rules. It stays published and unchanged.
+`configs/zimbabwe_aggregation_v2.json` fixes both and writes the new release `data/runs/zimbabwe_aggregation_v2/`.
+
+1. **Label-free windows (`window_anchor: calendar`).** No survey date (planting, harvest, crop cut) may be a model
+   input or a window anchor. v1 built `v1_preharvest_mean` from each Lacuna field's recorded planting and harvest dates
+   and made it the primary model. In v2 that variant is not computed as a feature and is not a model candidate. V1 is
+   the common December 1 <= acquisition < April 1 calendar mean for both sources. Crop-date counts stay in
+   `window_audit.csv` only as `diagnostic_` columns; no model, eligibility rule or headline uses them.
+2. **Training rows follow `labels_v1.include_primary` (`training_rows: include_primary`).** v1 merged arms used all
+   4,330 feature-eligible Zimbabwe 2024 rows, including the 1,874 recorded zeros that the team excludes
+   (`zimbabwe_2024_zero_likely_not_measured`). In v2 the source pool is the 2,456 include_primary rows with
+   common-window features (2,458 include_primary rows minus 2 without four observed months). The frozen 2 km
+   permission table is filtered to these rows; a buffer distance depends only on coordinates, so no decision changes.
+   Every fit asserts that its target and source rows are include_primary. The 1,880 Lacuna rows were already include_primary.
+
+The v2 primary contrast is ten-band calendar V1 minus ten-band V0, Lacuna only. Everything else is unchanged: the 1,504
+evaluation fields, outer folds 1–4 of `s1_cc2km`, fold 0 never fitted or scored, inner folds, the 2 km buffer, the alpha
+and source-weight grids, seed 20261107 and 2,000 bootstrap draws. Lacuna + 2024 pooling in t/ha remains the recorded
+team exception (`docs/DECISIONS.md`, 7 November). The Lacuna-only index mean+max control must still reproduce its saved
+step 9 predictions; the merged control is refitted, because step 9 trained it on the excluded zeros.
+
+The sections below are the original v1 protocol. Under v2, read "V1" as the calendar control only.
+
 Fixed before new model scoring on 7 November 2026, after inspecting coverage/dates but not new model results.
 This user-requested experiment compares temporal aggregations of existing satellite data. It reuses the previously
 examined development population, so all conclusions remain exploratory. It adds no weather, MOSAIKS or neural model.

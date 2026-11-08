@@ -1,0 +1,18 @@
+{
+  "status": "passed",
+  "training_rows": "include_primary",
+  "training_pool_rows_checked": 3912,
+  "labels": 6598,
+  "weather_cells": 97,
+  "field_months": 59382,
+  "historical_cell_months": 39576,
+  "weather_values_reconstructed": 303508,
+  "evaluation_fields_per_arm": 1504,
+  "arms": 13,
+  "reserved_fold_scored": false,
+  "minimum_source_distance_to_protected_km": 2.0069986839711693,
+  "bootstrap_draws_replayed": 2000,
+  "controls_identical": true,
+  "selected_model_replay": "fold 1 weather_shared",
+  "verifier_sha256": "4bb4c6ced328b1e62bfb2bfbd338ff3c34f5068865801d0fa3395668a492b820"
+}

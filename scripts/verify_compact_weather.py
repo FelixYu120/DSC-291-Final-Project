@@ -13,26 +13,39 @@ from threadpoolctl import threadpool_limits
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from cropyield.experiments.zimbabwe_weather import make_context, predict, verify_release
+from cropyield.experiments.zimbabwe_merge import default_output, training_rows
+from cropyield.experiments.zimbabwe_weather import (
+    make_context,
+    predict,
+    release_paths,
+    verify_release,
+)
 from cropyield.experiments.zimbabwe_weather_compact import (
     CONFIG,
     CONTROL_NAMES,
-    FULL_WEATHER,
-    OUTPUT,
-    PRIOR,
-    WEATHER,
     load_compact,
 )
 
 
-def verify():
-    config = json.loads(CONFIG.read_text())
-    verify_release(OUTPUT)
+def verify(config_path=CONFIG):
+    config = json.loads(Path(config_path).read_text())
+    paths = release_paths(config)
+    prior, weather, full_weather, output = paths["merge"], paths["weather"], paths["weather_run"], default_output(config)
+    verify_release(output)
     rows, features, _, membership, permission, controls = load_compact(config)
     for name in ["target_memberships.csv", "source_spatial_permissions.csv"]:
-        assert (OUTPUT / name).read_bytes() == (PRIOR / name).read_bytes()
-    stored = pd.read_parquet(OUTPUT / "compact_weather.parquet").sort_index()
-    assert len(stored) == 6212
+        assert (output / name).read_bytes() == (prior / name).read_bytes()
+    stored = pd.read_parquet(output / "compact_weather.parquet").sort_index()
+    # Expected rows from labels_v1 itself: the 1,880 Lacuna 2023 primary rows plus the 2024 rows the rule admits.
+    labels = pd.read_parquet(ROOT / "data/processed/labels_v1.parquet").set_index("obs_id")
+    lacuna = labels.cohort.eq("zimbabwe_lacuna_2022_2023") & labels.season_year.eq(2023) & labels.include_primary
+    source = labels.cohort.eq("zimbabwe_2024")
+    if training_rows(config) == "include_primary":
+        source &= labels.include_primary
+    assert len(stored) == int(lacuna.sum() + source.sum()) and set(stored.index) == set(labels.index[lacuna | source])
+    pool = sorted(set(permission.loc[permission.allowed_by_spatial_rule, "obs_id"]) | set(membership.loc[membership.role.eq("fit"), "obs_id"]))
+    if training_rows(config) == "include_primary":
+        assert labels.loc[pool, "include_primary"].all(), "A fit pool holds a row outside labels_v1.include_primary"
     pd.testing.assert_frame_equal(stored, rows[stored.columns])
     # Descriptive support check only: no yields, parameter selection or filtering.
     target = rows[rows.domain.eq("lacuna") & rows.fold.isin([1, 2, 3, 4])]
@@ -47,7 +60,7 @@ def verify():
 
     # Reconstruct the two early-season columns directly from the history and
     # historical normal rates, independently of early_weather/cell-month helpers.
-    history = pd.read_parquet(WEATHER / "weather_history.parquet")
+    history = pd.read_parquet(weather / "weather_history.parquet")
     normal = history[history.year.between(1991, 2020)].groupby(["weather_grid_id", "calendar_month"])
     rain_normal, temp_normal = normal.rain_rate_mm_day.mean(), normal.t2m_c.mean()
     hist = history.set_index(["weather_grid_id", "year", "calendar_month"])
@@ -64,10 +77,10 @@ def verify():
         np.testing.assert_allclose(group.wx_t2m_anomaly_c_oct_dec, temperature / days, rtol=0, atol=1e-10)
         checks += len(group) * 2
     for family, expected in features.items():
-        pd.testing.assert_frame_equal(pd.read_parquet(OUTPUT / f"features_{family}.parquet"), expected)
+        pd.testing.assert_frame_equal(pd.read_parquet(output / f"features_{family}.parquet"), expected)
 
-    pred = pd.read_csv(OUTPUT / "predictions.csv", dtype={"group_id": str})
-    metrics = pd.read_csv(OUTPUT / "metrics.csv").set_index("method")
+    pred = pd.read_csv(output / "predictions.csv", dtype={"group_id": str})
+    metrics = pd.read_csv(output / "metrics.csv").set_index("method")
     reserved = set(rows[rows.domain.eq("lacuna") & rows.fold.eq(0)].index)
     expected_ids = set(rows[rows.domain.eq("lacuna") & rows.fold.isin([1, 2, 3, 4])].index)
     assert pred.method.nunique() == 19 and len(expected_ids) == 1504
@@ -85,9 +98,9 @@ def verify():
         pd.testing.assert_frame_equal(a, b)
         np.testing.assert_array_equal(a.prediction_t_ha, b.prediction_t_ha)
 
-    tuning = pd.read_csv(OUTPUT / "tuning.csv")
-    selected = pd.read_csv(OUTPUT / "selected_parameters.csv")
-    accounting = pd.read_csv(OUTPUT / "fit_accounting.csv")
+    tuning = pd.read_csv(output / "tuning.csv")
+    selected = pd.read_csv(output / "selected_parameters.csv")
+    accounting = pd.read_csv(output / "fit_accounting.csv")
     assert len(selected) == 40 and len(accounting) == 160
     for pick in selected.itertuples():
         choices = tuning[tuning.outer_fold.eq(pick.outer_fold) & tuning.method.eq(pick.method)]
@@ -111,8 +124,8 @@ def verify():
     wide = pred.pivot(index="obs_id", columns="method", values="prediction_t_ha").sort_index()
     truth = pred[pred.method.eq("monthly_tree_target")].set_index("obs_id").loc[wide.index]
     error = (wide - truth.yield_t_ha.to_numpy()[:, None])**2
-    pairs = pd.read_csv(OUTPUT / "paired_differences.csv")
-    interactions = pd.read_csv(OUTPUT / "transfer_benefit_interaction.csv")
+    pairs = pd.read_csv(output / "paired_differences.csv")
+    interactions = pd.read_csv(output / "transfer_benefit_interaction.csv")
     for unit, labels in [("spatial_group", truth.group_id), ("weather_cell", rows.loc[wide.index].weather_grid_id)]:
         labels = labels.to_numpy()
         members = [np.flatnonzero(labels == g) for g in np.unique(labels)]
@@ -140,15 +153,16 @@ def verify():
         replay = predict(data, "tree", {"leaves": int(pick.leaves), "ratio": pick.ratio}, config)
     saved = pred[pred.method.eq(pick.method)].set_index("obs_id").loc[query].prediction_t_ha
     np.testing.assert_allclose(replay[:len(query)], saved, rtol=0, atol=1e-9)
-    gap = pd.read_csv(OUTPUT / "training_outer_diagnostics.csv")
+    gap = pd.read_csv(output / "training_outer_diagnostics.csv")
     g = gap[gap.outer_fold.eq(1) & gap.method.eq(pick.method)].iloc[0]
     assert np.isclose(g.training_rmse_t_ha, np.sqrt(np.mean((replay[len(query):] - data["yt"])**2)), atol=1e-10)
-    verify_release(FULL_WEATHER)
-    return {"status": "passed", "arms": 19, "evaluation_fields_per_arm": 1504,
+    verify_release(full_weather)
+    return {"status": "passed", "training_rows": training_rows(config), "training_pool_rows_checked": len(pool), "arms": 19, "evaluation_fields_per_arm": 1504,
             "compact_feature_rows": len(stored), "new_weather_values_reconstructed": checks,
             "old_controls_unchanged": len(CONTROL_NAMES), "selected_models_checked": len(selected),
             "accounting_records_checked": len(accounting), "intervals_replayed": len(pairs),
-            "bootstrap_units": ["232 spatial groups", "30 weather cells"],
+            "bootstrap_units": [f"{pairs.loc[pairs.bootstrap_unit.eq('spatial_group'), 'clusters'].iloc[0]} spatial groups",
+                                f"{pairs.loc[pairs.bootstrap_unit.eq('weather_cell'), 'clusters'].iloc[0]} weather cells"],
             "selected_tree_replayed": True, "reserved_fold_scored": False,
             "frozen_split_files_identical": True, "input_and_output_hashes_verified": True,
             "descriptive_weather_support": support}
@@ -156,10 +170,14 @@ def verify():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=ROOT / "data/runs/zimbabwe_weather_compact_validation_v1.json")
+    parser.add_argument("--config", type=Path, default=CONFIG)
+    parser.add_argument("--output", type=Path, help="Receipt path; default data/runs/<experiment>-named v1 file")
     args = parser.parse_args()
-    result = verify()
+    version = json.loads(args.config.read_text())["experiment"].rsplit("_", 1)[-1]
+    if args.output is None:
+        args.output = ROOT / f"data/runs/zimbabwe_weather_compact_validation_{version}.json"
+    result = verify(args.config.resolve())
     args.output.write_text(json.dumps(result, indent=2) + "\n")
     pd.DataFrame(result["descriptive_weather_support"]).to_csv(
-        args.output.with_name("zimbabwe_weather_compact_support_v1.csv"), index=False)
+        args.output.with_name(f"zimbabwe_weather_compact_support_{version}.csv"), index=False)
     print(json.dumps(result, indent=2))

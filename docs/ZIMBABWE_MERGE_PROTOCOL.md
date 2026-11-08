@@ -97,3 +97,26 @@ An inner-CV source weight of zero means that fold rejected auxiliary training, n
 
 Sources: [Lacuna provider](https://doi.org/10.5281/zenodo.10060610),
 [2024 source paper](https://arxiv.org/html/2511.12999v1), local provider metadata and the recorded handoff audit.
+
+## v2 amendment (8 November 2026): training rows follow `include_primary`
+
+The v1 run (`configs/zimbabwe_merge_v1.json`) broke a team rule. Its pooled arms trained on all **4,332** screened
+2024 rows, including the **1,874** recorded zeros that `labels_v1` excludes
+(`exclusion_reason = zimbabwe_2024_zero_likely_not_measured`). The register rows "2024 zeros" and "Legacy positive-only
+2024 selection" above describe that v1 choice. The v1 release stays unchanged as a historical record.
+
+`configs/zimbabwe_merge_v2.json` sets `"training_rows": "include_primary"`. Every training pool then holds only rows with
+`labels_v1.include_primary = True`: the same 1,880 Lacuna 2023 rows and **2,458** Zimbabwe 2024 rows. The code stops
+if a fit pool holds another row. When the key is absent, the code keeps the v1 behaviour, so v1 replays still work.
+The full 6,598-row catalog still holds every screened label; `comparison_candidate` marks the rows in this experiment.
+
+The v2 pool holds no zeros. `pooled_positive_sensitivity` and `pooled_zero_weight_sensitivity` would give the same
+model as `pooled_adaptive`, so v2 does not run them, and the code refuses them under `include_primary`.
+Everything else is unchanged: the 1,504 Lacuna 2023 evaluation fields, outer folds 1–4 of `s1_cc2km`, fold 0 never
+fitted or scored, the 2 km source buffer, inner CV, grids, seed, 2,000 bootstrap draws and the December–June window.
+Pooling Lacuna and 2024 in t/ha stays a recorded team exception (`docs/DECISIONS.md`, 7 November).
+No survey date (planting, harvest or crop cut) is a model input or a window anchor: the window is the fixed
+December–June calendar of `labels_v1.season_year`.
+
+Run: `python scripts/step9_compare_zimbabwe_merge.py --config configs/zimbabwe_merge_v2.json`
+(output `data/runs/zimbabwe_merge_v2/`).

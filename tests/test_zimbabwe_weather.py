@@ -10,6 +10,8 @@ from cropyield.experiments.zimbabwe_weather import (
     WeatherTransform,
     make_context,
     predict,
+    release_paths,
+    run_models,
 )
 
 
@@ -54,3 +56,38 @@ def test_zero_source_weight_recovers_target_only_and_weights_normalize_source_si
     duplicated = {**data, **{key:np.concatenate([data[key],data[key]]) for key in ["xs","ys","weights"]}}
     np.testing.assert_allclose(predict(data,"shared",{"alpha":10,"ratio":.3},config),
                                predict(duplicated,"shared",{"alpha":10,"ratio":.3},config),atol=1e-12)
+
+
+def v2_synthetic():
+    rows = pd.DataFrame({"fold": [1, 1, 2, 2, -1], "group_id": ["a", "a", "b", "b", "auxiliary"],
+                         "yield_t_ha": [1., 2., 3., 4., 5.], "domain": ["lacuna"] * 4 + ["zimbabwe_2024"],
+                         "feature_eligible": True, "weather_grid_id": "cell",
+                         "include_primary": [True, True, True, True, False]},
+                        index=["t1", "t2", "t3", "t4", "s1"])
+    membership = pd.DataFrame({"obs_id": ["t3", "t4", "t1", "t2"], "outer_fold": 1, "inner_fold": 0,
+                               "role": ["fit", "fit", "evaluation", "evaluation"]})
+    permission = pd.DataFrame({"obs_id": ["s1"], "outer_fold": [1], "inner_fold": [0],
+                               "minimum_distance_to_protected_km": [5.], "allowed_by_spatial_rule": [True]})
+    return rows, membership, permission
+
+
+def test_v2_weather_fit_pool_rejects_a_source_row_outside_include_primary():
+    rows, membership, permission = v2_synthetic()
+    config = json.loads((CONFIG.parent/"zimbabwe_weather_v2.json").read_text())
+    with pytest.raises(ValueError, match="include_primary"):
+        run_models(rows, {}, membership, permission, config)
+
+
+def test_v2_weather_configs_read_only_v2_releases_and_keep_v1_settings():
+    v1 = json.loads(CONFIG.read_text())
+    v2 = json.loads((CONFIG.parent/"zimbabwe_weather_v2.json").read_text())
+    assert release_paths() == release_paths(v1)  # absent keys keep the v1 releases
+    assert all(path.name.endswith("_v2") for path in [*release_paths(v2).values()][:3])
+    changed = {"experiment", "training_rows", "merge_run", "diagnosis_run", "weather_release"}
+    assert v2["training_rows"] == "include_primary"
+    assert {k: v for k, v in v2.items() if k not in changed} == {k: v for k, v in v1.items() if k not in changed}
+    compact_v1 = json.loads((CONFIG.parent/"zimbabwe_weather_compact_v1.json").read_text())
+    compact_v2 = json.loads((CONFIG.parent/"zimbabwe_weather_compact_v2.json").read_text())
+    assert all(path.name.endswith("_v2") for path in release_paths(compact_v2).values())
+    changed |= {"weather_run"}
+    assert {k: v for k, v in compact_v2.items() if k not in changed} == {k: v for k, v in compact_v1.items() if k not in changed}

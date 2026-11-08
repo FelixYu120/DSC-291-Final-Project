@@ -1,0 +1,124 @@
+{
+  "config": {
+    "fold_roles": {
+      "0": "holdout",
+      "1": "cv",
+      "2": "cv",
+      "3": "cv",
+      "4": "cv"
+    },
+    "minimum_clear_months": 4,
+    "new_models_may_score_test": false,
+    "prediction_setting": "retrospective_full_season_yield_estimation",
+    "primary_split": "s1_cc2km",
+    "release": "zimbabwe_midterm_v2",
+    "robustness_split": "s2_region",
+    "role_scheme": "team: cross-validate over folds 1-4 with pooled out-of-fold scores; fold 0 held back (docs/EVALUATION.md)",
+    "scope": "Zimbabwe Lacuna maize, raw harvest years 2022 and 2023; primary analysis 2023 pure-stand rainfed",
+    "source_doi": "10.5281/zenodo.10060610",
+    "supersedes": "zimbabwe_midterm_v1, whose fold 1 = validation, folds 2-4 = train labels differ from the team protocol",
+    "test_status": "historical_previously_evaluated"
+  },
+  "git_base_commit": "912de10741c50b3b4ae9eb835093cbd702d25a8b",
+  "inputs": {
+    "configs\\team_database_v1.json": "c57a284f6334cc824284c85c327a79a5123b305ae4de818eb099de1ffd257b95",
+    "configs\\zimbabwe_midterm_v2.json": "6a0bb617904b2d9d367760a34a5d87438cd97df04d5799b56fff42e79574faa3",
+    "data\\audit\\zimbabwe_screened_candidates.csv": "b5760d3ea75d3019d06c97f8f77ad4d32b5a796185537fc940fc6aab3bd4d14c",
+    "data\\cropyield.duckdb": "e192b9d6021fdae020f9b08123b98648dc4b5274989635927c709a5607cdcd60",
+    "data\\metadata\\zimbabwe.json": "dac1072632c8818a4c831d45f77a3a3ed34dc7d4564e49197b94ce062f34f175",
+    "data\\processed\\labels_v1.parquet": "49aae383c4489aa98e9e7fe8c31cda6bf1cd752adc8e9540cffdc147a5e0ef92",
+    "data\\raw\\zimbabwe\\Lacuna_Yield_data_geojson-2023.geojson": "0dc4301509072c4306c951d88cf7cc6e0832c46aab921d237341c17bc6bb78cd",
+    "data\\raw\\zimbabwe\\Yield_forecasting _and_Crop_Mask_LACUNA_Technical_Manual.py": "6387ca5c8b7c400ae35cad4859cfc035981abc54cd155b3970b05b59392c7d41",
+    "data\\splits\\manifest.json": "b8abf5e47c59d7e6c93620742de65ca5ba6a332d3a701eedc61a67d2533af53f",
+    "data\\splits\\zimbabwe_lacuna_2022_2023__s1_cc2km.csv": "253f437d30a3742779e164c6b30fda5d613d5fe38decccf2b45ce21d95288dff",
+    "data\\splits\\zimbabwe_lacuna_2022_2023__s2_region.csv": "da357af13e1fa78d55c812211fc9948d425673dff0426be4d20a396aed827252",
+    "docs\\DECISIONS.md": "ea4d9d718bcdbf1bfcee7b4063495a617232f92a3bc54bdd28f41ea6e9dac9d1",
+    "docs\\EVALUATION.md": "e540590667ecb2b9c762dcc160f85a0580c6cfaafbeb082f3122be81268b16e4",
+    "docs\\ZIMBABWE_DATA_HANDOFF.md": "534726e9d3d5c34ce7ffd065204d414050cee4cdb53901f8036b9a0114adc321",
+    "pyproject.toml": "78f0c7a739c60341ebb5f4cd40c0246089c982c238e70f306c4b221b53eb4925",
+    "requirements.txt": "758d3b0fe92e4efa02aa1f9e5d67f18aacb868c8df2a13d09b1880cc1ee5a061",
+    "scripts\\step8_build_zimbabwe_handoff.py": "5fc384cdb09e43f0b483711f6b34744d2eb9ed63d22fe17c1484055026e8e2ae",
+    "src\\cropyield\\data\\handoff.py": "070fcfb23db4167374ad40f88bf76ef2b400aff546f4190422e6836cd8231b77",
+    "src\\cropyield\\data\\xy.py": "41743292fd48c3df77d08a616aa5d20ef6c8bb4a618c5e6f28dc6cd083f69048",
+    "src\\cropyield\\eval\\splits.py": "138dd5cd18abb26da00f6cb6fb1c2615a46e0ee0f8cb7ad91b3f98abde789a85"
+  },
+  "outputs": {
+    "README.md": {
+      "bytes": 18026,
+      "sha256": "0a1cedd65cbfc4511381f06f4eaa08a0994b0e1a0c7c416a745ee5ffba4d6b5a"
+    },
+    "audit_report.md": {
+      "bytes": 6355,
+      "sha256": "5cdfb34c6fe512e9037ba080c9d0236dcdd7248c3aba361dd4cd12e2ec285777"
+    },
+    "audit_summary.json": {
+      "bytes": 2933,
+      "sha256": "52e470fdb57ae6b9329a15fe59980587897568e63366c5d242f213a4368e2860"
+    },
+    "cleaned_labels.csv": {
+      "bytes": 1070628,
+      "sha256": "9a5ae12535f99630f2e97a2c33a623bbeb67ee74ff83f81ceac48b9d4fe048cc"
+    },
+    "cleaned_labels.parquet": {
+      "bytes": 280933,
+      "sha256": "4264b695b26c964971833d91c3b68f1ef0ef4439edca04f616cbdb3b20d47c19"
+    },
+    "data_dictionary.csv": {
+      "bytes": 13133,
+      "sha256": "65fc03a1eb8fde05eeb076fe533bb2a8f4b378740da4848a2687b76f6823ef90"
+    },
+    "data_overview.png": {
+      "bytes": 154925,
+      "sha256": "76408f9fa86bee81dd2a0e4ffad487ac7b952a0ed803c66eeec6bac96d83da11"
+    },
+    "feature_quality.csv": {
+      "bytes": 2987,
+      "sha256": "97f5955ce74e749edcf7af12f62306e38efee60503dde4431191d8e615751312"
+    },
+    "label_summary.csv": {
+      "bytes": 269,
+      "sha256": "8199ab9a8c2327bb94e28143a7a0ff58a6df3e90c60689f05a0b667c55dc119b"
+    },
+    "model_table.csv": {
+      "bytes": 375238,
+      "sha256": "27c773e0a49125ad60f494ac07f913d2852d25fa49c4d38742b115fe27f07679"
+    },
+    "model_table.parquet": {
+      "bytes": 265158,
+      "sha256": "71da29deb2654c4f00d84c8f5be5e0339db87632acba2d3274c281c6541cab92"
+    },
+    "monthly_coverage.csv": {
+      "bytes": 281,
+      "sha256": "a105b2572475e04d0e4ff955470eb0fbf3944499cab133abb4609975f55604be"
+    },
+    "monthly_features.csv": {
+      "bytes": 4093066,
+      "sha256": "78ad58f4d4ec3964ed809ab592fcc6c585769b2a6fb418885c973fb67d56fe1a"
+    },
+    "monthly_features.parquet": {
+      "bytes": 1439319,
+      "sha256": "50ce7def70da947075e1f5c01ecd95be5adfc28fc177ac3d66501c20823fa7b8"
+    },
+    "row_audit.csv": {
+      "bytes": 717503,
+      "sha256": "d72d2dbf33c62d33c6f52f862920ea6da5773e5f2e33d8113b98a2ddad37167f"
+    },
+    "split_s1_cc2km.csv": {
+      "bytes": 189410,
+      "sha256": "86d3c113a5a5478ad78e1cbcb1652be8cdf9a73f30632af1ce85df4a1eaa8bb0"
+    },
+    "split_s2_region.csv": {
+      "bytes": 199553,
+      "sha256": "3fb09e8d18053b74110edcbd0e8ea84aaf57df3e79ca054773b62464ea15f02a"
+    }
+  },
+  "python": "3.12.10",
+  "versions": {
+    "duckdb": "1.5.5",
+    "matplotlib": "3.11.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "scipy": "1.18.1"
+  }
+}

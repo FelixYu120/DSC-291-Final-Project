@@ -1,5 +1,32 @@
 # Broader Zimbabwe training populations: fixed protocol
 
+## v2 amendment: team rules (8 November 2026, before any v2 score)
+
+The v1 release (`configs/zimbabwe_multiyear_v1.json`) broke two team rules. It stays published and unchanged.
+`configs/zimbabwe_multiyear_v2.json` fixes both and writes `data/runs/zimbabwe_multiyear_v2/`.
+
+1. **Label-free windows (`window_anchor: calendar`).** v1's prespecified comparison used the crop-date window
+   `v1_preharvest_mean`, anchored on each Lacuna field's survey planting and harvest dates. That window also entered the
+   shared eligibility rule, so survey dates could remove training rows. In v2 the crop-date variant is not a feature set,
+   so dates touch neither predictors nor eligibility. The prespecified comparison becomes ten-band **calendar V1**
+   (December 1 <= acquisition < April 1) full-Zimbabwe minus all-Lacuna.
+2. **Training rows follow `labels_v1.include_primary` (`training_rows: include_primary`).** v1 all-Lacuna added 217
+   non-primary 2023 Lacuna rows (212 intercropped, 5 irrigated); v1 full-Zimbabwe also added all 4,330 imagery-eligible
+   2024 rows, including the 1,874 recorded zeros (`zimbabwe_2024_zero_likely_not_measured`). In v2 every pool is
+   include_primary rows only: no extra Lacuna rows and 2,456 Zimbabwe 2024 rows. The 169 Lacuna 2022 rows are excluded
+   both by imagery and by `dropped_year_2022_imagery_gap`. Every fit asserts that its rows are include_primary.
+
+Consequence, stated before fitting: all-Lacuna now uses exactly the step 14 Lacuna-only rows, and full-Zimbabwe exactly the
+step 14 v2 merged rows. The controls come from `data/runs/zimbabwe_aggregation_v2/` (`controls_release`). The 22 new arms
+are still fitted, then compared with their step 14 twin; an arm whose predictions differ by at most 1e-9 t/ha is marked
+`identical_to` in `arm_identity.csv` and `method_metadata.csv`. It is not presented as new evidence.
+
+Unchanged: the 1,504 evaluation fields, outer folds 1–4 of `s1_cc2km`, fold 0 never fitted or scored, inner folds, the
+2 km buffer, the four-month imagery rule, no imputation, grids, seed 20261107 and 2,000 bootstrap draws. Lacuna + 2024
+pooling in t/ha remains the recorded team exception (`docs/DECISIONS.md`, 7 November).
+
+The sections below are the original v1 protocol.
+
 This protocol is written before fitting the step 15 models. The question is whether more eligible Lacuna observations, and then Zimbabwe 2024 observations, improve prediction on the same 1,504 primary Lacuna 2023 development fields used in step 14. This is an exploratory comparison on previously used development folds, not a new blind test. Fold 0 (376 fields) remains reserved and contributes neither fitting nor scoring outcomes.
 
 ## Requested populations and actual imagery support

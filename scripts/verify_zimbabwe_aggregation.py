@@ -1,8 +1,16 @@
-"""Independently verify the released V0–V3 aggregates, splits, scores and primary interval."""
+"""Independently verify the released V0–V3 aggregates, splits, scores and primary interval.
+
+Works for v1 and for the team-rule v2 release (``window_anchor: calendar``, ``training_rows:
+include_primary``). Under v2 it also checks, without experiment code, that no feature uses a crop
+date and that every permitted 2024 training row is ``labels_v1.include_primary``.
+Recorded code/doc/config inputs that differ in the working tree are accepted only when the same
+bytes exist in Git history at a commit that recorded this release (or differ only by CRLF checkout).
+"""
 
 import argparse
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 import numpy as np
@@ -29,8 +37,47 @@ def sha(p):
     return h.hexdigest()
 
 
+anchor = config.get("window_anchor", "crop_dates")
+rule = config.get("training_rows", "all_screened")
+assert anchor in {"crop_dates", "calendar"} and rule in {"all_screened", "include_primary"}
+all_variants = ["v0_mean", "v1_preharvest_mean", "v1_calendar_mean", "v2_max", "v3_median", "v3_mode"]
+variants = config.get("variants", all_variants)
+if anchor == "calendar":
+    assert "v1_preharvest_mean" not in variants
+    assert "preharvest" not in config["primary_method"] + config["primary_reference"]
+
+
+def release_commits(release):
+    try:
+        relative = (release / "manifest.json").relative_to(root).as_posix()
+        return subprocess.run(["git", "-C", str(root), "log", "--all", "--format=%H", "--", relative],
+                              capture_output=True, text=True, check=True).stdout.split()
+    except (ValueError, OSError, subprocess.CalledProcessError):
+        return []
+
+
+def input_source(name, expected, commits):
+    """Where the recorded input bytes were found; data files must match the working tree."""
+    path = root / name
+    if path.is_file() and sha(path) == expected:
+        return "working_tree"
+    if name.startswith("data/"):
+        return None
+    if path.is_file() and hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest() == expected:
+        return "working_tree_crlf_checkout"
+    for commit in commits:
+        blob = subprocess.run(["git", "-C", str(root), "show", f"{commit}:{name}"], capture_output=True)
+        if blob.returncode == 0 and hashlib.sha256(blob.stdout).hexdigest() == expected:
+            return "recorded_git_history"
+    return None
+
+
+commits = release_commits(out)
+input_sources = {}
 for name, value in manifest["inputs"].items():
-    assert sha(root / name) == value, ("input", name)
+    found = input_source(name, value, commits)
+    assert found is not None, ("input", name)
+    input_sources[found] = input_sources.get(found, 0) + 1
 for name, value in manifest["outputs"].items():
     assert sha(out / name) == value["sha256"], ("output", name)
 for name in ["target_memberships.csv", "source_spatial_permissions.csv"]:
@@ -60,10 +107,12 @@ for method, p in pred.groupby("method"):
         atol=1e-9,
     )
 legacy = pd.read_csv(prior / "predictions.csv", dtype={"group_id": str})
+# The step 9 pooled control trained on 2024 zeros; under include_primary only the
+# Lacuna-only control is a reproduction of saved predictions.
 for old, new in [
     ("lacuna_only", "legacy_indices_mean_max_target"),
     ("pooled_adaptive", "legacy_indices_mean_max_merged"),
-]:
+][: 2 if rule == "all_screened" else 1]:
     a = legacy[legacy.method.eq(old)].set_index("obs_id").sort_index()
     b = pred[pred.method.eq(new)].set_index("obs_id").sort_index()
     assert a.index.equals(b.index)
@@ -96,8 +145,9 @@ dictionary = json.loads((out / "feature_dictionary.json").read_text())
 bands = ["b02", "b03", "b04", "b05", "b06", "b07", "b08", "b8a", "b11", "b12"]
 indices = ["ndvi", "gcvi", "mtci", "ndvi705", "ndvi740"]
 cols = bands + indices
+# Under the calendar rule the reconstruction never reads a crop date.
 m = monthly.merge(
-    obs[["season_year", "plant_date", "harvest_date"]],
+    obs[["season_year", "plant_date", "harvest_date"] if anchor == "crop_dates" else ["season_year"]],
     left_on="obs_id",
     right_index=True,
     validate="many_to_one",
@@ -108,19 +158,27 @@ end = pd.to_datetime(m.season_year.astype(str) + "-07-01")
 cut = pd.to_datetime(
     m.season_year.astype(str) + "-" + config["calendar_cutoff_month_day"]
 )
-plant = pd.to_datetime(m.plant_date)
-harvest = pd.to_datetime(m.harvest_date)
 valid = ~m.missing & m.acquired.ge(start) & m.acquired.lt(end)
-lower = plant.where(plant.notna() & plant.gt(start), start)
-upper = harvest.fillna(cut)
 scopes = {
     "v0_mean": valid,
     "v2_max": valid,
     "v3_median": valid,
-    "v1_preharvest_mean": valid & m.acquired.ge(lower) & m.acquired.lt(upper),
     "v1_calendar_mean": valid & m.acquired.lt(cut),
 }
+if anchor == "crop_dates":
+    plant = pd.to_datetime(m.plant_date)
+    harvest = pd.to_datetime(m.harvest_date)
+    lower = plant.where(plant.notna() & plant.gt(start), start)
+    upper = harvest.fillna(cut)
+    scopes["v1_preharvest_mean"] = valid & m.acquired.ge(lower) & m.acquired.lt(upper)
+expected_sets = {f"{family}_{variant}" for family in ["bands", "indices"] for variant in variants}
+assert set(dictionary) == expected_sets | {"legacy_indices_mean_max"}, sorted(dictionary)
+assert set(pred.method) == {f"{name}_{training}" for name in dictionary for training in ["target", "merged"]}
+if anchor == "calendar":
+    assert not any("preharvest" in name for name in list(dictionary) + list(pred.method))
 for variant, mask in scopes.items():
+    if variant not in variants:
+        continue
     stat = (
         "max" if variant == "v2_max" else "median" if variant == "v3_median" else "mean"
     )
@@ -156,7 +214,7 @@ def independent_mode(values):
 
 
 agg = m[valid].groupby("obs_id")[cols].agg(independent_mode).reindex(wide.index)
-for family, variables in [("bands", bands), ("indices", indices)]:
+for family, variables in [("bands", bands), ("indices", indices)] if "v3_mode" in variants else []:
     np.testing.assert_allclose(
         wide[dictionary[family + "_v3_mode"]].to_numpy(),
         agg[variables].to_numpy(),
@@ -167,6 +225,23 @@ for family, variables in [("bands", bands), ("indices", indices)]:
 # Check selected source counts against the original permission table.
 select = pd.read_csv(out / "selected_parameters.csv")
 perm = pd.read_csv(out / "source_spatial_permissions.csv")
+training_rows = {"rule": rule}
+if rule == "include_primary":
+    # Read the team flag straight from the frozen labels, not from the release.
+    labels = pd.read_parquet(root / "data/processed/labels_v1.parquet").set_index("obs_id")
+    primary_flag = labels.include_primary.reindex(obs.index).fillna(False).astype(bool)
+    pool = obs.index[obs.domain.eq("zimbabwe_2024") & obs.feature_eligible.astype(bool) & primary_flag]
+    dropped = obs.index[obs.domain.eq("zimbabwe_2024") & obs.feature_eligible.astype(bool) & ~primary_flag]
+    assert primary_flag.loc[obs.domain.eq("lacuna")].all()
+    assert len(pool) == 2456 and len(dropped) == 1874
+    assert set(labels.loc[dropped, "exclusion_reason"]) == {"zimbabwe_2024_zero_likely_not_measured"}
+    assert obs.loc[dropped, "yield_t_ha"].eq(0).all()
+    audit_rows = pd.read_csv(out / "training_rows_audit.csv").set_index("obs_id").loc[obs.index]
+    assert np.array_equal(audit_rows.training_pool.astype(bool), obs.index.isin(pool) | obs.domain.eq("lacuna"))
+    assert np.array_equal(audit_rows.include_primary.astype(bool), primary_flag)
+    perm = perm[perm.obs_id.isin(pool)]
+    training_rows.update({"source_training_pool": len(pool), "source_excluded_zero_rows": len(dropped),
+                          "lacuna_rows_all_include_primary": True})
 allows = (
     perm[perm.inner_fold.eq(0) & perm.allowed_by_spatial_rule]
     .groupby("outer_fold")
@@ -183,11 +258,15 @@ result = {
     "primary_delta_rmse": float(primary.delta_rmse_t_ha),
     "primary_ci_independent": ci.tolist(),
     "input_hashes": len(manifest["inputs"]),
+    "input_sources": input_sources,
+    "window_anchor": anchor,
+    "training_rows": training_rows,
     "output_hashes": len(manifest["outputs"]),
-    "feature_reconstruction": "all six variants for all6212 candidates and all15 variables",
+    "feature_reconstruction": f"all {len(variants)} model variants for all 6212 candidates and all 15 variables"
+    + ("; no crop date read" if anchor == "calendar" else ""),
     "mode": "separate recursive implementation",
     "membership_and_permissions": "byte-identical to original",
-    "original_control_predictions": "exact within1e-12",
+    "original_control_predictions": "exact within 1e-12" + ("" if rule == "all_screened" else " (Lacuna-only control)"),
     "source_usage_by_method": select.groupby("method")
     .source_used.apply(list)
     .to_dict(),

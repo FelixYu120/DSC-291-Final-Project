@@ -1,0 +1,59 @@
+{
+  "status": "passed",
+  "training_rows": "include_primary",
+  "training_pool_rows_checked": 3912,
+  "arms": 19,
+  "evaluation_fields_per_arm": 1504,
+  "compact_feature_rows": 4338,
+  "new_weather_values_reconstructed": 8676,
+  "old_controls_unchanged": 9,
+  "selected_models_checked": 40,
+  "accounting_records_checked": 160,
+  "intervals_replayed": 52,
+  "bootstrap_units": [
+    "232 spatial groups",
+    "30 weather cells"
+  ],
+  "selected_tree_replayed": true,
+  "reserved_fold_scored": false,
+  "frozen_split_files_identical": true,
+  "input_and_output_hashes_verified": true,
+  "descriptive_weather_support": [
+    {
+      "feature": "wx_rain_percent_normal_jan_mar",
+      "target_min": 80.12800972266227,
+      "target_max": 168.42316953196766,
+      "source_min": 30.10846215055665,
+      "source_max": 135.77538882185857,
+      "source_rows_outside_target_range": 1983,
+      "eligible_source_rows": 2456
+    },
+    {
+      "feature": "wx_t2m_anomaly_c_jan_mar",
+      "target_min": -1.2077777777777774,
+      "target_max": -0.006207407407407138,
+      "source_min": 0.08201831501831534,
+      "source_max": 2.37201098901099,
+      "source_rows_outside_target_range": 2456,
+      "eligible_source_rows": 2456
+    },
+    {
+      "feature": "wx_rain_percent_normal_oct_dec",
+      "target_min": 61.91707787028181,
+      "target_max": 123.69357226506396,
+      "source_min": 60.45321689665768,
+      "source_max": 245.3062214216433,
+      "source_rows_outside_target_range": 1131,
+      "eligible_source_rows": 2456
+    },
+    {
+      "feature": "wx_t2m_anomaly_c_oct_dec",
+      "target_min": -0.920398550724639,
+      "target_max": 0.32939492753623134,
+      "source_min": -0.02112681159420277,
+      "source_max": 1.7972717391304354,
+      "source_rows_outside_target_range": 2065,
+      "eligible_source_rows": 2456
+    }
+  ]
+}

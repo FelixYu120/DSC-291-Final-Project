@@ -30,11 +30,24 @@ BANDS = ["b02", "b03", "b04", "b05", "b06", "b07", "b08", "b8a", "b11", "b12"]
 INDICES = ["ndvi", "gcvi", "mtci", "ndvi705", "ndvi740"]
 DEFAULT_OUTPUT = ROOT / "data/processed/zimbabwe_midterm_v1"
 CONFIG = ROOT / "configs/zimbabwe_midterm_v1.json"
+TEAM_OUTPUT = ROOT / "data/processed/zimbabwe_midterm_v2"
+TEAM_CONFIG = ROOT / "configs/zimbabwe_midterm_v2.json"
+# Fold roles. The legacy scheme of release v1 names fold 1 "validation" and folds 2-4 "train". The team rule
+# (docs/EVALUATION.md) cross-validates over folds 1-4 and holds fold 0 back; release v2 records that scheme.
+LEGACY_ROLES = {"0": "test", "1": "validation", "2": "train", "3": "train", "4": "train"}
+TEAM_ROLES = {"0": "holdout", "1": "cv", "2": "cv", "3": "cv", "4": "cv"}
+RESTRICTED_PARTITIONS = {"test", "holdout"}
 
 
 def require(condition: bool, message: str) -> None:
     if not condition:
         raise ValueError(message)
+
+
+def partition_order(roles: dict) -> list[str]:
+    """The partitions of one of the two allowed role schemes, in reporting order."""
+    require(roles in (LEGACY_ROLES, TEAM_ROLES), "Changing role assignment requires a separately reviewed protocol")
+    return ["train", "validation", "test"] if roles == LEGACY_ROLES else ["cv", "holdout"]
 
 
 def read_raw(path: Path) -> tuple[pd.DataFrame, dict]:
@@ -128,7 +141,7 @@ def reconcile_labels(raw: pd.DataFrame, labels: pd.DataFrame) -> pd.DataFrame:
 
 
 def explicit_split(split: pd.DataFrame, labels: pd.DataFrame, roles: dict, family: str) -> tuple[pd.DataFrame, dict]:
-    """Keep immutable fold membership and label its use in one train/validation/test run."""
+    """Keep immutable fold membership and label each fold's use: legacy train/validation/test or team cv/holdout."""
     require(split.obs_id.is_unique, f"{family}: duplicate split ID")
     require(set(split.obs_id) == set(labels.obs_id), f"{family}: split coverage differs from primary labels")
     require(split.family.eq(family).all() and split["repeat"].eq(0).all(), f"{family}: unexpected family/repeat")
@@ -136,7 +149,8 @@ def explicit_split(split: pd.DataFrame, labels: pd.DataFrame, roles: dict, famil
     table = split.copy()
     table["partition"] = table.fold.astype(str).map(roles)
     require(table.partition.notna().all(), f"{family}: unknown fold")
-    require(set(table.partition) == {"train", "validation", "test"}, f"{family}: an empty partition")
+    order = partition_order(roles)
+    require(set(table.partition) == set(order), f"{family}: an empty partition")
     require(table.groupby("group_id").partition.nunique().max() == 1, f"{family}: split group leakage")
     where = table.merge(labels[["obs_id", "lat", "lon", "admin_unit", "season_year"]],
                         on="obs_id", validate="one_to_one", suffixes=("", "_label"))
@@ -148,11 +162,16 @@ def explicit_split(split: pd.DataFrame, labels: pd.DataFrame, roles: dict, famil
         require(where.groupby("admin_unit").partition.nunique().max() == 1, "Admin1 crosses partitions")
     xyz = unit_xyz(where.lat.to_numpy(), where.lon.to_numpy())
     distances = {}
-    for left, right in itertools.combinations(["train", "validation", "test"], 2):
-        a, b = xyz[where.partition.eq(left)], xyz[where.partition.eq(right)]
+    pairs = [("partition", left, right) for left, right in itertools.combinations(order, 2)]
+    if roles == TEAM_ROLES:  # the cross-validation folds must also be 2 km apart from each other
+        folds = sorted(where.fold.astype(str).unique())
+        pairs += [("fold", left, right) for left, right in itertools.combinations(folds, 2)]
+    for column, left, right in pairs:
+        a, b = xyz[where[column].astype(str).eq(left)], xyz[where[column].astype(str).eq(right)]
         chord = cKDTree(b).query(a)[0].min()
         distance = 2 * EARTH_RADIUS_KM * np.arcsin(np.clip(chord / (2 * EARTH_RADIUS_KM), 0, 1))
-        distances[f"{left}_to_{right}"] = float(distance)
+        name = f"{left}_to_{right}" if column == "partition" else f"fold{left}_to_fold{right}"
+        distances[name] = float(distance)
         if family == "s1_cc2km":
             require(distance >= 2 - 1e-8, f"{family}: {left}/{right} separation below 2 km")
     summary = {"rows": table.partition.value_counts().sort_index().to_dict(),
@@ -270,10 +289,13 @@ def write_overview(path: Path, summary: dict, labels: pd.DataFrame, split: pd.Da
     axes[1].set(ylabel="Primary fields", title="Monthly satellite coverage", ylim=(0, bottom.max() * 1.16))
     axes[1].legend(frameon=False, fontsize=9, loc="upper center", ncol=3)
     points = split.merge(labels[["obs_id", "lat", "lon"]], on="obs_id", validate="one_to_one")
-    for part, color, marker in [("train", "#2176ae", "."), ("validation", "#eea236", "+"), ("test", "#b2425b", "x")]:
+    styles = {"train": ("#2176ae", ".", "train"), "validation": ("#eea236", "+", "validation"),
+              "test": ("#b2425b", "x", "test (historical)"), "cv": ("#2176ae", ".", "cross-validation, folds 1–4"),
+              "holdout": ("#b2425b", "x", "fold 0, held back")}
+    for part, (color, marker, label) in styles.items():
         group = points[points.partition.eq(part)]
-        axes[2].scatter(group.lon, group.lat, s=13, c=color, marker=marker, alpha=.7,
-                        label=part + (" (historical)" if part == "test" else ""))
+        if len(group):
+            axes[2].scatter(group.lon, group.lat, s=13, c=color, marker=marker, alpha=.7, label=label)
     axes[2].set(xlabel="Longitude (degrees)", ylabel="Latitude (degrees)", title="Primary split: field coordinates")
     axes[2].legend(frameon=False, fontsize=9)
     fig.suptitle("Zimbabwe Lacuna data audit — November 7, 2026", fontsize=14)
@@ -283,12 +305,46 @@ def write_overview(path: Path, summary: dict, labels: pd.DataFrame, split: pd.Da
 
 def write_report(path: Path, summary: dict, config: dict) -> None:
     s = summary
+    order = partition_order(config["fold_roles"])
+    legacy = config["fold_roles"] == LEGACY_ROLES
     split_lines = []
     for name, info in s["splits"].items():
         counts = info["rows"]
         distances = info["minimum_distance_km"]
-        split_lines.append(f"| {name} | {counts['train']} | {counts['validation']} | {counts['test']} | "
+        split_lines.append(f"| {name} | " + " | ".join(str(counts[part]) for part in order) + " | "
                            f"{min(distances.values()):.3f} |")
+    pair_check = ("Primary split train/validation/test pairs are separated by at least 2 km." if legacy else
+                  "In the primary split every pair of folds is separated by at least 2 km.")
+    table = chr(10).join(split_lines)
+    if legacy:
+        partitions = f"""Existing fold 0 → test; fold 1 → validation; folds 2–4 → train. No frozen assignment is changed.
+
+| Family | Train | Validation | Test | Minimum across partition pairs (km) |
+|---|---:|---:|---:|---:|
+{table}
+
+`s1_cc2km` is the primary new-location comparison. `s2_region` is the Admin1 holdout sensitivity analysis; it does not promise 2 km separation.
+Fit clipping, imputation, scaling and hyperparameters on training data only. Use grouped internal CV or the validation partition for tuning.
+Monthly rows inherit their field's partition; never randomly split observation-month rows.
+
+**Evaluation history:** test is a historical, previously evaluated partition, not an untouched prospective holdout.
+The November 1 decision permits no new model arm to score fold 0 in any family. This release preserves that restriction and trains no models.
+New models can develop on training/validation data; a genuinely fresh confirmation needs new unexamined observations or an explicitly revised protocol."""
+    else:
+        partitions = f"""Folds 1–4 → cv; fold 0 → holdout. This is the team protocol (`docs/EVALUATION.md`): cross-validate over folds 1–4
+(fit on three folds, predict the fourth) and score the pooled out-of-fold predictions; fold 0 is held back. No frozen
+assignment is changed; `fold` keeps the original fold number.
+
+| Family | Cross-validation (folds 1–4) | Held back (fold 0) | Minimum across fold pairs (km) |
+|---|---:|---:|---:|
+{table}
+
+`s1_cc2km` is the primary new-location comparison. `s2_region` is the Admin1 holdout sensitivity analysis; it does not promise 2 km separation.
+Fit clipping, imputation, scaling and hyperparameters on the training folds only, with grouped inner CV.
+Monthly rows inherit their field's partition and fold; never randomly split observation-month rows.
+
+**Evaluation history:** R0, R1, R2 and A1 were already scored on fold 0 (owner ruling, 1 Nov 2026). No new model arm
+scores fold 0 in any family, except one pre-registered final test. This release trains no models."""
     text = f"""# Zimbabwe Lacuna data audit
 
 Generated by `python scripts/step8_build_zimbabwe_handoff.py`, release `{config['release']}`.
@@ -318,7 +374,7 @@ The filename contains 2022–2023; the delivered primary model population is 202
 - Database yields and inclusion flags match the label file; observed-month counts match the monthly table.
 - Missing months contain missing reflectance, rather than fabricated zeros. Observed reflectance and model features are finite.
 - Split membership covers every primary observation exactly once, and keeps each splitting group whole.
-- No pair within 10 m crosses partitions. Primary split train/validation/test pairs are separated by at least 2 km.
+- No pair within 10 m crosses partitions. {pair_check}
 
 ## Yield and source limitations
 
@@ -346,19 +402,7 @@ Dry weight, wet weight, reported yield and crop-condition labels are audit field
 
 ## Explicit partitions
 
-Existing fold 0 → test; fold 1 → validation; folds 2–4 → train. No frozen assignment is changed.
-
-| Family | Train | Validation | Test | Minimum across partition pairs (km) |
-|---|---:|---:|---:|---:|
-{chr(10).join(split_lines)}
-
-`s1_cc2km` is the primary new-location comparison. `s2_region` is the Admin1 holdout sensitivity analysis; it does not promise 2 km separation.
-Fit clipping, imputation, scaling and hyperparameters on training data only. Use grouped internal CV or the validation partition for tuning.
-Monthly rows inherit their field's partition; never randomly split observation-month rows.
-
-**Evaluation history:** test is a historical, previously evaluated partition, not an untouched prospective holdout.
-The November 1 decision permits no new model arm to score fold 0 in any family. This release preserves that restriction and trains no models.
-New models can develop on training/validation data; a genuinely fresh confirmation needs new unexamined observations or an explicitly revised protocol.
+{partitions}
 
 ## Reproducibility and handoff
 
@@ -377,7 +421,7 @@ Sources: [PULA / Lacuna release](https://doi.org/10.5281/zenodo.10060610), its l
     path.write_text(text, encoding="utf-8")
 
 
-def write_dictionary(path: Path, tables: dict[str, pd.DataFrame]) -> None:
+def write_dictionary(path: Path, tables: dict[str, pd.DataFrame], roles: dict = LEGACY_ROLES) -> None:
     descriptions = {
         "obs_id": "Stable field-season key; join tables using this, never row order",
         "source_id": "Provider Case_ID; no verified longitudinal farm identifier",
@@ -447,7 +491,8 @@ def write_dictionary(path: Path, tables: dict[str, pd.DataFrame]) -> None:
         "group_id": "Actual grouping used by this frozen split; keep whole in all partitions",
         "cluster_id": "Legacy cluster identifier copied into original split; group_id is authoritative",
         "fold": "Original immutable fold number 0–4",
-        "partition": "train (folds 2–4), validation (fold 1), historical restricted test (fold 0)",
+        "partition": ("train (folds 2–4), validation (fold 1), historical restricted test (fold 0)" if roles == LEGACY_ROLES
+                      else "cv (folds 1–4, cross-validated, pooled out-of-fold scores) or holdout (fold 0, held back)"),
         "repeat": "Zero for these spatial split families",
         "family": "s1_cc2km or s2_region; separate evaluation questions",
         "dataset": "zimbabwe, the provider/audit dataset key",
@@ -492,8 +537,7 @@ def build_handoff(output: Path = DEFAULT_OUTPUT, database: Path | None = None,
                   root: Path = ROOT, config_path: Path = CONFIG) -> dict:
     database = database or root / "data/cropyield.duckdb"
     config = json.loads(config_path.read_text())
-    require(config["fold_roles"] == {"0": "test", "1": "validation", "2": "train", "3": "train", "4": "train"},
-            "Changing role assignment requires a separately reviewed protocol")
+    partition_order(config["fold_roles"])  # only the legacy or the team role scheme
     require(config["new_models_may_score_test"] is False, "Historical test restrictions cannot be removed by config")
     verify_inputs(root, database)
     before = input_hashes(root, database, config_path)
@@ -557,11 +601,11 @@ def build_handoff(output: Path = DEFAULT_OUTPUT, database: Path | None = None,
                                     **dict(zip(["min", "p01", "median", "p99", "max"], q))))
         csv_write(pd.DataFrame(quality), staged / "feature_quality.csv")
         handbook = (root / "docs/ZIMBABWE_DATA_HANDOFF.md").read_text(encoding="utf-8")
-        handbook = handbook.replace("../data/processed/zimbabwe_midterm_v1/", "./")
+        handbook = handbook.replace(f"../data/processed/{config['release']}/", "./")
         (staged / "README.md").write_text(handbook, encoding="utf-8")
         json_write(summary, staged / "audit_summary.json")
         write_report(staged / "audit_report.md", summary, config)
-        write_dictionary(staged / "data_dictionary.csv", tables)
+        write_dictionary(staged / "data_dictionary.csv", tables, config["fold_roles"])
         write_overview(staged / "data_overview.png", summary, primary, splits["s1_cc2km"], coverage)
         after = input_hashes(root, database, config_path)
         require(before == after, "An input changed while building; release not published")
@@ -582,9 +626,10 @@ def load_handoff(output: Path = DEFAULT_OUTPUT, partition: str = "train", family
     Test access is explicit because these fields have already been evaluated.
     The override is for reproducing permitted historical baselines, not new arms.
     """
-    require(partition in {"train", "validation", "test"}, "Unknown partition")
+    require(partition in {"train", "validation", "test", "cv", "holdout"}, "Unknown partition")
     require(family in {"s1_cc2km", "s2_region"}, "Unknown split family")
-    require(partition != "test" or allow_historical_test, "Historical test is restricted; new arms must not score it")
+    require(partition not in RESTRICTED_PARTITIONS or allow_historical_test,
+            "Fold 0 (test or holdout) is restricted; new arms must not score it")
     manifest = json.loads((output / "manifest.json").read_text())
     for name in ["model_table.parquet", f"split_{family}.csv"]:
         require(sha256(output / name) == manifest["outputs"][name]["sha256"], f"Release hash mismatch: {name}")

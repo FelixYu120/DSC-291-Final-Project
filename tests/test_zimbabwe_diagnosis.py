@@ -11,6 +11,7 @@ from cropyield.experiments.zimbabwe_diagnosis import (
     choose_target_groups,
     make_context,
     predict,
+    run_target_models,
     source_mask,
 )
 from cropyield.experiments.zimbabwe_merge import predict_model
@@ -106,3 +107,34 @@ def test_new_unweighted_adaptation_reproduces_previous_model(synthetic, config):
     old = predict_model(data, "pooled_adaptive", {"alpha": 10., "source_ratio": .3},
                         {**config, "zero_sensitivity_weight": .25})
     np.testing.assert_allclose(new, old, atol=1e-12)
+
+
+V2 = CONFIG.parent / "zimbabwe_transfer_diagnosis_v2.json"
+
+
+def test_v2_diagnosis_reads_the_v2_merge_and_keeps_every_other_setting(config):
+    v2 = json.loads(V2.read_text())
+    assert v2["training_rows"] == "include_primary" and v2["merge_run"] == "data/runs/zimbabwe_merge_v2"
+    changed = {"experiment", "training_rows", "merge_run"}
+    assert {k: v for k, v in v2.items() if k not in changed} == {k: v for k, v in config.items() if k not in changed}
+
+
+def test_v2_fit_pool_rejects_a_source_row_outside_include_primary():
+    rows = pd.DataFrame({"fold": [1, 1, 2, 2, -1], "group_id": ["a", "a", "b", "b", "auxiliary"],
+                         "yield_t_ha": [1., 2., 3., 4., 5.], "domain": ["lacuna"] * 4 + ["zimbabwe_2024"],
+                         "include_primary": [True, True, True, True, False]},
+                        index=["t1", "t2", "t3", "t4", "s1"])
+    membership = pd.DataFrame({"obs_id": ["t3", "t4", "t1", "t2"], "outer_fold": 1, "inner_fold": 0,
+                               "role": ["fit", "fit", "evaluation", "evaluation"]})
+    permission = pd.DataFrame({"obs_id": ["s1"], "outer_fold": [1], "inner_fold": [0],
+                               "minimum_distance_to_protected_km": [5.], "allowed_by_spatial_rule": [True]})
+    with pytest.raises(ValueError, match="include_primary"):
+        run_target_models(rows, {}, membership, permission, json.loads(V2.read_text()))
+
+
+def test_matched_subsets_still_work_when_the_source_has_no_zeros():
+    source = pd.DataFrame({"yield_t_ha": [1., 2., 3., 4., 5., 6.],
+                           "quality_subset": [True, False, True, False, True, False]})
+    for seed in [606, 707, 808]:
+        random = source[source_mask(source, "matched", seed)]
+        assert len(random) == 3 and random.yield_t_ha.gt(0).all()

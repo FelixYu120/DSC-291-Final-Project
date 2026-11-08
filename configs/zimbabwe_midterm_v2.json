@@ -1,0 +1,20 @@
+{
+  "release": "zimbabwe_midterm_v2",
+  "scope": "Zimbabwe Lacuna maize, raw harvest years 2022 and 2023; primary analysis 2023 pure-stand rainfed",
+  "minimum_clear_months": 4,
+  "fold_roles": {
+    "0": "holdout",
+    "1": "cv",
+    "2": "cv",
+    "3": "cv",
+    "4": "cv"
+  },
+  "primary_split": "s1_cc2km",
+  "robustness_split": "s2_region",
+  "test_status": "historical_previously_evaluated",
+  "new_models_may_score_test": false,
+  "prediction_setting": "retrospective_full_season_yield_estimation",
+  "source_doi": "10.5281/zenodo.10060610",
+  "role_scheme": "team: cross-validate over folds 1-4 with pooled out-of-fold scores; fold 0 held back (docs/EVALUATION.md)",
+  "supersedes": "zimbabwe_midterm_v1, whose fold 1 = validation, folds 2-4 = train labels differ from the team protocol"
+}

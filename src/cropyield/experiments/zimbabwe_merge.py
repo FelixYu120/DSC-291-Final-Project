@@ -36,6 +36,27 @@ from cropyield.eval.splits import EARTH_RADIUS_KM, unit_xyz
 AUXILIARY = "zimbabwe_2024"
 CONFIG = ROOT / "configs/zimbabwe_merge_v1.json"
 OUTPUT = ROOT / "data/runs/zimbabwe_merge_v1"
+# "all_screened" is the v1 legacy pool (every audited 2024 row, recorded zeros included); it trains on rows
+# the team excludes. "include_primary" follows labels_v1.include_primary, the team rule. Absent key = v1.
+TRAINING_ROWS = ("all_screened", "include_primary")
+ZERO_POLICY_METHODS = ("pooled_positive_sensitivity", "pooled_zero_weight_sensitivity")
+
+
+def training_rows(config: dict) -> str:
+    rule = config.get("training_rows", "all_screened")
+    require(rule in TRAINING_ROWS, f"Unknown training_rows rule: {rule}")
+    return rule
+
+
+def require_training_rows(frame: pd.DataFrame, config: dict, what: str = "training pool") -> None:
+    """Under the team rule, every row that can enter a fit must have labels_v1.include_primary = True."""
+    if training_rows(config) == "include_primary":
+        require("include_primary" in frame.columns and frame["include_primary"].eq(True).all(),
+                f"{what} holds rows outside labels_v1.include_primary")
+
+
+def default_output(config: dict) -> Path:
+    return ROOT / "data/runs" / config["experiment"]
 
 
 def audit_2024(path: Path) -> pd.DataFrame:
@@ -89,10 +110,11 @@ def prepare_data(root: Path, config: dict) -> tuple[pd.DataFrame, pd.DataFrame, 
     lacuna = reconcile_labels(lacuna_raw, labels)
     target = lacuna[lacuna.include_primary & lacuna.season_year.eq(config["target_year"])].copy()
     source_audit = audit_2024(root / "data/raw/vision_guided_yield_estimation/metadata.csv")
-    aux = labels[labels.cohort.eq(AUXILIARY)].copy()
-    require(set(source_audit.loc[source_audit.label_eligible, "obs_id"]) == set(aux.obs_id),
+    rule = training_rows(config)
+    screened = labels[labels.cohort.eq(AUXILIARY)].copy()
+    require(set(source_audit.loc[source_audit.label_eligible, "obs_id"]) == set(screened.obs_id),
             "Independent 2024 label screen differs from frozen screened IDs")
-    raw_check = aux.merge(source_audit, on="obs_id", suffixes=("_frozen", "_raw"), validate="one_to_one")
+    raw_check = screened.merge(source_audit, on="obs_id", suffixes=("_frozen", "_raw"), validate="one_to_one")
     for col in ["lat", "lon", "source_row"]:
         require(np.isclose(raw_check[f"{col}_frozen"], raw_check[f"{col}_raw"], rtol=0, atol=1e-7).all(),
                 f"2024 raw/frozen disagreement: {col}")
@@ -104,20 +126,22 @@ def prepare_data(root: Path, config: dict) -> tuple[pd.DataFrame, pd.DataFrame, 
     target = target.merge(split[["obs_id", "fold", "group_id"]], on="obs_id", validate="one_to_one")
     target["domain"] = "lacuna"
     target["n_cuts_observed"] = 1
-    aux["domain"] = "zimbabwe_2024"
+    screened["domain"] = "zimbabwe_2024"
+    screened = screened.merge(source_audit[["obs_id", "n_cuts_observed"]], on="obs_id", validate="one_to_one")
+    # v1 ("all_screened") superseded positive-only inclusion; v2 ("include_primary") keeps the team rule.
+    aux = (screened if rule == "all_screened" else screened[screened.include_primary.eq(True)]).copy()
     aux["fold"] = -1
     aux["group_id"] = "auxiliary"
-    aux = aux.merge(source_audit[["obs_id", "n_cuts_observed"]], on="obs_id", validate="one_to_one")
     catalog_lacuna = lacuna.copy()
     catalog_lacuna["domain"] = "lacuna"
     catalog_lacuna["n_cuts_observed"] = 1
-    catalog = pd.concat([catalog_lacuna, aux.drop(columns=["fold", "group_id"])], ignore_index=True)
+    catalog = pd.concat([catalog_lacuna, screened], ignore_index=True)
     catalog["yield_t_ha"] = catalog.yield_kg_ha / 1000
     catalog["season_label"] = (catalog.season_year - 1).astype(str) + "/" + catalog.season_year.astype(str)
-    catalog["comparison_candidate"] = catalog.obs_id.isin(target.obs_id) | catalog.domain.eq("zimbabwe_2024")
+    catalog["comparison_candidate"] = catalog.obs_id.isin(target.obs_id) | catalog.obs_id.isin(aux.obs_id)
     catalog = catalog.sort_values("obs_id").reset_index(drop=True)
-    # Explicitly supersede positive-only inclusion in this separately named experiment.
     combined = pd.concat([target, aux], ignore_index=True)
+    require_training_rows(combined, config, "Combined comparison table")
     combined["yield_t_ha"] = combined.yield_kg_ha / 1000
     combined["season_label"] = (combined.season_year - 1).astype(str) + "/" + combined.season_year.astype(str)
     with duckdb.connect(str(database), read_only=True) as con:
@@ -156,6 +180,12 @@ def prepare_data(root: Path, config: dict) -> tuple[pd.DataFrame, pd.DataFrame, 
         "source_feature_eligible": int(combined.loc[combined.domain.eq("zimbabwe_2024"), "feature_eligible"].sum()),
         "feature_names": FEATURES, "common_window": "December through June of each agricultural season",
     }
+    if rule != "all_screened":
+        summary.update({"training_rows": rule, "source_screened_labels": len(screened),
+                        "source_screened_zeros": int(screened.is_zero.sum()),
+                        "source_excluded_by_training_rule": len(screened) - len(aux),
+                        "source_exclusion_reasons": screened.loc[~screened.obs_id.isin(aux.obs_id), "exclusion_reason"]
+                        .value_counts().sort_index().to_dict()})
     return combined, source_audit, catalog, summary
 
 
@@ -207,7 +237,7 @@ def predict_model(data: dict, method: str, parameters: dict, config: dict) -> np
     xt, xs, xq, yt, ys = (data[k] for k in ["xt", "xs", "xq", "yt", "ys"])
     if method == "train_mean":
         return np.full(len(xq), yt.mean())
-    keep, source_weights = source_policy(method, ys, config["zero_sensitivity_weight"])
+    keep, source_weights = source_policy(method, ys, config.get("zero_sensitivity_weight", 1.))
     xs, ys = xs[keep], ys[keep]
     ratio = parameters.get("source_ratio", 0)
     use_source = len(xs) > 0 and ratio > 0
@@ -275,6 +305,8 @@ def score_predictions(y: np.ndarray, prediction: np.ndarray) -> dict:
 def run_folds(combined: pd.DataFrame, config: dict) -> tuple[pd.DataFrame, ...]:
     target = combined[combined.domain.eq("lacuna")].copy()
     source = combined[combined.domain.eq("zimbabwe_2024") & combined.feature_eligible].copy()
+    require_training_rows(target, config, "Lacuna target pool")
+    require_training_rows(source, config, "Zimbabwe 2024 source pool")
     reserved = target[target.fold.eq(config["reserved_fold"])]
     development = target[target.fold.isin(config["target_folds"])].copy()
     require(config["reserved_fold"] == 0 and 0 not in config["target_folds"], "Fold 0 cannot enter this experiment")
@@ -313,7 +345,7 @@ def run_folds(combined: pd.DataFrame, config: dict) -> tuple[pd.DataFrame, ...]:
                 tuning.append({"outer_fold": outer, "method": method, **params, "inner_rmse_t_ha": np.sqrt(loss)})
             _, params = min(trials, key=lambda item: item[0])
             pred = predict_model(outer_data, method, params, config)
-            keep, _ = source_policy(method, allowed.yield_t_ha.to_numpy(), config["zero_sensitivity_weight"])
+            keep, _ = source_policy(method, allowed.yield_t_ha.to_numpy(), config.get("zero_sensitivity_weight", 1.))
             selected_source_count = int(keep.sum()) if params.get("source_ratio", 0) > 0 else 0
             chosen.append({"outer_fold": outer, "method": method, **params,
                            "n_target_train": len(train), "n_target_evaluation": len(evaluation),
@@ -389,7 +421,27 @@ def plot_results(path: Path, metrics: pd.DataFrame, differences: pd.DataFrame, c
 
 
 def write_report(path: Path, config: dict, summary: dict, metrics: pd.DataFrame,
-                 differences: pd.DataFrame, selected: pd.DataFrame) -> None:
+                 differences: pd.DataFrame, selected: pd.DataFrame,
+                 config_name: str = "configs/zimbabwe_merge_v1.json",
+                 output_name: str = "data/runs/zimbabwe_merge_v1") -> None:
+    legacy = training_rows(config) == "all_screened"
+    if legacy:
+        sensitivity = ("Positive-only/zero-downweight and tree comparisons are\n"
+                       "sensitivity analyses, not separately confirmed discoveries or evidence that zeros are invalid.")
+        source_text = (f"- **{summary['source_labels']:,}** 2024 labels pass the independent measurement audit. Of these,\n"
+                       f"  **{summary['source_single_cut']}** have one measured box. Their available-box averages are respected.")
+        zero_text = f"These are distinguishable from **{summary['source_zeros']:,}** recorded zero yields."
+        rule_text = "Original `include_primary` is retained as legacy metadata; the new experiment intentionally allows valid 2024 zeros."
+    else:
+        sensitivity = ("The v1 positive-only and zero-weight arms are not run: the `include_primary`\n"
+                       "pool holds no zeros, so both would equal the primary adaptive arm. Tree comparisons are sensitivity analyses.")
+        source_text = (f"- **{summary['source_screened_labels']:,}** 2024 labels pass the independent measurement audit. Training rows follow\n"
+                       f"  `labels_v1.include_primary`: **{summary['source_labels']:,}** rows. The **{summary['source_excluded_by_training_rule']:,}**\n"
+                       f"  excluded rows are the recorded zeros (`zimbabwe_2024_zero_likely_not_measured`); they stay in the catalog only.\n"
+                       f"  **{summary['source_single_cut']}** training rows have one measured box. Their available-box averages are respected.")
+        zero_text = f"These are distinguishable from **{summary['source_screened_zeros']:,}** recorded zero yields."
+        rule_text = ("Every training row has `include_primary = True` (config `training_rows: include_primary`);\n"
+                     "  the run stops if a fit pool holds another row.")
     rows = []
     for _, r in metrics.iterrows():
         rank = "n/a" if not np.isfinite(r.spearman) else f"{r.spearman:.3f}"
@@ -421,8 +473,7 @@ so this is a retrospective data-sharing experiment, not a real-time 2023 forecas
 
 All negative predictions are clipped to zero by the same rule. Metrics are within Lacuna only; no score combines
 the target and source outcome distributions. `paired_differences.csv` contains every uncertainty interval;
-the primary method was specified before the run. Positive-only/zero-downweight and tree comparisons are
-sensitivity analyses, not separately confirmed discoveries or evidence that zeros are invalid.
+the primary method was specified before the run. {sensitivity}
 
 ## What was merged and corrected
 
@@ -431,15 +482,14 @@ sensitivity analyses, not separately confirmed discoveries or evidence that zero
   The controlled comparison uses **{summary['target_primary']:,}** primary Lacuna 2023 labels.
   The existing three inconsistent raw Lacuna conversions remain excluded.
 - **{summary['raw_2024_maize']:,}** raw 2024 Zimbabwe maize records inspected. **{summary['raw_2024_missing_yield']:,}** have
-  explicitly missing yields. These are distinguishable from **{summary['source_zeros']:,}** recorded zero yields.
-- **{summary['source_labels']:,}** 2024 labels pass the independent measurement audit. Of these,
-  **{summary['source_single_cut']}** have one measured box. Their available-box averages are respected.
+  explicitly missing yields. {zero_text}
+{source_text}
 - No blanket multiplicative conversion was needed: available per-box yields equal dry kg × 0.25, and available-box
   averages equal reported field yield. This confirms numeric consistency, not physical moisture equivalence.
 - **{summary['source_feature_eligible']:,}** source rows meet common-window feature eligibility before fold-specific spatial buffering.
 - Both cohorts use December–June aggregates, the same ten spectral predictors, and at least four observed months.
   `combined_data.parquet` preserves the harmonized labels, source/season/management metadata, eligibility and features.
-  Original `include_primary` is retained as legacy metadata; the new experiment intentionally allows valid 2024 zeros.
+  {rule_text}
 
 ## How incompatibilities were handled
 
@@ -459,8 +509,8 @@ the released files are explicitly modeled or bounded through sensitivity analyse
 
 ## Reproduce and inspect
 
-From the repository root: `python scripts/step9_compare_zimbabwe_merge.py`.
-Config: `configs/zimbabwe_merge_v1.json`. Results are generated in `data/runs/zimbabwe_merge_v1/`.
+From the repository root: `python scripts/step9_compare_zimbabwe_merge.py{"" if legacy else " --config " + config_name}`.
+Config: `{config_name}`. Results are generated in `{output_name}/`.
 Use a new `--output` directory when changing the code/config. The manifest records inputs, code and outputs.
 
 - `source_2024_audit.csv`: all raw 2024 maize records, measurement checks and exclusion reasons.
@@ -495,10 +545,19 @@ def experiment_inputs(root: Path, config_path: Path) -> dict:
     return result
 
 
+def relative_name(path: Path, root: Path = ROOT) -> str:
+    path = Path(path)
+    return path.relative_to(root).as_posix() if path.is_relative_to(root) else str(path)
+
+
 def run_experiment(output: Path = OUTPUT, config_path: Path = CONFIG, root: Path = ROOT) -> dict:
     config = json.loads(config_path.read_text())
     require(config["target_folds"] == [1, 2, 3, 4] and config["reserved_fold"] == 0, "Do not change target evaluation population")
     require(config["calendar_months"] == [12, 1, 2, 3, 4, 5, 6], "This implementation requires December–June")
+    if training_rows(config) == "include_primary":
+        # include_primary 2024 rows hold no zeros, so these arms would only duplicate pooled_adaptive.
+        require(not set(config["methods"]) & set(ZERO_POLICY_METHODS),
+                "Zero-policy arms equal pooled_adaptive under include_primary; drop them from the config")
     before = experiment_inputs(root, config_path)
     combined, audit, catalog, summary = prepare_data(root, config)
     with threadpool_limits(limits=1):
@@ -515,7 +574,8 @@ def run_experiment(output: Path = OUTPUT, config_path: Path = CONFIG, root: Path
         catalog.to_parquet(staged / "harmonized_labels.parquet", index=False)
         json_write(summary, staged / "data_summary.json")
         (staged / "PROTOCOL.md").write_text((root / "docs/ZIMBABWE_MERGE_PROTOCOL.md").read_text(), encoding="utf-8")
-        write_report(staged / "RESULTS.md", config, summary, metrics, differences, selected)
+        write_report(staged / "RESULTS.md", config, summary, metrics, differences, selected,
+                     relative_name(config_path, root), relative_name(output, root))
         plot_results(staged / "comparison.png", metrics, differences, config)
         require(before == experiment_inputs(root, config_path), "Input/code changed during the run")
         manifest = {"config": config, "inputs": before, "python": platform.python_version(),

@@ -1,0 +1,3 @@
+bootstrap_unit,clusters,delta_rmse_t_ha,ci_low,ci_high,negative_means
+spatial_group,232,6.92541226752e-05,-0.0468935924068,0.0421716685984,four weather features increased the benefit of merging vs no weather
+weather_cell,30,6.92541226752e-05,-0.0418992572859,0.0506809671121,four weather features increased the benefit of merging vs no weather
