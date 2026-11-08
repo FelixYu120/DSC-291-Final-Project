@@ -2,6 +2,13 @@
 
 Uses public Earth Search Collection 1 COGs; no account or API key is required.
 Run with --help. See README.md for timing assumptions and scientific caveats.
+
+Two opt-in modes for data v2 (docs/DECISIONS.md, 5 Nov 2026); without them nothing behaves differently:
+  --base-run <run folder>  top-up: keep every scene that run accepted (hard links, no download) and try
+                           only the candidates it did not try, in the months it left empty.
+  --collection sentinel-2-l2a  the older collection, which holds 2022 and early 2019. Its offset is set to 0
+                           only for the (processing baseline, offset flag) pairs measured on 5 Nov 2026;
+                           any other item is rejected before a pixel is read.
 """
 from __future__ import annotations
 
@@ -13,8 +20,10 @@ from functools import lru_cache
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import re
+import shutil
 import sys
 
 import numpy as np
@@ -37,6 +46,11 @@ DATASETS = ("one_acre_fund_full", "zimbabwe", "malawi_2022", "malawi_2023",
             "vision_guided_yield_estimation")
 API = "https://earth-search.aws.element84.com/v1"
 COLLECTION = "sentinel-2-c1-l2a"
+OLDER_COLLECTION = "sentinel-2-l2a"
+# (s2:processing_baseline, earthsearch:boa_offset_applied) pairs of the older collection whose files hold no
+# -1000 offset, so offset 0 is right. Measured 5 Nov 2026: 05.00 flagged equals Collection 1 (median difference
+# 0.0000), 03.01 differs by at most 0.0024, 04.00 unflagged read 0.1 too low with the stated -0.1.
+OLDER_OFFSET_ZERO = {("03.01", False), ("04.00", False), ("04.00", True), ("05.00", True)}
 BANDS = {"B02": "blue", "B03": "green", "B04": "red", "B05": "rededge1",
          "B06": "rededge2", "B07": "rededge3", "B08": "nir", "B8A": "nir08",
          "B11": "swir16", "B12": "swir22"}
@@ -192,10 +206,11 @@ def load_records(args):
 
 class Catalog:
     """Cache complete paginated searches per 0.25-degree cell and calendar year."""
-    def __init__(self, directory, cloud_cover, refresh=False):
+    def __init__(self, directory, cloud_cover, refresh=False, collection=COLLECTION):
         self.directory = directory
         self.cloud_cover = cloud_cover
         self.refresh = refresh
+        self.collection = collection   # part of the cache key, so each collection has its own cached searches
         self.session = requests.Session()
         retry = Retry(total=4, backoff_factor=1, status_forcelist=(429, 500, 502, 503, 504),
                       allowed_methods=("GET", "POST"))
@@ -204,7 +219,7 @@ class Catalog:
 
     @lru_cache(maxsize=8)
     def cell(self, x, y, year):
-        params = {"collections": COLLECTION, "bbox": f"{x/4},{y/4},{(x+1)/4},{(y+1)/4}",
+        params = {"collections": self.collection, "bbox": f"{x/4},{y/4},{(x+1)/4},{(y+1)/4}",
                   "datetime": f"{year}-01-01T00:00:00Z/{year}-12-31T23:59:59Z",
                   "query": json.dumps({"eo:cloud_cover": {"lte": self.cloud_cover}}), "limit": 100}
         path = self.directory / f"{digest({'api': API, 'params': params})}.json"
@@ -337,12 +352,45 @@ def verified_scene(directory):
         return None
 
 
+def base_months(base_run, record_key):
+    """The attempts of a complete record of an earlier run, by month; {} when that run has no complete record."""
+    path = base_run / "records" / record_key / "record.json"
+    if not path_exists(path):
+        return {}
+    old = json.loads(Path(filesystem_path(path)).read_text())
+    months = defaultdict(list)
+    for attempt in old["attempts"] if old["status"] == "complete" else []:
+        months[attempt["month"]].append(attempt)
+    return months
+
+
+def link_scene(source, target):
+    """An accepted scene of the base run as hard links: the same bytes, no download, the base run untouched.
+
+    Every later write of the pipeline goes to a .part file and then replaces the name, so it never writes
+    through a link into the base run.
+    """
+    if verified_scene(target):
+        return
+    shutil.rmtree(filesystem_path(target), ignore_errors=True)
+    shutil.copytree(filesystem_path(source), filesystem_path(target), copy_function=os.link)
+
+
 def download_scene(item, directory, record, grid, aoi, args):
+    older = getattr(args, "collection", COLLECTION) == OLDER_COLLECTION
+    if older:  # checked first, so not even a cached file of an unmeasured item is accepted
+        measured = (item["properties"].get("s2:processing_baseline"),
+                    bool(item["properties"].get("earthsearch:boa_offset_applied")))
+        if measured not in OLDER_OFFSET_ZERO:
+            return {"status": "rejected_unmeasured_offset", "item_id": item["id"], "clear_fraction_aoi": None}
     cached = verified_scene(directory)
     if cached:
         return {"status": "accepted", "item_id": item["id"], "reused": True,
                 "clear_fraction_aoi": cached["clear_fraction_aoi"]}
     assets = item["assets"]
+    if older:
+        assets = {name: {**asset, "raster:bands": [{**band, "offset": 0.0} for band in asset.get("raster:bands", [{}])]}
+                  for name, asset in assets.items()}
     scl = read_asset(assets["scl"], grid, categorical=True)
     clear = np.isin(scl, (4, 5, 6))  # vegetation, bare/nonvegetated, water
     fraction = float(clear[aoi].mean())
@@ -360,7 +408,8 @@ def download_scene(item, directory, record, grid, aoi, args):
     files = {name: sha256(directory / name) for name in ("reflectance.tif", "scl.tif", "valid_mask.tif")}
     atomic_json(directory / "scene.json", {
         "item": item, "record_key": record["record_key"], "bands": args.bands,
-        "reflectance_units": "unitless BOA reflectance; STAC scale and offset applied once",
+        "reflectance_units": ("unitless BOA reflectance; STAC scale applied, offset 0 (older collection, measured pair)"
+                              if older else "unitless BOA reflectance; STAC scale and offset applied once"),
         "nodata": NODATA, "clear_scl_classes": [4, 5, 6], "clear_fraction_aoi": fraction,
         "clear_fraction_chip": float(valid.mean()), "files_sha256": files,
         "downloaded_at": datetime.now(timezone.utc).isoformat()})
@@ -383,10 +432,25 @@ def process_record(record, run_dir, catalog, args):
     aoi, contained = aoi_for(record, grid)
     write_tif(directory / "aoi_mask.tif", aoi.astype("uint8"), grid, None, ["field_or_point_mask"])
     items = catalog.search(record)
+    base_run = getattr(args, "base_run", None)
+    base = base_months(base_run, record["record_key"]) if base_run else {}
     attempts, accepted, unresolved_errors = [], [], False
-    for month, candidates in month_candidates(items, args.max_scenes, args.candidates_per_month):
+    plan = dict(month_candidates(items, args.max_scenes, args.candidates_per_month))
+    for month in sorted(set(plan) | set(base)):   # a base month that today's catalogue lacks is still kept
+        candidates, settled = plan.get(month, []), base.get(month, [])
         month_ok, month_error = False, False
+        for old in settled:                      # top-up: the base run's scene stays the month's scene
+            if old["status"] == "accepted":
+                link_scene(base_run / "records" / record["record_key"] / old["item_id"], directory / old["item_id"])
+                accepted.append(old["item_id"])
+                month_ok = True
+        attempts += settled
+        tried = {old["item_id"] for old in settled if old["status"] != "error"}   # an error is tried again
         for item in candidates:
+            if month_ok:
+                break
+            if item["id"] in tried:
+                continue                         # the base run already read this SCL and rejected it
             if not re.fullmatch(r"[A-Za-z0-9_.-]+", item["id"]) or item["id"] in (".", ".."):
                 raise ValueError("Unsafe STAC item identifier")
             # An error moves to the next scene. If a later scene passes, the record can still end complete.
@@ -408,7 +472,8 @@ def process_record(record, run_dir, catalog, args):
                           "grid": {**grid, "transform": list(grid["transform"])[:6]},
                           "aoi_type": "field_polygon" if record["geometry"]["type"] != "Point" else "point_pixel",
                           "entire_aoi_inside_chip": contained,
-                          "aoi_sha256": sha256(directory / "aoi_mask.tif")})
+                          "aoi_sha256": sha256(directory / "aoi_mask.tif"),
+                          **({"base_run": Path(base_run).name} if base_run else {})})
     return {"record_key": record["record_key"], "status": status, "scenes": len(accepted)}
 
 
@@ -434,7 +499,15 @@ def arguments(argv=None):
     parser.add_argument("--only-listed", action="store_true",
                         help="select exactly the records in --date-overrides (e.g. a pilot); --offset/--limit apply to that list")
     parser.add_argument("--refresh-catalog", action="store_true", help="refresh cached searches and reconsider completed records")
+    parser.add_argument("--collection", choices=(COLLECTION, OLDER_COLLECTION), default=COLLECTION,
+                        help="Earth Search collection; the older one only for months Collection 1 lacks")
+    parser.add_argument("--base-run", type=Path,
+                        help="top-up: keep this run's accepted scenes (hard links) and try only the candidates it did not try")
+    parser.add_argument("--catalog-dir", type=Path, help="cached STAC searches; default <output-dir>/catalog_cache")
     args = parser.parse_args(argv)
+    # "--max-cloud-cover 80" parses as 80.0, which would name another run folder and cache key than the default 80.
+    if float(args.max_cloud_cover).is_integer():
+        args.max_cloud_cover = int(args.max_cloud_cover)
     if args.only_listed and not args.date_overrides:
         parser.error("--only-listed needs --date-overrides")
     if (args.min_year < 2019 or args.offset < 0 or (args.limit is not None and args.limit < 1)
@@ -448,11 +521,33 @@ def arguments(argv=None):
     return args
 
 
-def main(argv=None):
-    args = arguments(argv)
+def run_config(args):
+    """The settings that name the run folder; the defaults give run-517bfcf0a69c6cac, the v1 run."""
     config = {k: getattr(args, k) for k in ("bands", "chip_size", "resolution", "max_scenes",
         "candidates_per_month", "max_cloud_cover", "min_clear_fraction", "date_policy", "fallback_days")}
-    config.update(pipeline_version=PIPELINE_VERSION, api=API, collection=COLLECTION)
+    config.update(pipeline_version=PIPELINE_VERSION, api=API, collection=args.collection)
+    if args.collection == OLDER_COLLECTION:
+        config["offset_rule"] = "older_collection_offset0_measured_pairs_2026-11-05"
+    if getattr(args, "base_run", None):
+        config["base_run"] = Path(args.base_run).name   # a top-up never shares a folder with a plain run
+    return config
+
+
+def check_base_run(base_run, config):
+    """A top-up must cut the same chips with the same rules as the run it extends."""
+    old = json.loads(next(Path(base_run).glob("plan-*.json")).read_text())["config"]
+    same = ("bands", "chip_size", "resolution", "max_scenes", "min_clear_fraction", "date_policy", "fallback_days",
+            "pipeline_version", "api")
+    differ = [key for key in same if old.get(key) != config.get(key)]
+    if differ:
+        raise ValueError(f"--base-run was made with other settings: {differ}")
+
+
+def main(argv=None):
+    args = arguments(argv)
+    config = run_config(args)
+    if args.base_run:
+        check_base_run(args.base_run, config)
     records, input_hashes = load_records(args)
     eligible = len(records)
     if args.only_listed:
@@ -484,7 +579,8 @@ def main(argv=None):
     print(json.dumps(summary, indent=2), flush=True)
     if args.command == "plan":
         return 0
-    catalog = Catalog(args.output_dir / "catalog_cache", args.max_cloud_cover, args.refresh_catalog)
+    catalog = Catalog(args.catalog_dir or args.output_dir / "catalog_cache", args.max_cloud_cover,
+                      args.refresh_catalog, args.collection)
     results, failures = [], 0
     # HTTP range reads avoid downloading whole scenes. Serial operation limits load.
     with rasterio.Env(GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR", CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif",

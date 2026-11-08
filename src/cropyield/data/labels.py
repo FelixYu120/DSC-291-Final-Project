@@ -8,7 +8,7 @@ target; models standardise inside the training fold.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import hashlib
 import io
 import json
@@ -28,12 +28,18 @@ from cropyield.eval.splits import connected_clusters, has_neighbour
 
 RAW_DIR = ROOT / "data" / "raw"
 LABELS_PATH = ROOT / "data" / "processed" / "labels_v1.parquet"
+# Data v2 (docs/DECISIONS.md, 5 Nov 2026): v1 plus Malawi 2022, whose polygons come from a second audit with
+# the datum operation EPSG:1113. Every other row is the v1 row unchanged.
+V2_DIR = ROOT / "data" / "v2"
+LABELS_V2_PATH = V2_DIR / "processed" / "labels_v2.parquet"
+AUDIT_V2_DIR = V2_DIR / "audit"
 MANIFEST_PATH = ROOT / "data" / "metadata" / "download_manifest.json"
 MAX_YIELD_KG_HA = 15_000
 ACRE_HA = 0.40468564224
 OAF_WORKBOOK = RAW_DIR / "one_acre_fund_full" / "one_acre_fund_mel_data_all_countries.xlsx"
 LACUNA_GEOJSON = RAW_DIR / "zimbabwe" / "Lacuna_Yield_data_geojson-2023.geojson"
 MALAWI_2023_ZIP = RAW_DIR / "malawi" / "mwi_kas_lc_fo_202305_cc_yield.zip"
+MALAWI_2022_ZIP = RAW_DIR / "malawi" / "mwi_mwi_lc_fo_202205_averageyield_v1.zip"
 
 
 @dataclass(frozen=True)
@@ -62,6 +68,21 @@ MEASUREMENTS = {
     "zimbabwe_lacuna_2022_2023": Measurement("second", "ZWE", "cut_8x5m_dry_weight", 40, 1, None, True, "field_gps", "OGC:CRS84"),
     "zimbabwe_2024": Measurement("parked", "ZWE", "mean_2_boxes_40m2", 40, 2, None, False, "field_gps", "EPSG:4326"),
 }
+MEASUREMENTS_V2 = {**MEASUREMENTS, "malawi_2022": replace(MEASUREMENTS["malawi_2022"], role="second",
+                                                          source_crs="EPSG:20936 via EPSG:1113")}
+
+
+def audit_dir(name: str, version: int) -> Path:
+    """Where a cohort's audited rows are: data/v2/audit for Malawi 2022 in v2, data/audit for everything else.
+
+    The v2 audit must have been written with EPSG:1113, as MEASUREMENTS_V2 records; anything else stops here.
+    """
+    if version == 2 and name == "malawi_2022":
+        summary = AUDIT_V2_DIR / "summary.json"
+        if not summary.exists() or json.loads(summary.read_text())["datum_operation"] != "EPSG:1113":
+            raise ValueError(f"{summary} is missing or was not written with --datum-operation EPSG:1113")
+        return AUDIT_V2_DIR
+    return AUDIT_DIR
 
 # Audited rows per cohort and harvest year; a change here means the audit changed.
 EXPECTED_ROWS = {("malawi_2022", 2022): 529, ("malawi_2023", 2023): 260, ("kenya_oaf_2019_2020", 2019): 1768,
@@ -138,9 +159,18 @@ def malawi_2023_raw() -> pd.DataFrame:
                              for r in reader.records()])
 
 
-def field_polygons(dataset: str) -> dict[str, str]:
+def malawi_2022_raw() -> pd.DataFrame:
+    """AVG_YLD of Malawi 2022 from the shapefile itself, by ``source_id``."""
+    import shapefile
+    with zipfile.ZipFile(MALAWI_2022_ZIP) as archive:
+        stem = next(name[:-4] for name in archive.namelist() if name.endswith(".shp"))
+        reader = shapefile.Reader(dbf=io.BytesIO(archive.read(stem + ".dbf")))
+        return pd.DataFrame([{"source_id": r["globalid"], "AVG_YLD": r["AVG_YLD"]} for r in reader.records()])
+
+
+def field_polygons(dataset: str, directory: Path = AUDIT_DIR) -> dict[str, str]:
     """source_id -> polygon WKT from the audited WGS84 boundary file."""
-    path = AUDIT_DIR / f"{dataset}_candidates_wgs84.geojson"
+    path = directory / f"{dataset}_candidates_wgs84.geojson"
     features = json.loads(path.read_text())["features"]
     return {str(f["properties"]["source_id"]): shape(f["geometry"]).wkt for f in features}
 
@@ -166,13 +196,14 @@ def geodesic_km(lat1, lon1, lat2, lon2) -> np.ndarray:
     return 2 * 6371.0088 * np.arcsin(np.sqrt(h))
 
 
-def cohort_frame(name: str, oaf: pd.DataFrame, lacuna: pd.DataFrame) -> pd.DataFrame:
-    """labels_v1 rows of one cohort, before the flags that need all rows of the cohort."""
-    rows, m = load_cohort(name), MEASUREMENTS[name]
+def cohort_frame(name: str, oaf: pd.DataFrame, lacuna: pd.DataFrame, version: int = 1) -> pd.DataFrame:
+    """labels rows of one cohort, before the flags that need all rows of the cohort."""
+    directory = audit_dir(name, version)
+    rows, m = load_cohort(name, directory), (MEASUREMENTS_V2 if version == 2 else MEASUREMENTS)[name]
     frame = pd.DataFrame({
         "obs_id": rows["obs_id"], "cohort": name, "role": m.role, "dataset": rows["dataset"],
         "source_id": rows["source_id"], "source_row": rows["source_row"],
-        "source_sha256": sha256(AUDIT_DIR / f"{COHORTS[name].dataset}_screened_candidates.csv"),
+        "source_sha256": sha256(directory / f"{COHORTS[name].dataset}_screened_candidates.csv"),
         "country_iso3": m.iso3, "season_year": rows["year"],
         "season_start": pd.to_datetime(rows["season_start"]), "season_end": pd.to_datetime(rows["season_end"]),
         "yield_kg_ha": rows["yield_kg_ha"],
@@ -195,7 +226,7 @@ def cohort_frame(name: str, oaf: pd.DataFrame, lacuna: pd.DataFrame) -> pd.DataF
         observed.notna(), "photo_filename" if name == "zimbabwe_2024" else "crop_cut_time", "none"))
     frame["geometry_wkt"] = None
     if name.startswith("malawi"):
-        polygons = field_polygons(COHORTS[name].dataset)
+        polygons = field_polygons(COHORTS[name].dataset, directory)
         frame["geometry_wkt"] = frame["source_id"].map(polygons)
     if name == "malawi_2023":
         frame["cut1_kg_ha"] = rows["yield_kg_ha"]
@@ -237,11 +268,14 @@ def add_cohort_flags(frame: pd.DataFrame) -> pd.DataFrame:
     return frame
 
 
-def exclusion_reasons(frame: pd.DataFrame) -> pd.Series:
-    """Why a row is out of the primary analysis; '' for rows that are in. First reason wins."""
+def exclusion_reasons(frame: pd.DataFrame, version: int = 1) -> pd.Series:
+    """Why a row is out of the primary analysis; '' for rows that are in. First reason wins.
+
+    In v2 the Malawi 2022 imagery gap is closed (older collection), so that rule is gone; all else is v1.
+    """
     # An NA in intercropped or irrigated counts as pure stand and rainfed. No Lacuna row is NA.
     conditions = [
-        (frame["cohort"] == "malawi_2022", "dropped_cohort_2022_imagery_gap"),
+        ((frame["cohort"] == "malawi_2022") & (version == 1), "dropped_cohort_2022_imagery_gap"),
         ((frame["cohort"] == "zimbabwe_lacuna_2022_2023") & (frame["season_year"] == 2022), "dropped_year_2022_imagery_gap"),
         ((frame["cohort"] == "zimbabwe_lacuna_2022_2023") & frame["intercropped"].fillna(False).astype(bool), "lacuna_intercropped"),
         ((frame["cohort"] == "zimbabwe_lacuna_2022_2023") & frame["irrigated"].fillna(False).astype(bool), "lacuna_irrigated"),
@@ -264,11 +298,11 @@ COLUMNS = ["obs_id", "cohort", "role", "dataset", "source_id", "source_row", "so
            "include_primary", "exclusion_reason"]
 
 
-def build_labels(oaf: pd.DataFrame, lacuna: pd.DataFrame) -> pd.DataFrame:
-    """All cohorts, in COHORTS order, with every labels_v1 column."""
-    frames = [add_cohort_flags(cohort_frame(name, oaf, lacuna)) for name in COHORTS]
+def build_labels(oaf: pd.DataFrame, lacuna: pd.DataFrame, version: int = 1) -> pd.DataFrame:
+    """All cohorts, in COHORTS order, with every labels column; version 1 is labels_v1, version 2 adds Malawi 2022."""
+    frames = [add_cohort_flags(cohort_frame(name, oaf, lacuna, version)) for name in COHORTS]
     labels = pd.concat(frames, ignore_index=True)
-    labels["exclusion_reason"] = exclusion_reasons(labels)
+    labels["exclusion_reason"] = exclusion_reasons(labels, version)
     labels["include_primary"] = labels["exclusion_reason"] == ""
     return labels[COLUMNS]
 
@@ -302,7 +336,14 @@ def check_labels(labels: pd.DataFrame) -> list[str]:
 
 
 def check_against_raw(labels: pd.DataFrame, oaf: pd.DataFrame, lacuna: pd.DataFrame) -> list[str]:
-    """Checks 3, 5, 7 and 9 of docs/DATA.md: rows re-derive from the provider files."""
+    """Rows re-derive from the provider files (parts of checks 3, 7 and 11 of docs/DATA.md).
+
+    Kenya: source id, yield, kg/ha against kg/acre, latitude, district. Lacuna: yield, t/ha = dry kg x 0.25,
+    latitude. Malawi 2022 and 2023: yield and the nested cut. Zimbabwe 2024: the yield is the mean of its two
+    boxes. The SHA-256 of 4 raw files (OAF workbook, Lacuna GeoJSON, both Malawi zips) against
+    data/metadata/download_manifest.json, where it lists them. Not checked here: longitudes, the Malawi polygon
+    area (check 5) and the Zimbabwe 2024 metadata.csv checksum.
+    """
     problems = []
     kenya = labels[labels["cohort"] == "kenya_oaf_2019_2020"].merge(oaf, on="source_row", validate="one_to_one")
     # Excel stored one id as a date; the audit wrote it with isoformat().
@@ -335,12 +376,16 @@ def check_against_raw(labels: pd.DataFrame, oaf: pd.DataFrame, lacuna: pd.DataFr
     if (np.abs(malawi["cut2_kg_ha"] - malawi["subc_ey_t"].astype(float) * 1000) > 1e-6).any():
         problems.append("Malawi 2023: nested cut differs from subc_ey_t")
 
+    malawi_2022 = labels[labels["cohort"] == "malawi_2022"].merge(malawi_2022_raw(), on="source_id", validate="one_to_one")
+    if (np.abs(malawi_2022["yield_kg_ha"] - malawi_2022["AVG_YLD"].astype(float) * 1000) > 1e-6).any():
+        problems.append("Malawi 2022: yield_kg_ha differs from AVG_YLD")
+
     boxes = labels[(labels["cohort"] == "zimbabwe_2024") & labels["cut1_kg_ha"].notna() & labels["cut2_kg_ha"].notna()]
     if (np.abs(boxes["yield_kg_ha"] - (boxes["cut1_kg_ha"] + boxes["cut2_kg_ha"]) / 2) > 1).any():
         problems.append("Zimbabwe 2024: yield is not the mean of the two boxes")
 
     recorded = {entry["path"].replace("\\", "/"): entry["sha256"] for entry in manifest_entries()}
-    for path in (OAF_WORKBOOK, LACUNA_GEOJSON, MALAWI_2023_ZIP):
+    for path in (OAF_WORKBOOK, LACUNA_GEOJSON, MALAWI_2023_ZIP, MALAWI_2022_ZIP):
         key = path.relative_to(RAW_DIR).as_posix()
         found = [value for name, value in recorded.items() if name.endswith(key)]
         if found and found[0] != sha256(path):

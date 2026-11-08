@@ -8,6 +8,7 @@ from the screened candidates, so it never sees those rows.
 """
 from __future__ import annotations
 
+import argparse
 from collections import Counter, defaultdict
 import csv
 from datetime import date, datetime
@@ -22,6 +23,7 @@ import zipfile
 
 import openpyxl
 from pyproj import CRS, Transformer
+from pyproj.transformer import TransformerGroup
 import shapefile
 from shapely.geometry import Point, mapping, shape
 from shapely.ops import transform
@@ -260,14 +262,28 @@ def zimbabwe():
     return result, {"all_source_rows": len(data["features"]), "all_crop_counts": dict(crops), "source_crs": "OGC:CRS84"}
 
 
-def malawi(year):
+def named_operation(crs, code):
+    """The one transformation from crs to WGS 84 that uses the datum operation `code`, e.g. EPSG:1113.
+
+    PROJ's default for Arc 1950 in Malawi is EPSG:1117, "Arc 1950 to WGS 84 (5)". Data v2 uses EPSG:1113,
+    "Arc 1950 to WGS 84 (1)", chosen by a label-free test (docs/DECISIONS.md, 5 Nov 2026).
+    """
+    name = Transformer.from_pipeline(code).description
+    found = [t for t in TransformerGroup(crs, "EPSG:4326", always_xy=True).transformers if f"+ {name} (" in t.description]
+    if len(found) != 1:
+        raise ValueError(f"{code} ({name}) matches {len(found)} transformations, not exactly one")
+    return found[0]
+
+
+def malawi(year, operation=None):
     filename = "mwi_mwi_lc_fo_202205_averageyield_v1.zip" if year == 2022 else "mwi_kas_lc_fo_202305_cc_yield.zip"
     result = []
     operations = Counter()
     with zipfile.ZipFile(RAW / "malawi" / filename) as z:
         stem = next(n[:-4] for n in z.namelist() if n.endswith(".shp"))
         crs = CRS.from_wkt(z.read(stem + ".prj").decode())
-        trans = Transformer.from_crs(crs, "EPSG:4326", always_xy=True)
+        trans = (Transformer.from_crs(crs, "EPSG:4326", always_xy=True) if operation is None
+                 else named_operation(crs, operation))
         reader = shapefile.Reader(shp=io.BytesIO(z.read(stem + ".shp")),
                                  shx=io.BytesIO(z.read(stem + ".shx")),
                                  dbf=io.BytesIO(z.read(stem + ".dbf")))
@@ -428,20 +444,43 @@ def finish(name, rows, details):
     return summary
 
 
-def main():
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--only", help="audit this dataset only (data v2: malawi_2022); writes no cross-dataset report")
+    parser.add_argument("--out-dir", type=Path, help="write here instead of data/audit")
+    parser.add_argument("--datum-operation", help="Malawi: a named datum operation, e.g. EPSG:1113 (data v2)")
+    args = parser.parse_args(argv)
+    global OUT
+    if (args.only or args.datum_operation) and (args.out_dir is None or args.out_dir.resolve() == OUT.resolve()):
+        parser.error("--only and --datum-operation need an --out-dir other than data/audit, which v1 uses")
+    OUT = args.out_dir or OUT
     OUT.mkdir(parents=True, exist_ok=True)
     summaries = []
     all_rows = {}
-    for name, loader in [("one_acre_fund_full", oaf_full), ("one_acre_fund_curated", oaf_curated),
-                         ("zimbabwe", zimbabwe), ("malawi_2022", lambda: malawi(2022)),
-                         ("malawi_2023", lambda: malawi(2023)),
-                         ("vision_guided_yield_estimation", vision_guided_yield_estimation)]:
+    loaders = [("one_acre_fund_full", oaf_full), ("one_acre_fund_curated", oaf_curated),
+               ("zimbabwe", zimbabwe), ("malawi_2022", lambda: malawi(2022, args.datum_operation)),
+               ("malawi_2023", lambda: malawi(2023, args.datum_operation)),
+               ("vision_guided_yield_estimation", vision_guided_yield_estimation)]
+    if args.only:
+        loaders = [(name, loader) for name, loader in loaders if name == args.only]
+        if not loaders:
+            parser.error(f"--only {args.only}: no such dataset")
+    for name, loader in loaders:
         print(f"Auditing {name}", flush=True)
         rows, details = loader()
         summary = finish(name, rows, details)
+        if args.datum_operation and name.startswith("malawi"):   # the fixed note describes v1's operation (27 m)
+            used = "; ".join(f"{o['description']} ({o['reported_accuracy_m']:g} m accuracy)"
+                             for o in details["coordinate_operations_used"])
+            summary["notes"] = [note.replace("The selected Arc 1950 to WGS84 datum operation reports 27 m accuracy",
+                                             f"The datum operation used is {used}") for note in summary["notes"]]
         summaries.append(summary)
         all_rows[name] = rows
         print(json.dumps({k: summary[k] for k in ["dataset", "maize_records", "passes_basic_checks", "passes_basic_checks_since_2019", "flag_counts"]}), flush=True)
+    if args.only:
+        (OUT / "summary.json").write_text(json.dumps({"datum_operation": args.datum_operation, "datasets": summaries},
+                                                     indent=2, allow_nan=False) + "\n")
+        return
     def fingerprint(r):
         if not r["passes_basic_checks"]:
             return None

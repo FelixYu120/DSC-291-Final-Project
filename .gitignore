@@ -20,6 +20,11 @@ data/models/
 # Added 2026-10-29: the project database, rebuilt by scripts/step6_build_database.py.
 data/*.duckdb
 data/*.duckdb.wal
+data/v2/*.duckdb
+data/v2/*.duckdb.wal
 
 # Added 2026-10-31: local files moved out of data/ (_parked/LANDING.md).
 _parked/local/
+
+# Added 2026-11-08: TensorBoard logs of the Presto runs (large, rebuilt by the runs).
+experiments/presto_finetune/tensorboard/
