@@ -1,0 +1,12 @@
+model,signal_columns,availability_flags,training_percentile_clip
+Clear-month count,1,0,False
+NDVI seasonal,2,9,True
+GCVI seasonal,2,9,True
+MTCI seasonal,2,9,True
+NDVI705 seasonal,2,9,True
+NDVI740 seasonal,2,9,True
+All indices seasonal,10,9,True
+Spectral bands seasonal,20,9,False
+MOSAIKS field seasonal,1024,9,False
+MOSAIKS chip seasonal,1024,9,False
+Presto whole season,128,9,False

@@ -1,0 +1,11 @@
+model,monthly_signal_columns,availability_flags,all_missing_columns_in_this_copy,missing_signal_values_pct,training_percentile_clip
+Monthly availability,9,0,0,0.0,False
+NDVI monthly,9,9,2,29.01891252955083,True
+GCVI monthly,9,9,2,29.01891252955083,True
+MTCI monthly,9,9,2,29.01891252955083,True
+NDVI705 monthly,9,9,2,29.01891252955083,True
+NDVI740 monthly,9,9,2,29.01891252955083,True
+All indices monthly,45,9,10,29.01891252955083,True
+Monthly bands,90,9,20,29.01891252955083,False
+MOSAIKS field monthly,9216,9,2048,29.70449172576832,False
+MOSAIKS chip monthly,9216,9,2048,29.01891252955083,False
