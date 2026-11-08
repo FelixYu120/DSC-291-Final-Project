@@ -2,6 +2,8 @@
 
 For the current deliverable, start with the [Zimbabwe project guide](zimbabwe/README.md).
 
+For Felix and Florian's paper contribution, use the [paper materials](paper/README.md): an editable data sources and preparation section, a one-page results summary, a complete results ledger and the bibliography. They quote the v1 runs of 7 Nov; the rule-compliant v2 values are in the [results notebook](../notebooks/lacuna_results_consensus.ipynb), section 6.1.
+
 ## Current explanations
 
 | Topic | Document |

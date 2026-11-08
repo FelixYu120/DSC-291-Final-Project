@@ -17,6 +17,8 @@ This page indexes the results across the repository. The v1 Zimbabwe reports sta
 The Lacuna experiments of 7–8 Nov (step-up ladder, time features, Presto) keep their results next to their code in
 [experiments/](../experiments/), each with a README.
 
+For the paper and team handoff, Felix's [one-page results summary](../docs/paper/RESULTS_SUMMARY.md), [complete appendix](../docs/paper/RESULTS_APPENDIX.md) and [full-precision ledger](../docs/paper/RESULTS_LEDGER.csv) quote the v1 runs of 7 Nov; use the v2 values in the [results notebook](../notebooks/lacuna_results_consensus.ipynb), section 6.1. The ledger distinguishes reused controls from different predictions and keeps the separate 2024 source-diagnostic population explicit.
+
 ## Zimbabwe experiments
 
 **Use the v2 results (8 Nov).** They follow the team rules (`include_primary` training rows, label-free calendar

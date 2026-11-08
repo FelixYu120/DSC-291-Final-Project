@@ -47,7 +47,7 @@ def test_scripts_top_level_holds_only_numbered_steps():
     numbers = [re.match(r"step(\d+b?)_", name).group(1) for name in top if name.startswith("step")]
     assert len(numbers) == len(set(numbers)), f"two scripts share a step number: {sorted(numbers)}"
     folders = {script.parent.relative_to(SCRIPTS).as_posix() for script in python_files(SCRIPTS)} - {"."}
-    assert folders == {"baselines", "quality", "verification"}
+    assert folders == {"baselines", "paper", "quality", "verification"}
 
 
 @pytest.mark.skipif(shutil.which("git") is None or not (REPO / ".git").exists(), reason="needs the git checkout")

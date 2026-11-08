@@ -11,6 +11,7 @@ scripts/
   baselines/              R0/R1/A1 baseline tables and the data v1 against v2 comparison
   quality/                the data-quality audit and the review stages
   verification/           independent checkers, the R² audit and the recorded-code replay
+  paper/                  builds the two DOCX files in docs/paper/ from their Markdown
 ```
 
 The root of `scripts/` holds only numbered steps and `get_all_data.py`. Steps 8–15 stay at the root because the v2
@@ -151,6 +152,13 @@ script names, because they run the code of the recorded revision. Most verifiers
 config; `audit_zimbabwe_r2.py` and `verify_multiyear_intervals.py` then rewrite their committed v1 receipt
 (`results/aggregation/`, `results/multiyear/`). Pass `--release` and `--output`/`--report` for v2.
 
+## paper/
+
+The document-only [build_paper_documents.py](paper/build_paper_documents.py) (Felix) creates the two editable documents in
+[docs/paper](../docs/paper/README.md) from reviewed text. It requires `python-docx`; it does not fit models or modify
+scientific releases. Document rendering and visual inspection remain required after changing the text. The text
+quotes the v1 runs of 7 Nov; rebuild it from the v2 releases before it goes into the report.
+
 ## Moved on 8 Nov 2026
 
 The files kept their code; only the folder (and three names) changed, together with the one `ROOT` line in each.
@@ -163,3 +171,4 @@ Receipts written before this date record the old paths and the old file hashes.
 | `run_baselines.py` | `scripts/baselines/spatial_baselines.py` |
 | `audit_data_quality.py`, `review_*.py` (4), `assemble_quality_variant.py` | `scripts/quality/` |
 | `reproduce_zimbabwe.py`, `verify_*.py` (5), `compare_compact_candidate.py`, `audit_zimbabwe_r2.py` | `scripts/verification/` |
+| `build_paper_documents.py` (Felix, added 7 Nov) | `scripts/paper/build_paper_documents.py` |

@@ -19,6 +19,7 @@ and tests whether rainfall and temperature improve prediction. Earlier Malawi/Ke
 | Read the whole dataset: structure, cleaning, quality register, splits | [Dataset guide](docs/DATASET.md) |
 | Use the rule-compliant Zimbabwe runs (8 Nov, v2) | [v2 runs and commands](docs/zimbabwe/README.md#rule-compliant-v2-runs-8-nov-2026) |
 | See the R0/R1/A1 baseline tables | [v1, all five folds](results/baseline_table.md), [data v2, folds 1–4](results/v2/baseline_table.md) |
+| Read Felix's manuscript section, one-page summary and results ledger (v1 runs of 7 Nov; v2 values in the [results notebook](notebooks/lacuna_results_consensus.ipynb)) | [Paper materials](docs/paper/README.md) |
 
 The basic merge experiment uses **10 vegetation-index features with Ridge**, not MOSAIKS. Naive pooling hurts;
 source-aware adjustment removes most of that penalty, but adding 2024 has not established a reliable accuracy gain.

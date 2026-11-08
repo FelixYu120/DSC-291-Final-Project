@@ -4,6 +4,8 @@ This is the entry point for Felix's data preparation and the subsequent merge/we
 Read the [one-page Ridge summary](SUMMARY.md), then follow [Data Guide 2](../../notebooks/data_guide_2_zimbabwe.ipynb)
 for the complete walkthrough. [METHODS.md](METHODS.md) contains the current concise findings and technical appendix.
 
+The [paper folder](../paper/README.md) contains Felix and Florian's manuscript section, a one-page team summary and every saved result with repeated controls identified. (Felix, 7 Nov: these files quote the **v1** runs; the rule-compliant v2 values are in [the results notebook](../../notebooks/lacuna_results_consensus.ipynb), section 6.1)
+
 ## Rule-compliant v2 runs (8 Nov 2026)
 
 The v1 releases below broke three team rules (`docs/DECISIONS.md`, 8 Nov): steps 9–15 trained on rows that
