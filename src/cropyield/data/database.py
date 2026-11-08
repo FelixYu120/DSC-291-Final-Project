@@ -34,7 +34,9 @@ def connect(read_only: bool = True) -> duckdb.DuckDBPyConnection:
     Example: ``con = connect(); con.sql("SELECT count(*) FROM master").fetchone()``
     """
     if not DATABASE.exists():
-        raise FileNotFoundError(f"{DATABASE} is missing; run: python scripts/step6_build_database.py")
+        raise FileNotFoundError(f"{DATABASE} is missing; download the shared team cropyield.duckdb "
+                                "described in README.md and place it here. Do not rebuild the team "
+                                "database: rebuilding removes its Presto embeddings.")
     return duckdb.connect(str(DATABASE), read_only=read_only)
 
 

@@ -24,7 +24,7 @@ OUT = Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location("step8", REPO / "scripts" / "step8_run_baseline.py")
 step8 = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(step8)                      # also puts src/ on sys.path
-from cropyield.baselines import ridge_cv  # noqa: E402
+from cropyield.baselines.models import ridge_cv  # noqa: E402
 from cropyield.eval.scores import centred, group_draws, in_large_clusters, r2, rank_inside_clusters, rmse, spearman  # noqa: E402
 
 INDICES = ["ndvi", "gcvi", "mtci", "ndvi705", "ndvi740"]

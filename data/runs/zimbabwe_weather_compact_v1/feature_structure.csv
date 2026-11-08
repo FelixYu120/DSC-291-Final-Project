@@ -1,0 +1,4 @@
+family,weather_features,target_cells,unique_profiles,constant_columns,centered_numerical_rank,high_correlation_pairs
+compact2,2,30,30,0,2,0
+compact4,4,30,30,0,4,0
+full46,46,30,30,0,29,20

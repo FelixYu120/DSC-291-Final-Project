@@ -1,0 +1,9 @@
+{
+  "stage": "candidate",
+  "recorded_code_commit": "e1235944f092359e4ed29d3ef20cef1f17085d10",
+  "inputs_and_original_outputs_verified_before_and_after": 329,
+  "original_releases_modified": false,
+  "output": "/Users/himan/Desktop/DSC190/results/integration/main_merge_20261107/candidate_comparison.csv",
+  "runner_sha256": "baf4c23c8547c52e25d975247468469e062eba3eebb74612d1c37c04640e31dc",
+  "python": "3.12.14"
+}

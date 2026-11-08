@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "labels": 6598,
+  "weather_cells": 97,
+  "field_months": 59382,
+  "historical_cell_months": 39576,
+  "weather_values_reconstructed": 303508,
+  "evaluation_fields_per_arm": 1504,
+  "arms": 13,
+  "reserved_fold_scored": false,
+  "minimum_source_distance_to_protected_km": 2.0069986839711693,
+  "bootstrap_draws_replayed": 2000,
+  "controls_identical": true,
+  "selected_model_replay": "fold 1 weather_shared",
+  "verifier_sha256": "c808828819bf574a8ca7f30391dab4b2518ad360e9248b489b976e14644d0e57"
+}

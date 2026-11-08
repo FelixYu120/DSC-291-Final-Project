@@ -40,7 +40,7 @@ def module(name: str, path: Path):
 
 tf = module("time_features", REPO / "experiments" / "time_features" / "time_features.py")   # loads step 8 too
 step8 = tf.step8
-from cropyield.baselines import Winsorize  # noqa: E402
+from cropyield.baselines.models import Winsorize  # noqa: E402
 from cropyield.eval.scores import centred, group_draws, in_large_clusters, r2, rank_inside_clusters, rmse, spearman  # noqa: E402
 
 warnings.filterwarnings("ignore", category=ConvergenceWarning)

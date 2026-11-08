@@ -1,0 +1,19 @@
+# Reproduce the three previously evaluated arms. No new model arms are enabled.
+experiment: spatial_baselines_v1
+cohorts:
+  - malawi_2023
+  - kenya_oaf_2019_2020
+  - zimbabwe_lacuna_2022_2023
+expected_rows:
+  malawi_2023: 251
+  kenya_oaf_2019_2020: 3977
+  zimbabwe_lacuna_2022_2023: 1880
+arms: [R0, R1, A1]
+split_family: s1_cc2km
+min_clear_months: 4
+knn_neighbors: 10
+ridge:
+  alphas_logspace: [-3, 5, 17]
+  inner_folds: 5
+seed: 20261029
+bootstrap_draws: 2000

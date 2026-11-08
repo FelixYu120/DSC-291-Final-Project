@@ -27,7 +27,7 @@ from sklearn.preprocessing import StandardScaler
 
 import presto_lib as lib
 import run_cohort
-from cropyield.baselines import Winsorize
+from cropyield.baselines.models import Winsorize
 
 step8 = lib.step8
 S2_AND_NDVI = list(range(2, 12)) + [16]  # B2..B12 and NDVI in Presto's NORMED_BANDS order

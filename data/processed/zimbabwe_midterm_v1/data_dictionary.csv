@@ -1,0 +1,136 @@
+table,column,dtype,null_count,meaning
+cleaned_labels,obs_id,str,0,"Stable field-season key; join tables using this, never row order"
+cleaned_labels,cohort,str,0,"zimbabwe_lacuna_2022_2023, the historical cohort identifier"
+cleaned_labels,role,str,0,"Legacy cohort priority; superseded for midterm scope, retained for snapshot compatibility"
+cleaned_labels,dataset,str,0,"zimbabwe, the provider/audit dataset key"
+cleaned_labels,source_id,str,0,Provider Case_ID; no verified longitudinal farm identifier
+cleaned_labels,source_row,int64,0,1-based position in provider GeoJSON features array
+cleaned_labels,source_sha256,str,0,"Legacy provenance: SHA-256 of screened audit CSV, not the raw GeoJSON"
+cleaned_labels,country_iso3,str,0,ZWE
+cleaned_labels,season_year,int64,0,Harvest calendar year; primary release uses 2023
+cleaned_labels,season_start,datetime64[us],0,Fixed October 1 of prior calendar year
+cleaned_labels,season_end,datetime64[us],0,Fixed June 30 of harvest year
+cleaned_labels,yield_kg_ha,float64,0,Target: provider metric tonnes/ha multiplied by 1000; provisional measurement basis
+cleaned_labels,yield_definition,str,0,cut_8x5m_dry_weight; measurement protocol identifier
+cleaned_labels,cut_area_m2,float64,0,"Declared crop-cut area, 40 square metres"
+cleaned_labels,n_cuts,int64,0,One declared crop cut per observation
+cleaned_labels,moisture_basis_pct,float64,2266,"Null means unknown, never zero percent"
+cleaned_labels,unit_provisional,bool,0,True: unresolved source terminology / measurement basis retained
+cleaned_labels,cut1_kg_ha,float64,2266,Null for Lacuna; no separately released repeat-cut yield
+cleaned_labels,cut2_kg_ha,float64,2266,Null for Lacuna; no repeat-cut noise estimate available
+cleaned_labels,geometry_type,str,0,Point for Zimbabwe; not a field polygon
+cleaned_labels,lat,float64,0,"WGS84 latitude, degrees north (negative in Zimbabwe)"
+cleaned_labels,lon,float64,0,"WGS84 longitude, degrees east"
+cleaned_labels,geometry_wkt,str,2266,Null: no walked field boundary supplied
+cleaned_labels,field_area_ha,float64,2266,Null: no whole-field area supplied; not the crop-cut area
+cleaned_labels,location_source,str,0,field_gps; accuracy undocumented
+cleaned_labels,source_crs,str,0,OGC:CRS84; longitude then latitude in source geometry
+cleaned_labels,plant_date,datetime64[us],0,"Recorded planting date; source value, never inferred"
+cleaned_labels,harvest_date,datetime64[us],0,"Recorded harvest date; source value, never inferred"
+cleaned_labels,obs_date,datetime64[us],0,Legacy observation date: harvest date for Lacuna
+cleaned_labels,obs_date_source,str,0,harvest_date for Lacuna
+cleaned_labels,intercropped,boolean,0,True means maize intercropped; excluded from primary analysis
+cleaned_labels,irrigated,boolean,0,True means irrigated; excluded from primary analysis
+cleaned_labels,admin_unit,str,0,"Trimmed lower-case provider Admin1, with mixed administrative levels"
+cleaned_labels,site_unit,str,2266,Null: provider has no corresponding site grouping
+cleaned_labels,cluster_2km,int32,0,Legacy cluster computed over all screened cohort years; use split group_id to partition
+cleaned_labels,site_distance_km,float64,2266,Null: provider has no site coordinate pair
+cleaned_labels,is_zero,bool,0,True for reported zero yield; retained in primary analysis
+cleaned_labels,near_dup_10m,bool,0,"Legacy neighbour flag over all screened rows, including excluded rows"
+cleaned_labels,polygon_overlap_dup,bool,0,False for point data; does not establish absence of overlapping fields
+cleaned_labels,date_outside_window,bool,0,Recorded observation date outside fixed Oct–Jun extraction window
+cleaned_labels,impossible_date,bool,0,Legacy flag for incompatible planting/harvest ordering or year
+cleaned_labels,source_flags,str,0,Semicolon-separated legacy audit warnings
+cleaned_labels,include_primary,bool,0,"True for 2023, pure stand, rainfed and existing label-quality rules"
+cleaned_labels,exclusion_reason,str,0,Legacy first exclusion reason; raw row audit also carries all applicable reasons
+row_audit,obs_id,str,0,"Stable field-season key; join tables using this, never row order"
+row_audit,source_id,str,0,Provider Case_ID; no verified longitudinal farm identifier
+row_audit,source_row,int64,0,1-based position in provider GeoJSON features array
+row_audit,lat,float64,0,"WGS84 latitude, degrees north (negative in Zimbabwe)"
+row_audit,lon,float64,0,"WGS84 longitude, degrees east"
+row_audit,country,str,0,Provider country text
+row_audit,source_yield_t_ha,float64,0,"Original yield column interpreted as metric tonnes/ha, never overwritten"
+row_audit,dry_weight_kg,float64,0,"Provider crop-cut dry mass; directly determines target, forbidden model predictor"
+row_audit,wet_weight_kg,float64,0,Provider crop-cut harvest mass; unavailable for preharvest prediction
+row_audit,plant_date,datetime64[us],0,"Recorded planting date; source value, never inferred"
+row_audit,harvest_date,datetime64[us],0,"Recorded harvest date; source value, never inferred"
+row_audit,intercropping_raw,str,0,"Unmodified provider text; audit metadata, excluded from model feature allowlist"
+row_audit,irrigation_raw,str,0,"Unmodified provider text; audit metadata, excluded from model feature allowlist"
+row_audit,admin_unit_raw,str,0,"Unmodified provider text; audit metadata, excluded from model feature allowlist"
+row_audit,crop_condition_raw,str,0,"Unmodified provider text; audit metadata, excluded from model feature allowlist"
+row_audit,crop_variety_raw,str,16,"Unmodified provider text; audit metadata, excluded from model feature allowlist"
+row_audit,intercropped,bool[pyarrow],0,True means maize intercropped; excluded from primary analysis
+row_audit,irrigated,bool[pyarrow],0,True means irrigated; excluded from primary analysis
+row_audit,admin_unit,string,0,"Trimmed lower-case provider Admin1, with mixed administrative levels"
+row_audit,season_year,Int64,0,Harvest calendar year; primary release uses 2023
+row_audit,yield_kg_ha,float64,0,Target: provider metric tonnes/ha multiplied by 1000; provisional measurement basis
+row_audit,expected_t_ha_from_dry_weight,float64,0,dry_weight_kg × 0.25 for the declared 40 m² cut; audit only
+row_audit,yield_conversion_mismatch,bool,0,"Provider yield disagrees with dry mass conversion (rtol=0.001, atol=0.001 t/ha)"
+row_audit,dry_weight_exceeds_wet_weight,bool,0,Dry mass exceeds wet mass; screening failure
+row_audit,valid_yield,bool,0,"Finite, nonnegative yield at most 30000 kg/ha for raw screening"
+row_audit,within_screening_envelope,bool,0,Inside coarse Zimbabwe bounding box; not country-polygon verification
+row_audit,valid_weights,bool,0,Both dry and wet masses are finite and nonnegative
+row_audit,screened_in,bool,0,Independent raw label-quality screen; includes both years
+row_audit,growing_days,int64,0,"Recorded harvest minus planting, days; audit only"
+row_audit,invalid_date_order,bool,0,Missing dates or nonpositive growing duration
+row_audit,exact_coordinate_reuse,bool,0,Two or more raw maize observations share coordinates; not proof of duplicate farm
+row_audit,is_zero,bool,0,True for reported zero yield; retained in primary analysis
+row_audit,all_exclusion_reasons,str,0,All applicable independent reasons; empty means primary eligible
+row_audit,include_primary_rederived,bool,0,Independent reconstruction of primary eligibility from raw provider values
+row_audit,exclusion_reason,str,0,Legacy first exclusion reason; raw row audit also carries all applicable reasons
+row_audit,months_with_data,float64,3,"Count of months with at least one valid field pixel, not independent samples"
+row_audit,postharvest_scenes,float64,3,Accepted acquisitions after recorded harvest; audit only
+row_audit,preplanting_scenes,float64,3,Accepted acquisitions before recorded planting; audit only
+row_audit,near_duplicate_primary,bool,0,"Has another primary observation within 10 m, recomputed on primary population"
+model_table,obs_id,str,0,"Stable field-season key; join tables using this, never row order"
+model_table,yield_t_ha,float64,0,Target in metric tonnes/ha; yield_kg_ha / 1000
+model_table,ndvi_season_max,float64,0,ndvi_season_max: unitless vegetation index; statistic across observed months
+model_table,ndvi_season_mean,float64,0,ndvi_season_mean: unitless vegetation index; statistic across observed months
+model_table,gcvi_season_max,float64,0,gcvi_season_max: unitless vegetation index; statistic across observed months
+model_table,gcvi_season_mean,float64,0,gcvi_season_mean: unitless vegetation index; statistic across observed months
+model_table,mtci_season_max,float64,0,mtci_season_max: unitless vegetation index; statistic across observed months
+model_table,mtci_season_mean,float64,0,mtci_season_mean: unitless vegetation index; statistic across observed months
+model_table,ndvi705_season_max,float64,0,ndvi705_season_max: unitless vegetation index; statistic across observed months
+model_table,ndvi705_season_mean,float64,0,ndvi705_season_mean: unitless vegetation index; statistic across observed months
+model_table,ndvi740_season_max,float64,0,ndvi740_season_max: unitless vegetation index; statistic across observed months
+model_table,ndvi740_season_mean,float64,0,ndvi740_season_mean: unitless vegetation index; statistic across observed months
+monthly_features,obs_id,str,0,"Stable field-season key; join tables using this, never row order"
+monthly_features,month,str,0,"YYYY-MM calendar month; nine months per field, including missing months"
+monthly_features,coverage_state,str,0,"clear, cloudy, no_scene or download_error from pinned extraction"
+monthly_features,acquired_date,datetime64[us],4910,Date of accepted scene; null for a month without a scene
+monthly_features,field_pixels,int32,0,Number of clear field pixels used; point fields usually one
+monthly_features,missing,bool,0,"True means no valid field reflectance; retain mask, do not interpret as bare ground"
+monthly_features,b02,float64,4910,"Sentinel-2 B02 L2A surface reflectance, unitless; null when missing"
+monthly_features,b03,float64,4910,"Sentinel-2 B03 L2A surface reflectance, unitless; null when missing"
+monthly_features,b04,float64,4910,"Sentinel-2 B04 L2A surface reflectance, unitless; null when missing"
+monthly_features,b05,float64,4910,"Sentinel-2 B05 L2A surface reflectance, unitless; null when missing"
+monthly_features,b06,float64,4910,"Sentinel-2 B06 L2A surface reflectance, unitless; null when missing"
+monthly_features,b07,float64,4910,"Sentinel-2 B07 L2A surface reflectance, unitless; null when missing"
+monthly_features,b08,float64,4910,"Sentinel-2 B08 L2A surface reflectance, unitless; null when missing"
+monthly_features,b8a,float64,4910,"Sentinel-2 B8A L2A surface reflectance, unitless; null when missing"
+monthly_features,b11,float64,4910,"Sentinel-2 B11 L2A surface reflectance, unitless; null when missing"
+monthly_features,b12,float64,4910,"Sentinel-2 B12 L2A surface reflectance, unitless; null when missing"
+monthly_features,ndvi,float64,4910,ndvi: unitless vegetation index from monthly reflectance
+monthly_features,gcvi,float64,4910,gcvi: unitless vegetation index from monthly reflectance
+monthly_features,mtci,float64,4910,mtci: unitless vegetation index from monthly reflectance
+monthly_features,ndvi705,float64,4910,ndvi705: unitless vegetation index from monthly reflectance
+monthly_features,ndvi740,float64,4910,ndvi740: unitless vegetation index from monthly reflectance
+monthly_features,time_index,int64,0,"Zero-based position in fixed season, 0=October, 8=June"
+split_s1_cc2km,obs_id,str,0,"Stable field-season key; join tables using this, never row order"
+split_s1_cc2km,cohort,str,0,"zimbabwe_lacuna_2022_2023, the historical cohort identifier"
+split_s1_cc2km,season_year,int64,0,Harvest calendar year; primary release uses 2023
+split_s1_cc2km,cluster_id,int64,0,Legacy cluster identifier copied into original split; group_id is authoritative
+split_s1_cc2km,group_id,str,0,Actual grouping used by this frozen split; keep whole in all partitions
+split_s1_cc2km,fold,str,0,Original immutable fold number 0–4
+split_s1_cc2km,repeat,int64,0,Zero for these spatial split families
+split_s1_cc2km,family,str,0,s1_cc2km or s2_region; separate evaluation questions
+split_s1_cc2km,partition,str,0,"train (folds 2–4), validation (fold 1), historical restricted test (fold 0)"
+split_s2_region,obs_id,str,0,"Stable field-season key; join tables using this, never row order"
+split_s2_region,cohort,str,0,"zimbabwe_lacuna_2022_2023, the historical cohort identifier"
+split_s2_region,season_year,int64,0,Harvest calendar year; primary release uses 2023
+split_s2_region,cluster_id,int64,0,Legacy cluster identifier copied into original split; group_id is authoritative
+split_s2_region,group_id,str,0,Actual grouping used by this frozen split; keep whole in all partitions
+split_s2_region,fold,str,0,Original immutable fold number 0–4
+split_s2_region,repeat,int64,0,Zero for these spatial split families
+split_s2_region,family,str,0,s1_cc2km or s2_region; separate evaluation questions
+split_s2_region,partition,str,0,"train (folds 2–4), validation (fold 1), historical restricted test (fold 0)"

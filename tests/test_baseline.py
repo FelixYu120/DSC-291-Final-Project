@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from cropyield.baselines import Winsorize, coordinates_knn, ridge_cv, train_mean
+from cropyield.baselines.models import Winsorize, coordinates_knn, ridge_cv, train_mean
 from cropyield.data.labels import sha256
 from cropyield.eval.scores import (centred, group_draws, paired_difference_ci, r2, rank_inside_clusters, rmse,
                                    spearman)

@@ -1,0 +1,28 @@
+{
+  "experiment": "zimbabwe_multiyear_v1",
+  "target_folds": [1, 2, 3, 4],
+  "reserved_fold": 0,
+  "minimum_clear_months": 4,
+  "calendar_months": [12, 1, 2, 3, 4, 5, 6],
+  "calendar_cutoff_month_day": "04-01",
+  "feature_families": ["bands", "indices"],
+  "variants": ["v0_mean", "v1_preharvest_mean", "v1_calendar_mean", "v2_max", "v3_median", "v3_mode"],
+  "training_sets": ["all_lacuna", "all_zimbabwe"],
+  "ridge_alphas": [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0],
+  "source_weight_ratios": [0.0, 0.1, 0.3, 1.0],
+  "zero_sensitivity_weight": 0.25,
+  "auxiliary_buffer_km": 2.0,
+  "bootstrap_draws": 2000,
+  "seed": 20261107,
+  "primary_method": "bands_v1_preharvest_mean_all_zimbabwe",
+  "primary_reference": "bands_v1_preharvest_mean_all_lacuna",
+  "mode_estimator": "half_sample_mode_mean_of_tied_recursive_estimates",
+  "evaluation_status": "exploratory_same_1504_lacuna_2023_development_fields_not_a_new_blind_test",
+  "prediction_setting": "retrospective_yield_estimation",
+  "missing_imagery_policy": "exclude_if_fewer_than_four_common_season_months_or_any_nonfinite_aggregate_predictor_no_imputation",
+  "calendar_sources": [
+    "https://fews.net/sites/default/files/documents/reports/ZW_February_to_September_2023_FSO_Final_jh.pdf",
+    "https://unfccc.int/sites/default/files/resource/NAP-Zimbabwe-2024.pdf"
+  ],
+  "mode_reference": "https://arxiv.org/abs/math/0505419"
+}

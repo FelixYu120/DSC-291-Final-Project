@@ -1,0 +1,42 @@
+{
+  "all_checks_passed": true,
+  "catalog_rows": 6598,
+  "model_arms": 52,
+  "predictions": 78208,
+  "same_evaluation_ids_per_arm": 1504,
+  "eligible_by_harvest_year": {
+    "2022": 0,
+    "2023": 2097,
+    "2024": 4330
+  },
+  "feature_sets_independently_reconstructed": 13,
+  "extra_lacuna_permissions_checked": 3472,
+  "extra_lacuna_allowed_by_split": {
+    "1/0": 132,
+    "1/1": 95,
+    "1/2": 87,
+    "1/3": 99,
+    "2/0": 149,
+    "2/1": 106,
+    "2/2": 98,
+    "2/3": 117,
+    "3/0": 138,
+    "3/1": 90,
+    "3/2": 101,
+    "3/3": 106,
+    "4/0": 150,
+    "4/1": 97,
+    "4/2": 108,
+    "4/3": 114
+  },
+  "original_memberships_and_source_permissions": "byte-identical",
+  "step14_control_arms": "26 prediction tables exactly preserved; continuous metrics within 1e-10; Spearman within 5e-6",
+  "spearman_csv_tie_tolerance": 5e-06,
+  "maximum_observed_spearman_error": 4.093028973972679e-06,
+  "selected_fits_independently_replayed": 104,
+  "maximum_prediction_replay_error": 5.141220782434175e-12,
+  "input_hashes": 63,
+  "output_hashes": 24,
+  "verifier_sha256": "ba2f9f7be125017c01d4c4fc5ab6a85444a2f928df34430096e4e302fd0b72de",
+  "manifest_sha256": "270721466cb10d2ad236f440706b808f1c43f5e2891882eab7657fb63ce1d36a"
+}

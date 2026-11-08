@@ -90,8 +90,8 @@ def test_a_cohort_with_no_model_rows_is_an_error_not_empty_data(data_dir):
         load_xy("malawi_2022", data_dir)
 
 
-def test_no_database_names_the_build_script(tmp_path):
-    with pytest.raises(FileNotFoundError, match="step6_build_database"):
+def test_no_database_explains_how_to_get_the_shared_file(tmp_path):
+    with pytest.raises(FileNotFoundError, match="download the shared team cropyield.duckdb"):
         load_xy(COHORT, tmp_path / "nowhere")
 
 

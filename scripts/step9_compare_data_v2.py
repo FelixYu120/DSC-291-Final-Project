@@ -24,7 +24,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from step8_run_baseline import (ALPHAS, COHORTS, COHORTS_V2, FAMILY, K, MIN_CLUSTER_FIELDS, RESULTS, ROOT, SEED,
                                 check_database, check_frozen, cohort_rows, git_commit, out_of_fold)
-from cropyield.baselines import coordinates_knn, ridge_cv
+from cropyield.baselines.models import coordinates_knn, ridge_cv
 from cropyield.data.labels import sha256
 from cropyield.data.xy import load_xy
 from cropyield.eval.scores import (BOOTSTRAP_DRAWS, centred, group_draws, in_large_clusters, paired_difference_ci,

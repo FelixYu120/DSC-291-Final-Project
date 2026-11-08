@@ -1,0 +1,51 @@
+{
+  "endpoint": "https://power.larc.nasa.gov/api/temporal/monthly/point",
+  "http_headers": {
+    "Content-Type": "application/json",
+    "Date": "Sat, 07 Nov 2026 10:23:17 GMT"
+  },
+  "parameter_metadata": {
+    "PRECTOTCORR": {
+      "longname": "Precipitation Corrected",
+      "units": "mm/day"
+    },
+    "T2M": {
+      "longname": "Temperature at 2 Meters",
+      "units": "C"
+    }
+  },
+  "parameters": {
+    "community": "AG",
+    "end": 2024,
+    "format": "JSON",
+    "latitude": -19.0,
+    "longitude": 32.5,
+    "parameters": "PRECTOTCORR,T2M",
+    "start": 1991
+  },
+  "provider_header": {
+    "api": {
+      "name": "POWER Monthly and Annual API",
+      "version": "v2.10.0"
+    },
+    "end": "20241231",
+    "fill_value": -999.0,
+    "sources": [
+      "MERRA2"
+    ],
+    "start": "19910101",
+    "time_standard": "LST",
+    "title": "NASA/POWER Source Native Resolution Monthly and Annual"
+  },
+  "provider_messages": [],
+  "response_bytes": 13307,
+  "response_coordinates": [
+    32.5,
+    -19.0,
+    1104.17
+  ],
+  "response_sha256": "50ee92703e3380887251467fb75f08b775095118328db43c89c0f99a1e873302",
+  "retrieved_at_utc": "2026-11-07T10:23:17.655309+00:00",
+  "url": "https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=PRECTOTCORR%2CT2M&community=AG&latitude=-19.0&longitude=32.5&start=1991&end=2024&format=JSON",
+  "weather_grid_id": "merra2_r142_c340"
+}

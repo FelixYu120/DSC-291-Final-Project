@@ -22,7 +22,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from cropyield.baselines import coordinates_knn, ridge_cv, train_mean  # noqa: E402
+from cropyield.baselines.models import coordinates_knn, ridge_cv, train_mean  # noqa: E402
 from cropyield.data.labels import sha256  # noqa: E402
 from cropyield.data.xy import load_xy  # noqa: E402
 from cropyield.eval.scores import (centred, in_large_clusters, paired_difference_ci, r2,  # noqa: E402

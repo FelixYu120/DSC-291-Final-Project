@@ -1,0 +1,10 @@
+method,reference,delta_rmse_t_ha,ci_low,ci_high,bootstrap_fraction_lower_rmse,primary_comparison
+train_mean,lacuna_only,0.191286018723,0.119657136241,0.265852351416,0,False
+lacuna_only,lacuna_only,0,0,0,0,False
+pooled_naive,lacuna_only,0.473954503239,0.310605375762,0.608427008337,0,False
+pooled_intercept,lacuna_only,-0.00295494575001,-0.00710637464244,0.00134971519329,0.9155,False
+pooled_adaptive,lacuna_only,-0.00295071233491,-0.00756687381108,0.00131943245647,0.908,True
+pooled_positive_sensitivity,lacuna_only,-0.00356928523491,-0.00839016819074,0.000716437481144,0.946,False
+pooled_zero_weight_sensitivity,lacuna_only,-0.00338058046052,-0.00823987322062,0.000973409298984,0.9345,False
+lacuna_tree,lacuna_only,0.0057880054031,-0.0289174827244,0.0392374024955,0.4015,False
+pooled_tree,lacuna_tree,-0.00332704556371,-0.018050233377,0.0118474662563,0.652,False

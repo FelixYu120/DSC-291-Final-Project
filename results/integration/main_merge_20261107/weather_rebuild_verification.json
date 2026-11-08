@@ -1,0 +1,63 @@
+{
+  "stage": "weather",
+  "recorded_code_commit": "e1235944f092359e4ed29d3ef20cef1f17085d10",
+  "inputs_and_original_outputs_verified_before_and_after": 329,
+  "original_releases_modified": false,
+  "output": "/private/tmp/zimbabwe-main-merge-weather-replay",
+  "runner_sha256": "baf4c23c8547c52e25d975247468469e062eba3eebb74612d1c37c04640e31dc",
+  "python": "3.12.14",
+  "output_comparisons": [
+    {
+      "path": "README.md",
+      "matches_original_sha256": true
+    },
+    {
+      "path": "climate_normals.csv",
+      "matches_original_sha256": true
+    },
+    {
+      "path": "harmonized_labels_weather.csv",
+      "matches_original_sha256": true
+    },
+    {
+      "path": "harmonized_labels_weather.parquet",
+      "matches_original_sha256": true
+    },
+    {
+      "path": "summary.json",
+      "matches_original_sha256": true
+    },
+    {
+      "path": "weather_cell_months.parquet",
+      "matches_original_sha256": true
+    },
+    {
+      "path": "weather_dictionary.csv",
+      "matches_original_sha256": true
+    },
+    {
+      "path": "weather_features.json",
+      "matches_original_sha256": true
+    },
+    {
+      "path": "weather_field_months.parquet",
+      "matches_original_sha256": true
+    },
+    {
+      "path": "weather_grid_mapping.csv",
+      "matches_original_sha256": true
+    },
+    {
+      "path": "weather_history.parquet",
+      "matches_original_sha256": true
+    },
+    {
+      "path": "weather_matched_cells.csv",
+      "matches_original_sha256": true
+    },
+    {
+      "path": "weather_retrieval_ledger.csv",
+      "matches_original_sha256": true
+    }
+  ]
+}

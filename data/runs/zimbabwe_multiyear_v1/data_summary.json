@@ -1,0 +1,70 @@
+{
+  "actual_lacuna_training_years": [
+    2023
+  ],
+  "actual_zimbabwe_training_years": [
+    2023,
+    2024
+  ],
+  "arms": 52,
+  "catalog_rows": 6598,
+  "coverage": [
+    {
+      "catalog_rows": 169,
+      "cohort": "zimbabwe_lacuna_2022_2023",
+      "domain": "lacuna",
+      "excluded_rows": 169,
+      "maximum_observed_months": 2,
+      "minimum_observed_months": 1,
+      "model_eligible_rows": 0,
+      "season_year": 2022
+    },
+    {
+      "catalog_rows": 2097,
+      "cohort": "zimbabwe_lacuna_2022_2023",
+      "domain": "lacuna",
+      "excluded_rows": 0,
+      "maximum_observed_months": 7,
+      "minimum_observed_months": 4,
+      "model_eligible_rows": 2097,
+      "season_year": 2023
+    },
+    {
+      "catalog_rows": 4332,
+      "cohort": "zimbabwe_2024",
+      "domain": "zimbabwe_2024",
+      "excluded_rows": 2,
+      "maximum_observed_months": 7,
+      "minimum_observed_months": 3,
+      "model_eligible_rows": 4330,
+      "season_year": 2024
+    }
+  ],
+  "eligible_extra_lacuna": 217,
+  "eligible_lacuna": 2097,
+  "eligible_source_2024": 4330,
+  "extra_intercropped_rainfed": 212,
+  "extra_irrigated": 5,
+  "extra_lacuna_outer_fit_counts": {
+    "1": 132,
+    "2": 149,
+    "3": 138,
+    "4": 150
+  },
+  "historical_control_arms": 26,
+  "imagery_imputation": false,
+  "lacuna_2022_excluded_insufficient_imagery": 169,
+  "new_arms": 26,
+  "requested_lacuna_years": [
+    2022,
+    2023
+  ],
+  "requested_zimbabwe_years": [
+    2022,
+    2023,
+    2024
+  ],
+  "source_2024_excluded_insufficient_imagery": 2,
+  "target_evaluation": 1504,
+  "target_reserved": 376
+}

@@ -1,0 +1,4 @@
+domain,cohort,season_year,catalog_rows,model_eligible_rows,minimum_observed_months,maximum_observed_months,excluded_rows
+lacuna,zimbabwe_lacuna_2022_2023,2022,169,0,1,2,169
+lacuna,zimbabwe_lacuna_2022_2023,2023,2097,2097,4,7,0
+zimbabwe_2024,zimbabwe_2024,2024,4332,4330,3,7,2

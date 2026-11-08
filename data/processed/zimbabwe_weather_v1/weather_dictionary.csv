@@ -1,0 +1,47 @@
+column,units,definition,provider,window,resolution
+wx_rain_total_mm_m01,mm,PRECTOTCORR mean daily rate × calendar days; sum for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_total_mm_m02,mm,PRECTOTCORR mean daily rate × calendar days; sum for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_total_mm_m03,mm,PRECTOTCORR mean daily rate × calendar days; sum for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_total_mm_m04,mm,PRECTOTCORR mean daily rate × calendar days; sum for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_total_mm_m05,mm,PRECTOTCORR mean daily rate × calendar days; sum for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_total_mm_m06,mm,PRECTOTCORR mean daily rate × calendar days; sum for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_total_mm_m10,mm,PRECTOTCORR mean daily rate × calendar days; sum for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_total_mm_m11,mm,PRECTOTCORR mean daily rate × calendar days; sum for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_total_mm_m12,mm,PRECTOTCORR mean daily rate × calendar days; sum for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_c_m01,degrees C,Monthly mean T2M; day-weighted mean for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_c_m02,degrees C,Monthly mean T2M; day-weighted mean for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_c_m03,degrees C,Monthly mean T2M; day-weighted mean for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_c_m04,degrees C,Monthly mean T2M; day-weighted mean for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_c_m05,degrees C,Monthly mean T2M; day-weighted mean for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_c_m06,degrees C,Monthly mean T2M; day-weighted mean for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_c_m10,degrees C,Monthly mean T2M; day-weighted mean for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_c_m11,degrees C,Monthly mean T2M; day-weighted mean for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_c_m12,degrees C,Monthly mean T2M; day-weighted mean for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_z_m01,standard deviations,"Monthly rainfall total minus historical mean, divided by historical sample standard deviation",NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_z_m02,standard deviations,"Monthly rainfall total minus historical mean, divided by historical sample standard deviation",NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_z_m03,standard deviations,"Monthly rainfall total minus historical mean, divided by historical sample standard deviation",NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_z_m04,standard deviations,"Monthly rainfall total minus historical mean, divided by historical sample standard deviation",NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_z_m05,standard deviations,"Monthly rainfall total minus historical mean, divided by historical sample standard deviation",NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_z_m06,standard deviations,"Monthly rainfall total minus historical mean, divided by historical sample standard deviation",NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_z_m10,standard deviations,"Monthly rainfall total minus historical mean, divided by historical sample standard deviation",NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_z_m11,standard deviations,"Monthly rainfall total minus historical mean, divided by historical sample standard deviation",NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_z_m12,standard deviations,"Monthly rainfall total minus historical mean, divided by historical sample standard deviation",NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_anomaly_c_m01,degrees C,T2M minus 1991–2020 month normal; day-weighted mean for season blocks,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_anomaly_c_m02,degrees C,T2M minus 1991–2020 month normal; day-weighted mean for season blocks,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_anomaly_c_m03,degrees C,T2M minus 1991–2020 month normal; day-weighted mean for season blocks,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_anomaly_c_m04,degrees C,T2M minus 1991–2020 month normal; day-weighted mean for season blocks,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_anomaly_c_m05,degrees C,T2M minus 1991–2020 month normal; day-weighted mean for season blocks,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_anomaly_c_m06,degrees C,T2M minus 1991–2020 month normal; day-weighted mean for season blocks,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_anomaly_c_m10,degrees C,T2M minus 1991–2020 month normal; day-weighted mean for season blocks,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_anomaly_c_m11,degrees C,T2M minus 1991–2020 month normal; day-weighted mean for season blocks,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_anomaly_c_m12,degrees C,T2M minus 1991–2020 month normal; day-weighted mean for season blocks,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_total_mm_oct_jun,mm,PRECTOTCORR mean daily rate × calendar days; sum for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_percent_normal_oct_jun,% of normal,100 × season rainfall / expected 1991–2020 rate for actual month lengths,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_c_oct_jun,degrees C,Monthly mean T2M; day-weighted mean for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_anomaly_c_oct_jun,degrees C,T2M minus 1991–2020 month normal; day-weighted mean for season blocks,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_total_mm_oct_mar,mm,PRECTOTCORR mean daily rate × calendar days; sum for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_percent_normal_oct_mar,% of normal,100 × season rainfall / expected 1991–2020 rate for actual month lengths,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_total_mm_jan_mar,mm,PRECTOTCORR mean daily rate × calendar days; sum for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_rain_percent_normal_jan_mar,% of normal,100 × season rainfall / expected 1991–2020 rate for actual month lengths,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_c_jan_mar,degrees C,Monthly mean T2M; day-weighted mean for named season block,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude
+wx_t2m_anomaly_c_jan_mar,degrees C,T2M minus 1991–2020 month normal; day-weighted mean for season blocks,NASA POWER / MERRA-2,October through June,0.5 degree latitude × 0.625 degree longitude

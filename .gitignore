@@ -9,7 +9,18 @@ data/raw/vision_guided_yield_estimation/q_field_photo.zip
 
 # Added 2026-10-26 with the project structure.
 data/features/
-data/runs/
+# Keep scratch runs and duplicate archives local; track the reviewed Zimbabwe releases.
+data/runs/*
+!data/runs/zimbabwe_merge_v1/
+!data/runs/zimbabwe_transfer_diagnosis_v1/
+!data/runs/zimbabwe_weather_v1/
+!data/runs/zimbabwe_weather_compact_v1/
+!data/runs/zimbabwe_aggregation_v1/
+!data/runs/zimbabwe_multiyear_v1/
+!data/runs/zimbabwe_weather_validation_v1.json
+!data/runs/zimbabwe_weather_compact_validation_v1.json
+!data/runs/zimbabwe_weather_compact_support_v1.csv
+!data/runs/zimbabwe_weather_compact_candidate_v1.csv
 .pytest_cache/
 .ruff_cache/
 *.egg-info/

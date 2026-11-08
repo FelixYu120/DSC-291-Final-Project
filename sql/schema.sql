@@ -82,7 +82,8 @@ CREATE TABLE coverage (
 
 
 -- 5. monthly_bands: one row per observation x month: median reflectance of the field pixels.
---    Sentinel-2 L2A surface reflectance, 0 to 1. Only observations with at least one scene.
+--    Sentinel-2 L2A surface reflectance, unitless; corrected values can fall outside 0 to 1.
+--    Only observations with at least one scene.
 CREATE TABLE monthly_bands (
     obs_id              VARCHAR NOT NULL,  -- key, see labels
     month               VARCHAR NOT NULL,  -- 'YYYY-MM'
