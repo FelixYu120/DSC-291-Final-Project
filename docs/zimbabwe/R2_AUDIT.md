@@ -1,5 +1,40 @@
 # How the V0–V3 R² values were calculated
 
+## v2 status (8 November): which numbers below broke a team rule
+
+This packet audits the **v1** release. Two team rules supersede part of it:
+
+1. **Label-free windows.** Every "V1 preharvest mean" score below (0.221860, 0.221149, 0.169061, 0.170550) uses each
+   field's survey planting and harvest dates as the window anchor. These models are no longer candidates.
+2. **Training rows follow `labels_v1.include_primary`.** Every `merged` score below trained on all 4,330
+   feature-eligible 2024 rows, including 1,874 recorded zeros that the team excludes. The v1 step 15 index-maximum
+   scores 0.180359 / 0.180568 also used 217 non-primary Lacuna rows.
+
+Lacuna-only (`target`) scores of the label-free variants are unchanged in v2. The R² definition, the 1,504 fields and
+SST = 5,921.399689832447 are unchanged. v2 pooled out-of-fold R² ([audit](../../results/aggregation_v2/r2_audit.csv),
+[receipt](../../results/aggregation_v2/r2_audit.json)):
+
+| Aggregation (v2) | 10 bands: target | 10 bands: merged | 5 indices: target | 5 indices: merged |
+|---|---:|---:|---:|---:|
+| V0 / V3 mean | 0.178491 | 0.178462 | 0.114127 | 0.114530 |
+| V1 calendar mean (Dec–Mar) | **0.218605** | **0.219324** | 0.173661 | 0.168952 |
+| V2 maximum | 0.088394 | 0.090896 | **0.178344** | **0.179048** |
+| V3 median | 0.043398 | 0.043766 | 0.050714 | 0.050829 |
+| V3 modal estimate | −0.030546 | −0.032472 | 0.014483 | 0.015076 |
+| Index mean + max control (10 features) | — | — | 0.180013 | 0.183268 |
+
+v2 merged arms use only the 2,456 include_primary 2024 rows; outer-fold allowed counts after the 2 km buffer are
+2,367 / 2,335 / 2,354 / 2,357. In step 15 v2 all 22 broader-pool arms are identical to these step 14 v2 arms, so the
+v2 index-maximum scores are 0.178344 (Lacuna) and 0.179048 (+ 2024). None of the v2 scores reproduces 0.21 either.
+The label-free counterpart of the disputed 0.17 index "preharvest" score is the index calendar mean, 0.173661.
+
+```bash
+python scripts/verification/audit_zimbabwe_r2.py --release data/runs/zimbabwe_aggregation_v2 --output results/aggregation_v2
+python scripts/verification/audit_zimbabwe_r2.py --release data/runs/zimbabwe_multiyear_v2 --output results/multiyear_v2
+```
+
+The rest of this packet is the original v1 audit, kept unchanged for the record.
+
 This is a review packet for the original **step-14 aggregation experiment**,
 `data/runs/zimbabwe_aggregation_v1/`. It explains the saved results before the
 expanded training-pool experiment. The R² definition stays the same in step 15,
@@ -19,7 +54,7 @@ we cannot identify the remaining difference or say which implementation caused i
 An independent calculation using NumPy and `sklearn.metrics.r2_score`, with no
 imports from the experiment's scoring code, reproduced all 26 saved scores to
 within 1e-10. It also checked that every model uses identical evaluation IDs,
-folds and target values. See [audit script](../../scripts/audit_zimbabwe_r2.py),
+folds and target values. See [audit script](../../scripts/verification/audit_zimbabwe_r2.py),
 [numeric audit](../../results/aggregation/r2_audit.csv) and
 [verification receipt](../../results/aggregation/r2_audit.json).
 
@@ -229,7 +264,7 @@ OLS fits does not justify substituting it for held-out Ridge R².
 From the repository root, with the project dependencies installed:
 
 ```bash
-python scripts/audit_zimbabwe_r2.py
+python scripts/verification/audit_zimbabwe_r2.py
 ```
 
 This reads committed CSVs; it needs no database, downloads, retraining or API

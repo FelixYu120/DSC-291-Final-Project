@@ -1,0 +1,85 @@
+{
+  "cohort": "malawi_2023",
+  "started": "2026-11-07T19:56:07.276098+00:00",
+  "finished": "2026-11-07T20:09:54.239971+00:00",
+  "window": [
+    "2022-10",
+    "2023-06"
+  ],
+  "fields_total": 253,
+  "fields_scored": 204,
+  "python": "3.12.10",
+  "torch": "2.14.1+cpu",
+  "numpy": "2.5.3",
+  "pandas": "3.0.6",
+  "sklearn": "1.9.1",
+  "presto_commit": "11e207a668a34336ced1d8e492a1bd5849b96c4a",
+  "presto_weights_sha256": "559c9d76f525bdf2dd3774da8b1e7f1510769b73baacac12e9e4d8d5c67fbe65",
+  "parked_sha256": {
+    "_parked/src/cropyield/features/presto_inputs.py": "074b9e4b7ccad348828074056b839ef9779bbac02d93a9137eb708740c6f9a83",
+    "_parked/src/cropyield/models/presto_weights.py": "25e8f1844513b750bb3efb930ca529d89a071bc9e593b59b20424ff1c56a0e97",
+    "_parked/src/cropyield/models/presto_single_file.py": "fb487a3a9ceb6040eaa8e97b9cd2dd9df8cb6c650ab889ac0868944ed55700df",
+    "_parked/src/cropyield/models/presto.py": "7187a2e6899a431cebf115986c7376f02e3c68935257192538ccd00f7d59e9cc"
+  },
+  "database_pin": "5f36d91bfafa0bf7ddf71457d85c2f385861b0b5a667863e149f5228d28a1e44",
+  "split_sha256": "d7536035db17f25e3a3658218ff97bf1e06897ba7d9e4a232c492d51572fd5a2",
+  "settings": {
+    "LEARNING_RATES": [
+      3e-05,
+      0.0001,
+      0.0003,
+      0.001
+    ],
+    "HEAD_LR_FACTOR": 10.0,
+    "WEIGHT_DECAY": 0.01,
+    "BATCH_SIZE": 32,
+    "GRAD_CLIP": 1.0,
+    "MAX_EPOCHS": 40,
+    "PATIENCE": 6,
+    "INNER_FOLDS": 5,
+    "SEED": 20261029
+  },
+  "p0_ridge_alphas": [
+    {
+      "arm": "P0",
+      "fold": "1",
+      "alpha": 100.0
+    },
+    {
+      "arm": "P0_noloc",
+      "fold": "1",
+      "alpha": 100.0
+    },
+    {
+      "arm": "P0",
+      "fold": "2",
+      "alpha": 316.22776601683796
+    },
+    {
+      "arm": "P0_noloc",
+      "fold": "2",
+      "alpha": 316.22776601683796
+    },
+    {
+      "arm": "P0",
+      "fold": "3",
+      "alpha": 316.22776601683796
+    },
+    {
+      "arm": "P0_noloc",
+      "fold": "3",
+      "alpha": 316.22776601683796
+    },
+    {
+      "arm": "P0",
+      "fold": "4",
+      "alpha": 316.22776601683796
+    },
+    {
+      "arm": "P0_noloc",
+      "fold": "4",
+      "alpha": 316.22776601683796
+    }
+  ],
+  "workers": 5
+}

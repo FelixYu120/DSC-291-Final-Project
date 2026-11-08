@@ -21,12 +21,25 @@ from cropyield.data.weather import CONFIG
 from cropyield.data.weather import OUTPUT as WEATHER
 from cropyield.experiments.zimbabwe_diagnosis import TrainingTransform
 from cropyield.experiments.zimbabwe_diagnosis import predict as previous_predict
-from cropyield.experiments.zimbabwe_merge import score_predictions
+from cropyield.experiments.zimbabwe_merge import (
+    require_training_rows,
+    score_predictions,
+    training_rows,
+)
 
 PRIOR = ROOT / "data/runs/zimbabwe_merge_v1"
 DIAGNOSIS = ROOT / "data/runs/zimbabwe_transfer_diagnosis_v1"
 OUTPUT = ROOT / "data/runs/zimbabwe_weather_v1"
 CONTROLS = ["monthly_target", "monthly_adaptive", "monthly_tree_target", "monthly_tree_transfer"]
+
+
+def release_paths(config=None):
+    """Upstream releases named by a weather/compact config; every key defaults to the v1 release."""
+    config = config or {}
+    return {"merge": ROOT/config.get("merge_run","data/runs/zimbabwe_merge_v1"),
+            "diagnosis": ROOT/config.get("diagnosis_run","data/runs/zimbabwe_transfer_diagnosis_v1"),
+            "weather": ROOT/config.get("weather_release","data/processed/zimbabwe_weather_v1"),
+            "weather_run": ROOT/config.get("weather_run","data/runs/zimbabwe_weather_v1")}
 
 
 class WeatherTransform:
@@ -54,14 +67,20 @@ def verify_release(directory):
         require(sha256(ROOT/name)==digest, f"Changed input: {name}")
 
 
-def load_weather_experiment():
-    for directory in [PRIOR, DIAGNOSIS, WEATHER]:
+def load_weather_experiment(config=None):
+    config = config or {}
+    paths = release_paths(config)
+    prior, diagnosis, weather = paths["merge"], paths["diagnosis"], paths["weather"]
+    for directory in [prior, diagnosis, weather]:
         verify_release(directory)
-    rows = pd.read_parquet(PRIOR/"combined_data.parquet").set_index("obs_id").sort_index()
+        upstream = json.loads((directory/"manifest.json").read_text())["config"]
+        require(training_rows(upstream)==training_rows(config), f"{directory.name} uses a different training-row rule")
+    rows = pd.read_parquet(prior/"combined_data.parquet").set_index("obs_id").sort_index()
+    require_training_rows(rows, config, "Merge comparison table")
     rows["group_id"] = rows.group_id.astype(str)
-    enriched = pd.read_parquet(WEATHER/"harmonized_labels_weather.parquet").set_index("obs_id")
-    names = json.loads((WEATHER/"weather_features.json").read_text())
-    imagery = pd.read_parquet(DIAGNOSIS/"features_monthly.parquet").reindex(rows.index)
+    enriched = pd.read_parquet(weather/"harmonized_labels_weather.parquet").set_index("obs_id")
+    names = json.loads((weather/"weather_features.json").read_text())
+    imagery = pd.read_parquet(diagnosis/"features_monthly.parquet").reindex(rows.index)
     require(len(imagery.columns)==122, "Monthly imagery feature schema changed")
     wx = enriched.loc[rows.index,names]
     require(np.isfinite(wx).all().all(), "Weather missing on comparison rows")
@@ -73,9 +92,9 @@ def load_weather_experiment():
         for variable in ["rain_z","t2m_anomaly_c"]:
             terms[f"interaction_ndvi_{variable}_m{month:02}"] = imagery[f"ndvi_month_{month:02}"]*wx[f"wx_{variable}_m{month:02}"]
     features["interactions"] = pd.concat([features["weather"],pd.DataFrame(terms,index=rows.index)],axis=1)
-    membership = pd.read_csv(PRIOR/"target_memberships.csv",dtype={"group_id":str})
-    permission = pd.read_csv(PRIOR/"source_spatial_permissions.csv")
-    controls = pd.read_csv(DIAGNOSIS/"predictions.csv",dtype={"group_id":str})
+    membership = pd.read_csv(prior/"target_memberships.csv",dtype={"group_id":str})
+    permission = pd.read_csv(prior/"source_spatial_permissions.csv")
+    controls = pd.read_csv(diagnosis/"predictions.csv",dtype={"group_id":str})
     controls = controls[controls.method.isin(CONTROLS)].copy()
     require(controls.groupby("method").size().eq(1504).all() and controls.outer_fold.ne(0).all(), "Invalid controls")
     return rows,features,membership,permission,controls
@@ -137,6 +156,7 @@ def run_models(rows, features, membership, permission, config):
             require(set(rows.loc[fit_ids].group_id).isdisjoint(rows.loc[val_ids].group_id),"Target group leakage")
             require(allowed.minimum_distance_to_protected_km.ge(config["buffer_km"]).all(),"Source buffer violation")
             require(rows.loc[source_ids].domain.eq("zimbabwe_2024").all() and rows.loc[source_ids].feature_eligible.all(),"Invalid source population")
+            require_training_rows(rows.loc[fit_ids+source_ids],config,f"Fit pool {outer}/{inner}")
             fit_cells = set(rows.loc[fit_ids].weather_grid_id)
             overlap.append({"outer_fold":outer,"inner_fold":inner,"query_rows":len(val_ids),
                             "query_cells":rows.loc[val_ids].weather_grid_id.nunique(),
@@ -227,14 +247,14 @@ def paired_metrics(predictions, config):
     return pd.DataFrame(metrics),pd.DataFrame(folds),pd.DataFrame(differences),interaction
 
 
-def weather_summaries(rows):
+def weather_summaries(rows, weather=WEATHER):
     selected = rows[(rows.domain.eq("lacuna")&rows.fold.ne(0))|rows.domain.eq("zimbabwe_2024")]
     columns = ["wx_rain_total_mm_oct_mar","wx_rain_percent_normal_oct_mar","wx_rain_total_mm_jan_mar",
                "wx_rain_percent_normal_jan_mar","wx_t2m_c_jan_mar","wx_t2m_anomaly_c_jan_mar"]
     cohorts = selected.groupby("domain")[columns].mean().reset_index()
     cohorts["n_fields"] = cohorts.domain.map(selected.groupby("domain").size())
     cohorts["n_weather_cells"] = cohorts.domain.map(selected.groupby("domain").weather_grid_id.nunique())
-    cells = pd.read_csv(WEATHER/"weather_matched_cells.csv")
+    cells = pd.read_csv(weather/"weather_matched_cells.csv")
     matched = cells.groupby("season_year")[columns].mean().reset_index()
     matched["n_weather_cells"] = cells.groupby("season_year").weather_grid_id.nunique().to_numpy()
     return cohorts,matched
@@ -267,19 +287,24 @@ def plot_results(path,metrics,differences,matched):
     plt.close(fig)
 
 
-def input_hashes(config_path):
+def input_hashes(config_path, paths=None):
+    upstream = paths or release_paths()
     paths = [Path(__file__),config_path,ROOT/"scripts/step12_compare_zimbabwe_weather.py",
              ROOT/"docs/ZIMBABWE_WEATHER_PROTOCOL.md",ROOT/"requirements.txt"]
-    for directory in [PRIOR,DIAGNOSIS,WEATHER]:
+    for directory in [upstream["merge"],upstream["diagnosis"],upstream["weather"]]:
         paths.extend(p for p in directory.iterdir() if p.is_file())
         manifest = json.loads((directory/"manifest.json").read_text())
         paths.extend(ROOT/name for name in manifest["inputs"])
     return {str(p.relative_to(ROOT)) if p.is_relative_to(ROOT) else str(p):sha256(p) for p in set(paths)}
 
 
-def write_results(path,metrics,differences,interaction,selected,overlap,matched):
+def write_results(path,metrics,differences,interaction,selected,overlap,matched,config=None):
+    config = config or {}
+    rule = [] if training_rows(config)=="all_screened" else [(
+        f"Training rows follow `labels_v1.include_primary` (config `training_rows`); rows, splits and source permissions "
+        f"come from `{config.get('merge_run')}`, so the 2024 pool holds no recorded zeros."), ""]
     lines = ["# Zimbabwe weather experiment", "", ("Exploratory results; every arm predicts the same 1,504 Lacuna 2023 fields. "
-             "Fold 0 remains reserved. RMSE/MAE/bias are t/ha. No-weather predictions are unchanged saved controls."), "",
+             "Fold 0 remains reserved. RMSE/MAE/bias are t/ha. No-weather predictions are unchanged saved controls."), "", *rule,
              "| Method | RMSE | MAE | Bias | R² |", "|---|---:|---:|---:|---:|"]
     lines += [f"| {r.method} | {r.rmse_t_ha:.6f} | {r.mae_t_ha:.6f} | {r.bias_t_ha:+.6f} | {r.r2:.6f} |" for r in metrics.itertuples()]
     primary = differences[differences.primary_comparison].iloc[0]
@@ -305,13 +330,14 @@ def write_results(path,metrics,differences,interaction,selected,overlap,matched)
 def run_experiment(output=OUTPUT,config_path=CONFIG):
     config = json.loads(config_path.read_text())
     require(config["target_folds"]==[1,2,3,4] and config["reserved_fold"]==0,"Reserved splits cannot change")
-    before = input_hashes(config_path)
-    rows,features,membership,permission,controls = load_weather_experiment()
+    paths = release_paths(config)
+    before = input_hashes(config_path,paths)
+    rows,features,membership,permission,controls = load_weather_experiment(config)
     with threadpool_limits(limits=1):
         new,tuning,selected,accounting,overlap = run_models(rows,features,membership,permission,config)
     predictions = pd.concat([controls,new],ignore_index=True)
     metrics,folds,differences,interaction = paired_metrics(predictions,config)
-    cohorts,matched = weather_summaries(rows)
+    cohorts,matched = weather_summaries(rows,paths["weather"])
     with tempfile.TemporaryDirectory(prefix="zimbabwe-weather-models-") as tmp:
         stage = Path(tmp)
         for name,table in {"predictions":predictions,"metrics":metrics,"fold_metrics":folds,"paired_differences":differences,
@@ -320,7 +346,7 @@ def run_experiment(output=OUTPUT,config_path=CONFIG):
             csv_write(table,stage/f"{name}.csv")
         # Keep exact split/permitted-source bytes, not a reserialized approximation.
         for name in ["target_memberships.csv","source_spatial_permissions.csv"]:
-            (stage/name).write_bytes((PRIOR/name).read_bytes())
+            (stage/name).write_bytes((paths["merge"]/name).read_bytes())
         enriched = rows.join(features["weather"].drop(columns=[c for c in features["weather"] if c in rows]),validate="one_to_one")
         enriched.to_parquet(stage/"combined_data_weather.parquet",index=True)
         csv_write(enriched.reset_index(),stage/"combined_data_weather.csv")
@@ -329,9 +355,9 @@ def run_experiment(output=OUTPUT,config_path=CONFIG):
         json_write({name:list(x.columns) for name,x in features.items()},stage/"feature_dictionary.json")
         json_write(interaction,stage/"transfer_benefit_interaction.json")
         (stage/"PROTOCOL.md").write_text((ROOT/"docs/ZIMBABWE_WEATHER_PROTOCOL.md").read_text(),encoding="utf-8")
-        write_results(stage/"RESULTS.md",metrics,differences,interaction,selected,overlap,matched)
+        write_results(stage/"RESULTS.md",metrics,differences,interaction,selected,overlap,matched,config)
         plot_results(stage/"weather_comparison.png",metrics,differences,matched)
-        require(before==input_hashes(config_path),"Inputs changed during weather experiment")
+        require(before==input_hashes(config_path,paths),"Inputs changed during weather experiment")
         json_write({"config":config,"inputs":before,"python":platform.python_version(),
                     "versions":{name:importlib.metadata.version(name) for name in ["numpy","pandas","scipy","scikit-learn","pyarrow","matplotlib"]},
                     "outputs":{p.name:{"sha256":sha256(p),"bytes":p.stat().st_size} for p in sorted(stage.iterdir())}},stage/"manifest.json")

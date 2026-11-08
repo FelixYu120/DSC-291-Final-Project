@@ -4,11 +4,15 @@ Answers the feedback "How will you measure generalization across time and space?
 fixed before the first model is trained. Evidence: semivariograms computed on the screened audit CSVs on
 29 October 2026, and arm R1 on the frozen folds and the `load_xy` rows, checked on 1 November 2026.
 
-**November 7 Zimbabwe handoff:** [`ZIMBABWE_DATA_HANDOFF.md`](ZIMBABWE_DATA_HANDOFF.md) defines explicit roles over
-these frozen folds: 2–4 train, 1 validation, 0 historical test. For `s1_cc2km`, counts are 1,128 / 376 / 376.
-This creates no new blind holdout: prior baselines have already evaluated these observations. The November 1 decision
-still prohibits scoring new model arms on fold 0 in any family. The derived `s2_region` partition has only two test
-Admin1 groups and three validation groups; it is a limited sensitivity check, not a precise national benchmark.
+**The team scoring rule (8 Nov 2026):** cross-validate over folds 1–4 of `s1_cc2km` (fit on three folds, predict the
+fourth) and score the pooled out-of-fold predictions; fold 0 is held back for one pre-registered final test. Training
+rows follow `labels_v1.include_primary`; survey dates (planting, harvest, crop-cut) are never inputs or window anchors.
+The Zimbabwe handoff release v2 (`data/processed/zimbabwe_midterm_v2`, [`ZIMBABWE_DATA_HANDOFF.md`](ZIMBABWE_DATA_HANDOFF.md))
+labels folds 1–4 `cv` (1,504 rows) and fold 0 `holdout` (376). Release v1 (7 Nov) labelled the same folds 2–4 train,
+1 validation, 0 test (1,128 / 376 / 376); that labelling is not the team rule, and v1 stays published only for the
+experiments that cite it. Fold 0 is not a new blind holdout: R0, R1, R2 and A1 were scored on it (1 Nov ruling). The
+`s2_region` family has only two Admin1 groups in fold 0 and three in fold 1; it is a limited sensitivity check, not a
+precise national benchmark.
 
 **November 7 merge comparison:** the separately authorized [protocol](ZIMBABWE_MERGE_PROTOCOL.md) compares
 Lacuna-only with Lacuna + 2024 using outer folds 1–4 and grouped inner CV. It never fits or scores fold 0.
@@ -50,14 +54,20 @@ split is reported only as a labelled diagnostic.
 | New village | `s1_cc2km` | no test field within 2 km of a training field | 5 folds over single-linkage connected components at 2 km |
 | New region | `s2_region` | whole districts held out | leave-group-out on the region unit, grouped into 5 folds |
 | New season | `temporal` | train one year, test the next | Kenya only (see below) |
+| New season, rank only (data v2) | `temporal_rank` | train one Malawi season, rank the fields of the other | `malawi_2022_2023`: the Malawi 2022 fields within 20 km of a 2023 field, and every 2023 field; repeat 0 trains on 2022, repeat 1 on 2023; groups are 2 km clusters over both seasons; Spearman only, because the crop cuts differ; not a spatial holdout |
 | Diagnostic | `random_diag` | random 5-fold | reported, labelled, never in the abstract |
+
+**Fold 0 is kept back.** Owner ruling of 1 Nov 2026 (`DECISIONS.md`): fold 0 of `s1_cc2km` is the test set for the end of
+the project. New scores use folds 1–4 as cross-validation; fold-0 fields still train. Data v2 scores (`step8 --version 2`,
+`step9`) follow this, also in the season transfer. Validation for tuning is the inner `GroupKFold` on `group_id` inside the
+training folds (`src/cropyield/baselines.py`).
 
 **Per cohort.**
 
 | Cohort | Spatial structure (evidence) | New village | New region | New season |
 |---|---|---|---|---|
 | Kenya OAF (3,977) | about half of the variance sits below 50 m, and the rest builds up to 50–100 km (semivariance over variance: 0.55 below 50 m, 0.60 at 1–2 km, 0.78 at 20–50 km, 0.99 at 50–100 km); district ICC 0.30 | 849 clusters, 5 folds, about 795 test fields per fold | leave-district-out over 50 normalised districts, 5 folds; no split file drops training fields near a test field, because that rule lived in the runner, which is parked (median test–train gap is only 4.6 km) | 2019 (1,768) → 2020 (2,209) and the reverse; split the 2020 test into districts seen in 2019 (1,849) and unseen (360, 11 districts) to separate time from space |
-| Malawi 2023 (260) | range about 1–2 km; one district | 53 clusters, 5 folds, about 52 per fold; pooled scores only | no region scale; stress test with 5 km clusters (21), 5 folds | none (Kasungu 2022 → 2023 needs the 2022 imagery) |
+| Malawi 2023 (260) | range about 1–2 km; one district | 53 clusters, 5 folds, about 52 per fold; pooled scores only | no region scale; stress test with 5 km clusters (21), 5 folds | data v2: `temporal_rank` Malawi 2022 ↔ 2023 (Kasungu), rank only |
 | Lacuna 2023 (second) | structure is between districts (`Admin1` ICC 0.41, range about 50 km) | 289 clusters, 5 folds | **leave-`Admin1`-out**, 5 folds: the key test for this cohort | none (2022 has 169 rows and no imagery) |
 
 Hyperparameters are tuned only inside the training fold, with the same grouping (nested group CV).
@@ -71,8 +81,9 @@ only on pooled sets of ≥ 200.
 Within cohort only, on pooled out-of-fold predictions, with fold mean ± SD alongside:
 
 - **Accuracy:** RMSE in t/ha (primary), MAE, bias, R² = 1 − SSE/SST.
-- **Ranking:** Spearman ρ, pooled and within each held-out group (median over groups with ≥ 10 fields),
-  because pooled scores across districts reward getting district means right.
+- **Ranking:** Spearman ρ inside clusters, because pooled scores across districts reward getting district
+  means right. Take the mean of each `group_id` and year out of y and of the prediction, keep clusters of at
+  least 3 fields, and take one Spearman. The median over groups of 10 fields would leave 3 clusters in Malawi.
 - **Targeting:** recall of the bottom 20 % of fields at a 20 % quota, and AUC for bottom 20 % (the "quota
   method" of Aiken et al. 2023).
 
@@ -126,7 +137,14 @@ countries; compare with that.
 - `data/splits/manifest.json`: generator commit, SHA-256 of `labels_v1` and of each split file, parameters,
   row counts.
 - Tests: each `obs_id` once per repeat; no `group_id` in two folds; `s1_cc2km` minimum test–train distance
-  ≥ 2 km; hashes match the manifest.
+  ≥ 2 km; hashes match the manifest. The 2 km is measured point to point on the labels `lat`/`lon` (inside the
+  polygon for Malawi); 4 Malawi 2022 polygons are 1,968 m edge to edge from a polygon in another fold, and no chip
+  pixel is shared.
+- Group on the split's `group_id`, never on `labels.cluster_2km`: for Lacuna, `cluster_2km` is built over all 2,266
+  rows, so 12 of its values hold fields of two folds.
+- Data v2: `data/v2/splits/` holds the 13 v1 files byte for byte, the Malawi 2022 files (`s1_cc2km` 97 groups,
+  `s2_region` k-means 20, `random_diag`) and `malawi_2022_2023__temporal_rank.csv`; `data/v2/splits/manifest.json`
+  pins them and `labels_v2`.
 - Commit with one line in `DECISIONS.md` and the git tag `splits-v1`. After that, splits are never edited.
 
 ## References (each opened on 29 October 2026)

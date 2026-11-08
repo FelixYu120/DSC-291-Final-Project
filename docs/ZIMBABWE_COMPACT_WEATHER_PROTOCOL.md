@@ -68,3 +68,11 @@ If simpler features reduce outer error while full-weather fits have lower traini
 with overfitting, not causal proof. If compact sets do not help, report it. Weather remains coarse, target observations cover
 one year, and climate/year/provider/management effects are confounded. The same required 2 km splits allow shared weather
 cells; this is retrospective spatial development evaluation, not a new-cell or future-season blind test.
+
+## v2 amendment (8 November 2026): training rows follow `include_primary`
+
+v1 inherited the v1 merge pool, which trained on 1,874 recorded 2024 zeros that `labels_v1.include_primary` excludes.
+`configs/zimbabwe_weather_compact_v2.json` sets `"training_rows": "include_primary"` and reads only v2 upstream releases
+(`zimbabwe_merge_v2`, `zimbabwe_transfer_diagnosis_v2`, `zimbabwe_weather_v2` processed and run). The no-weather and
+46-feature controls are the saved v2 predictions. Output: `data/runs/zimbabwe_weather_compact_v2/`. Feature sets, grids,
+splits, seed and bootstrap units are unchanged. Without the keys, the code keeps the v1 behaviour.

@@ -41,6 +41,8 @@ The archived MTCI-style feature is described by its actual formula. Changing it 
 
 ## Document production and verification
 
-[build_paper_documents.py](../../scripts/build_paper_documents.py) builds both DOCX files from the reviewed Markdown using `python-docx`. Word-native fraction objects keep the equations editable. The final documents were rendered and every page inspected; the team summary occupies exactly one page. The validation receipt records source/document hashes and render page counts. Rendered PDF/PNG intermediates are retained only for local layout checks.
+[build_paper_documents.py](../../scripts/paper/build_paper_documents.py) builds both DOCX files from the reviewed Markdown using `python-docx`. Word-native fraction objects keep the equations editable. The final documents were rendered and every page inspected; the team summary occupies exactly one page. The validation receipt records source/document hashes and render page counts. Rendered PDF/PNG intermediates are retained only for local layout checks.
 
 The score ledger was independently checked against saved predictions for sample count, uniqueness, RMSE, MAE and R². The manuscript was separately reviewed against processing code and primary sources. Frozen experiments were not rerun or rewritten for this writing task.
+
+8 Nov 2026 (merge into `data-v2-experiments`): `build_paper_documents.py` moved to `scripts/paper/` (its `ROOT` line changed, and it now reads the Markdown as UTF-8), so `validation.json` records the 7 Nov builder. The numbers here are the v1 runs of 7 Nov; the rule-compliant v2 values are in `notebooks/lacuna_results_consensus.ipynb`, section 6.1.

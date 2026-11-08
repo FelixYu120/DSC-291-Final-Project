@@ -1,5 +1,45 @@
 # Why the Zimbabwe merge helped little, and what improved
 
+## v2 correction (8 November 2026): training rows follow `include_primary`
+
+**The v1 numbers below trained on rows the team excludes.** v1 inherited the v1 merge pool: all 4,332 screened 2024
+rows, including the **1,874 recorded zeros** that `labels_v1.include_primary` excludes. v2
+(`configs/zimbabwe_transfer_diagnosis_v2.json`) inherits the v2 merge (`data/runs/zimbabwe_merge_v2`). Every fit pool
+holds only `include_primary` rows: 2,458 Zimbabwe 2024 rows (2,456 with imagery), no zeros. The 1,504 evaluation
+fields, folds, fold 0, 2 km buffer, inner CV, seeds and grids are unchanged. The run reproduced the v2 merge's
+seasonal baseline and adaptive predictions exactly. Lacuna-only arms are the same in v1 and v2.
+
+| Feature/learner family (RMSE t/ha) | Lacuna only | v1 with 2024 | v2 with 2024 | v2 paired ΔRMSE, 95% interval |
+|---|---:|---:|---:|---|
+| Seasonal Ridge | 1.7968 | 1.7938 | 1.7932 | −0.0036 [−0.0083, +0.0009] |
+| Monthly Ridge | 1.6926 | 1.6892 | **1.6869** | **−0.0057 [−0.0097, −0.0021]** |
+| Frozen Presto + Ridge | 1.6815 | 1.6796 | 1.6799 | −0.0016 [−0.0048, +0.0016] |
+| Monthly boosted trees | 1.6594 | 1.6578 | 1.6770 | +0.0176 [−0.0072, +0.0450] |
+| Selector, primary (transfer vs target-only) | 1.6923 | 1.6827 | 1.7009 | +0.0086 [−0.0336, +0.0440] |
+
+v1 primary: −0.0096 [−0.0439, +0.0226]. Under v2 the primary selector contrast turns slightly positive (worse), and
+its interval still crosses zero. Monthly adaptive Ridge is the only family whose v2 interval excludes zero; the gain is
+0.0057 t/ha (0.33%), small and exploratory. Merged monthly trees are worse than Lacuna-only trees in v2.
+R² (v2): monthly Ridge 0.2723 → 0.2772 with 2024; monthly trees 0.3006 → 0.2857; selectors 0.2726 / 0.2652.
+
+Other v2 changes: the 2024 mean is 0.857 t/ha (v1 0.486) and its zero share is 0. Naive pooling's extra MSE is still
+almost all squared bias (99.9%; v1 99.0%). Source-versus-target AUC: seasonal 0.787, monthly 0.995, Presto 0.9996,
+coordinates 0.697. Within 2024, learnability falls without the zeros: monthly Ridge R² 0.194 (v1 0.271), Presto
+Ridge 0.210, coordinates 0.194, on 1,944 protected fields. The zero/positive ranking AUC is undefined (no zeros).
+Five shuffled-label controls give 1.79623–1.79664 versus 1.79320 for true-label seasonal adaptation; three matched
+random subsets give 1.79300–1.79315 versus 1.79316 for the quality filter (2,157 of 2,458 rows). Density weighting
+gives seasonal RMSE 1.78892, the best seasonal point estimate. The conclusion does not change: adding 2024 gives at
+most a small, uncertain gain.
+
+v2 outputs: `data/runs/zimbabwe_transfer_diagnosis_v2/` (git-ignored); small copies in
+[`results/merge_v2/diagnosis/`](../../results/merge_v2/diagnosis/). Run
+`python scripts/step10_diagnose_zimbabwe_transfer.py --config configs/zimbabwe_transfer_diagnosis_v2.json`
+(about 13 minutes).
+
+The rest of this page describes the **v1 run**. Its numbers include the excluded zeros.
+
+## v1 findings
+
 The strongest supported explanation is **a large source/target population difference, combined with a weak initial
 feature representation**. The evidence does not support blaming the result primarily on widespread random corruption
 of 2024 labels. Better predictors and a stronger learner substantially improve Lacuna prediction; the incremental
@@ -66,9 +106,9 @@ reason transfer is weak.
 | Learnability within 2024 | Monthly Ridge achieves spatial-CV **R² = 0.271**, RMSE 0.720 versus 0.843 for the training mean, on 3,764 protected diagnostic fields. | There is learnable source signal. Predictability alone is not ground-truth validation. |
 | Geographic source signal | Coordinates alone achieve **R² = 0.264** and nonzero-ranking AUC 0.855. | Much of the learnable source structure is spatial; that does not guarantee a transferable field-level relationship with imagery. |
 
-The [source paper](https://arxiv.org/html/2511.12999v1) treats maize yields as zero-inflated, which is consistent with
-retaining recorded zeros while testing sensitivities. Neither the paper, these consistency checks, nor the drought
-proves that every individual zero is correct.
+The [source paper](https://arxiv.org/html/2511.12999v1) treats maize yields as zero-inflated. Neither the paper, these
+consistency checks, nor the drought proves that every individual zero is correct. The team rule excludes the zeros from
+training (`zimbabwe_2024_zero_likely_not_measured`); v1 broke that rule, and v2 above follows it.
 
 Lacuna has only one crop cut per field. We cannot estimate its measurement-noise ceiling from the source's two-cut
 correlation. Residual target error may include target measurement noise, unobserved management/weather and GPS/field
@@ -129,7 +169,7 @@ weighting, representation or learner changes. This does not establish that every
 
 Use the richer monthly representation as a serious baseline for the team's modeling work. Report its target-only
 and pooled variants side by side. Keep the harmonized 2024 observations and their quality flags available for auxiliary
-training; the evidence does not justify permanently deleting uncertain but valid labels or claiming a large pooling gain.
+training under the team rule (`include_primary` rows only); the evidence does not justify claiming a large pooling gain.
 For stronger attribution, the useful missing evidence is verified field/season alignment, management/weather inputs,
 and reference measurements for questionable labels. A fresh independent season is needed for confirmatory transfer claims.
 
@@ -141,13 +181,14 @@ for the Lacuna 2023 target population under the methods we tested. Filtering noi
 ## Reproduce and inspect
 
 - [Protocol](../ZIMBABWE_TRANSFER_DIAGNOSIS_PROTOCOL.md), specified before the follow-up models ran.
-- [Generated complete results](../../data/runs/zimbabwe_transfer_diagnosis_v1/RESULTS.md), including all 30 arms and selections.
+- [Generated complete results](../../data/runs/zimbabwe_transfer_diagnosis_v1/RESULTS.md), including all 30 arms and selections;
+  v2: [`results/merge_v2/diagnosis/RESULTS.md`](../../results/merge_v2/diagnosis/RESULTS.md).
 - [Runner](../../scripts/step10_diagnose_zimbabwe_transfer.py), [implementation](../../src/cropyield/experiments/zimbabwe_diagnosis.py),
-  [config](../../configs/zimbabwe_transfer_diagnosis_v1.json).
+  configs [v1](../../configs/zimbabwe_transfer_diagnosis_v1.json) and [v2](../../configs/zimbabwe_transfer_diagnosis_v2.json).
 - Outputs in `data/runs/zimbabwe_transfer_diagnosis_v1/`: predictors, quality flags, exact memberships/permissions,
   tuning, predictions, metrics, uncertainty, diagnostics and input/code/output hash manifest.
 
-Run `python scripts/reproduce_zimbabwe.py diagnosis` from the repository root with the first experiment and
+Run `python scripts/verification/reproduce_zimbabwe.py diagnosis` from the repository root with the first experiment and
 pinned team database present. Inputs are read-only; existing releases are immutable. The full suite passed
 **162 tests, with 2 skipped**. Original seasonal baseline/adaptation predictions are reproduced independently within
 the runner. Output-level checks verify source exclusions, same evaluation IDs, inner-only method selection, metrics,

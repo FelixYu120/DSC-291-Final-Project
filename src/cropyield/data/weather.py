@@ -24,6 +24,15 @@ CATALOG = ROOT / "data/runs/zimbabwe_merge_v1/harmonized_labels.parquet"
 OUTPUT = ROOT / "data/processed/zimbabwe_weather_v1"
 
 
+def catalog_path(config: dict) -> Path:
+    """Label catalog of the merge release named in the config (v1 by default)."""
+    return ROOT / config.get("merge_run", "data/runs/zimbabwe_merge_v1") / "harmonized_labels.parquet"
+
+
+def release_path(config: dict) -> Path:
+    return ROOT / config.get("weather_release", "data/processed/zimbabwe_weather_v1")
+
+
 def grid_mapping(labels, config):
     out = labels[["obs_id", "lat", "lon", "season_year"]].copy()
     lat_step, lon_step = config["latitude_spacing_degrees"], config["longitude_spacing_degrees"]
@@ -115,9 +124,10 @@ def fetch_cell(grid, config, cache=CACHE, offline=False):
 
 
 def download_weather(config, offline=False):
-    pinned = json.loads((CATALOG.parent / "manifest.json").read_text())
-    require(sha256(CATALOG) == pinned["outputs"][CATALOG.name]["sha256"], "Original label catalog changed")
-    labels = pd.read_parquet(CATALOG)
+    catalog = catalog_path(config)
+    pinned = json.loads((catalog.parent / "manifest.json").read_text())
+    require(sha256(catalog) == pinned["outputs"][catalog.name]["sha256"], "Original label catalog changed")
+    labels = pd.read_parquet(catalog)
     mapping = grid_mapping(labels,config)
     grids = mapping[["weather_grid_id","weather_grid_lat","weather_grid_lon"]].drop_duplicates().sort_values("weather_grid_id")
     finished = 0
@@ -195,6 +205,7 @@ def weather_dictionary(features):
 
 def build_weather(output=OUTPUT,config_path=CONFIG,offline=True):
     config = json.loads(config_path.read_text())
+    catalog = catalog_path(config)
     mapping,grids = download_weather(config,offline=offline)
     histories,ledger,inputs = [],[],{}
     for grid in grids.itertuples():
@@ -210,7 +221,7 @@ def build_weather(output=OUTPUT,config_path=CONFIG,offline=True):
                        "source":"MERRA2","time_standard":metadata["provider_header"]["time_standard"]})
         inputs[str(raw.relative_to(ROOT))] = sha256(raw)
         inputs[str(meta.relative_to(ROOT))] = sha256(meta)
-    for path in [CATALOG,CATALOG.parent/"manifest.json",CONFIG,Path(__file__),
+    for path in [catalog,catalog.parent/"manifest.json",Path(__file__),
                  ROOT/"scripts/step11_add_zimbabwe_weather.py", ROOT/"src/cropyield/data/handoff.py",
                  ROOT/"src/cropyield/data/labels.py", ROOT/"src/cropyield/eval/splits.py",
                  ROOT/"docs/ZIMBABWE_WEATHER_PROTOCOL.md",config_path]:
@@ -218,7 +229,7 @@ def build_weather(output=OUTPUT,config_path=CONFIG,offline=True):
     history = pd.concat(histories,ignore_index=True)
     normal = climate_normals(history,config)
     seasonal,wide,feature_names = seasonal_weather(history,normal,config)
-    labels = pd.read_parquet(CATALOG)
+    labels = pd.read_parquet(catalog)
     map_columns = [c for c in mapping if c.startswith("weather_")]
     enriched = labels.merge(mapping[["obs_id",*map_columns]],on="obs_id",validate="one_to_one")
     enriched = enriched.merge(wide,on=["weather_grid_id","season_year"],validate="many_to_one")

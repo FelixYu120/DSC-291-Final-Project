@@ -4,9 +4,38 @@ This is the entry point for Felix's data preparation and the subsequent merge/we
 Read the [one-page Ridge summary](SUMMARY.md), then follow [Data Guide 2](../../notebooks/data_guide_2_zimbabwe.ipynb)
 for the complete walkthrough. [METHODS.md](METHODS.md) contains the current concise findings and technical appendix.
 
-The [paper folder](../paper/README.md) contains Felix and Florian's manuscript section, a one-page team summary and every saved result with repeated controls identified.
+The [paper folder](../paper/README.md) contains Felix and Florian's manuscript section, a one-page team summary and every saved result with repeated controls identified. (Felix, 7 Nov: these files quote the **v1** runs; the rule-compliant v2 values are in [the results notebook](../../notebooks/lacuna_results_consensus.ipynb), section 6.1)
 
-## Work added, in order
+## Rule-compliant v2 runs (8 Nov 2026)
+
+The v1 releases below broke three team rules (`docs/DECISIONS.md`, 8 Nov): steps 9–15 trained on rows that
+`labels_v1.include_primary` excludes, steps 14–15 anchored a window on survey dates, and the step 8 handoff labelled
+fold 1 as validation. Each step now has a v2 config that follows the rules; a config without the new keys still
+reproduces v1. Use v2 for new work. The v1 releases are kept, unchanged, for the record.
+
+| Step | v2 config | Results (in git) |
+|---|---|---|
+| 8 | [zimbabwe_midterm_v2.json](../../configs/zimbabwe_midterm_v2.json) | [handoff v2](../../data/processed/zimbabwe_midterm_v2/README.md): folds 1–4 `cv`, fold 0 `holdout` |
+| 9–10 | [merge](../../configs/zimbabwe_merge_v2.json), [diagnosis](../../configs/zimbabwe_transfer_diagnosis_v2.json) | [results/merge_v2/](../../results/merge_v2/README.md) |
+| 11–13 | [weather](../../configs/zimbabwe_weather_v2.json), [compact](../../configs/zimbabwe_weather_compact_v2.json) | [results/weather_v2/](../../results/weather_v2/README.md) |
+| 14 | [aggregation](../../configs/zimbabwe_aggregation_v2.json) | [results/aggregation_v2/](../../results/aggregation_v2/RESULTS.md) |
+| 15 | [multiyear](../../configs/zimbabwe_multiyear_v2.json) | [results/multiyear_v2/](../../results/multiyear_v2/RESULTS.md) |
+
+v2 pools: 1,880 Lacuna 2023 fields (1,504 scored) and 2,456 `include_primary` Zimbabwe 2024 fields with imagery.
+The full v2 run folders `data/runs/zimbabwe_*_v2/` are git-ignored; rebuild them in order (about 45 minutes):
+
+```bash
+python scripts/step8_build_zimbabwe_handoff.py                                                     # v2 is the default
+python scripts/step9_compare_zimbabwe_merge.py --config configs/zimbabwe_merge_v2.json
+python scripts/step10_diagnose_zimbabwe_transfer.py --config configs/zimbabwe_transfer_diagnosis_v2.json
+python scripts/step11_add_zimbabwe_weather.py --config configs/zimbabwe_weather_v2.json
+python scripts/step12_compare_zimbabwe_weather.py --config configs/zimbabwe_weather_v2.json
+python scripts/step13_compare_compact_weather.py --config configs/zimbabwe_weather_compact_v2.json
+python scripts/step14_compare_zimbabwe_aggregation.py                                              # v2 is the default
+python scripts/step15_compare_zimbabwe_multiyear.py                                                # v2 is the default
+```
+
+## Work added, in order (v1, 7 Nov)
 
 Paths below are relative to the repository root. Scripts are the original stage entry points;
 use the [recorded-code runner](REPRODUCING.md) to reproduce steps 9–13 on current main.

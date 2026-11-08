@@ -1,6 +1,40 @@
 # Zimbabwe data merging weather enrichment and evaluation
 
-For the manuscript, use the audited [data sources and preparation section](../paper/DATA_SOURCES_AND_PREPARATION.md). It specifies the provider-specific screening tolerances, single-grid-cell Zimbabwe satellite support, archived `mtci` formula and the distinction between inferred 2024 area normalization and independently documented cut area.
+For the manuscript, use the audited [data sources and preparation section](../paper/DATA_SOURCES_AND_PREPARATION.md). It specifies the provider-specific screening tolerances, single-grid-cell Zimbabwe satellite support, archived `mtci` formula and the distinction between inferred 2024 area normalization and independently documented cut area. (Felix, 7 Nov: these files quote the **v1** runs; the rule-compliant v2 values are in [the results notebook](../../notebooks/lacuna_results_consensus.ipynb), section 6.1)
+
+## v2 correction (8 November 2026): training rows follow `include_primary`
+
+**The v1 merged numbers on this page trained on rows the team excludes.** v1 steps 9–13 pooled all 4,332 screened
+2024 rows, including the 1,874 recorded zeros that `labels_v1.include_primary` excludes. The v2 reruns
+(`configs/*_v2.json`, `"training_rows": "include_primary"`) train only on `include_primary` rows: 1,880 Lacuna 2023 and
+2,458 Zimbabwe 2024 rows. Evaluation fields, splits, fold 0, buffer, grids, seeds, bootstrap units and the
+December–June imagery and October–June weather windows are unchanged; no survey date is an input or window anchor.
+Lacuna-only arms are identical in v1 and v2. RMSE in t/ha on the same 1,504 fields:
+
+| Weather features added | Lacuna-only trees | Merged trees, v1 | Merged trees, v2 |
+|---|---:|---:|---:|
+| None | 1.6594 | 1.6578 | 1.6770 |
+| 46 | 1.6958 | 1.7221 | 1.7164 |
+| 2 | 1.6806 | 1.6740 | 1.6607 |
+| 4 | 1.6727 | 1.7029 | 1.6904 |
+| 4, shared-label Ridge (Lacuna-only Ridge 1.7283) | — | 1.6554 | **1.6428** |
+
+- Full weather, primary (merged minus Lacuna-only weather trees): v2 **+0.0206 [−0.0044, +0.0443]**
+  (v1 +0.0264 [+0.0094, +0.0450]). Weather × merging interaction: v2 +0.0030 [−0.0346, +0.0390] (v1 +0.0280 [+0.0025, +0.0579]).
+- Compact, primary (four-feature merged minus Lacuna-only trees): v2 **+0.0177 [−0.0095, +0.0467]** (v1 +0.0302 [−0.0009, +0.0612]).
+- Two-feature merged trees versus 46-feature merged trees: v2 −0.0557 [−0.1123, −0.0009] (v1 −0.0481 [−0.0995, +0.0053]).
+- Best arm overall: four-feature shared Ridge, v2 1.6428 (R² 0.315; v1 1.6554, R² 0.304). Post hoc against the best
+  imagery-only arm (Lacuna-only monthly trees, 1.6594): −0.0166 [−0.0583, +0.0267]. Not an established gain.
+- Overfitting signal persists: merged weather trees fit training data at RMSE 0.937 (imagery only 1.128) but score 1.715 out of fold.
+
+Without the excluded zeros, merging hurts less, but the conclusions do not change: no merged or weather arm is
+clearly better than imagery-only Lacuna trees. v2 outputs: `data/processed/zimbabwe_weather_v2/`,
+`data/runs/zimbabwe_weather_v2/`, `data/runs/zimbabwe_weather_compact_v2/`; small copies and independent verification
+receipts (both passed) in [`results/weather_v2/`](../../results/weather_v2/).
+
+The rest of this page describes the **v1 runs**.
+
+## v1 findings
 
 **Smaller weather sets recover some lost accuracy, but they do not establish a better overall model.** All comparisons use the same 1,504 Lacuna fields and frozen spatial splits. RMSE is in t/ha; lower is better.
 
@@ -27,7 +61,7 @@ These are exploratory, retrospective results. Reserved Lacuna fold 0 was neither
 
 A row is one recorded field-season, with its original source identity and yield. We append the two Zimbabwe sources vertically after giving their columns consistent meanings. We do not match a 2023 farmer to a 2024 farmer or average yields across years: the files lack a verified shared farm identifier. Spatial proximity is used to protect evaluation, not to infer identity.
 
-The catalog has **6,598 labels**: 2,266 Lacuna and 4,332 Zimbabwe 2024. The comparison keeps 1,880 pure-stand, rainfed Lacuna 2023 fields plus the 4,332 source fields. Reserve 376 target fields and exclude two source fields lacking sufficient imagery; each outer fit uses 1,128 target fields and spatially allowed source fields.
+The catalog has **6,598 labels**: 2,266 Lacuna and 4,332 Zimbabwe 2024. The v1 comparison kept 1,880 pure-stand, rainfed Lacuna 2023 fields plus all 4,332 source fields, the 1,874 zeros included; this broke the team rule. The v2 comparison keeps the same 1,880 Lacuna fields plus the **2,458** `include_primary` source fields. Reserve 376 target fields and exclude two source fields lacking sufficient imagery; each outer fit uses 1,128 target fields and spatially allowed source fields.
 
 | Difference | Lacuna | Zimbabwe 2024 |
 |---|---|---|
@@ -55,7 +89,7 @@ Reconcile raw IDs, coordinates and outcomes with frozen labels. Check unique sou
 
 Three Lacuna records imply dry kg × 0.5 instead of × 0.25 for 40 m². Exclude them; unknown area/weight errors cannot be repaired by guessing. Of the remaining 2,266 labels, 169 are from 2022 and 2,097 from 2023. Sequentially remove 212 intercropped and five irrigated 2023 records to obtain 1,880 primary fields. Keep 28 primary zero yields; retain nearby coordinates in shared spatial groups. The 2022 records remain catalog-only.
 
-The 5,055 raw maize records include **723 missing labels**, which are excluded without imputation: 590 comments indicate photos only and 133 indicate wet weight without dry weight. The 4,332 retained records have reported average yields. They include **1,874 recorded zeros** and **42 single-cut records**. Recorded zero and missing measurement are distinct states. Neither a late photo date nor drought alone proves whether an individual zero is correct.
+The 5,055 raw maize records include **723 missing labels**, which are excluded without imputation: 590 comments indicate photos only and 133 indicate wet weight without dry weight. The 4,332 retained records have reported average yields. They include **1,874 recorded zeros** and **42 single-cut records**. Recorded zero and missing measurement are distinct states. Neither a late photo date nor drought alone proves whether an individual zero is correct. `labels_v1` excludes the zeros from training (`zimbabwe_2024_zero_likely_not_measured`); v2 training pools follow that rule, v1 pools did not.
 
 Box conversion and average comparisons use an absolute tolerance of 0.000001 t/ha. The independently screened IDs, coordinates and outcomes must reconcile with the frozen screened labels. All row-level reasons remain available in `source_2024_audit.csv`.
 
@@ -133,7 +167,7 @@ Adaptive Ridge centers predictors and standardizes outcomes separately within tr
 
 For weighted methods, let the total target weight be `n_target` and source ratio be `r`. Normalize source weights so they sum to `r × n_target`; every target row has weight one. Candidate ratios are **0, 0.1, 0.3 and 1**. This prevents the larger 2024 sample from dominating simply by row count. Ratio zero recovers target-only fitting and must be reported as no source contribution.
 
-A source-quality experiment required two cuts, at least six observed imagery months and relative cut disagreement ≤1; both-zero pairs receive disagreement zero. It retained 4,027 labels. Random controls matched size and zero/positive composition. Filtering did not establish a gain, and valid zeros were not deleted merely because yields were low.
+A source-quality experiment required two cuts, at least six observed imagery months and relative cut disagreement ≤1; both-zero pairs receive disagreement zero. It retained 4,027 labels in v1 (v2: 2,157 of the 2,458 `include_primary` rows). Random controls matched size and zero/positive composition (v2: size only, as there are no zeros). Filtering did not establish a gain in either run.
 
 Each compact set tests five arms: target Ridge, adaptive Ridge, shared-label weighted Ridge, target boosted trees, and weighted merged boosted trees. Shared Ridge keeps physical yields with shared slopes; trees receive a cohort indicator. All select source weights using target inner validation. Ratio zero is permitted. Earlier weather experiments also tested 14 NDVI × weather-anomaly interactions and a weather-only model.
 
@@ -213,18 +247,25 @@ Use the [recorded-code runner](REPRODUCING.md) for the published experiments; th
 | `data/processed/zimbabwe_weather_v1/` | All enriched labels, monthly weather, history, normals, dictionary and provenance |
 | `data/runs/zimbabwe_weather_v1/` | Original 46-feature/interaction models and immutable controls |
 | `data/runs/zimbabwe_weather_compact_v1/` | Two/four-feature matrices, compact weather CSV/Parquet, 19-arm predictions/metrics, tuning, fit accounting, diagnostics and paired intervals |
+| `data/runs/zimbabwe_merge_v2/`, `zimbabwe_transfer_diagnosis_v2/`, `zimbabwe_weather_v2/`, `zimbabwe_weather_compact_v2/` | v2 reruns with `include_primary` training rows (git-ignored; same file layout as v1) |
+| `data/processed/zimbabwe_weather_v2/` | Weather enrichment of the v2 catalog, built offline from the same raw snapshots; weather values equal v1 |
+| `results/merge_v2/`, `results/weather_v2/` | Small v2 summaries, manifests and verification receipts |
+
+v2 commands, in order: `python scripts/step9_compare_zimbabwe_merge.py --config configs/zimbabwe_merge_v2.json`, then step 10
+with `configs/zimbabwe_transfer_diagnosis_v2.json`, steps 11 and 12 with `configs/zimbabwe_weather_v2.json`, and step 13
+with `configs/zimbabwe_weather_compact_v2.json`. The verifiers and `compare_compact_candidate.py` take the same `--config`.
 
 For a GRU or another sequence model, explicitly order weather months October, November, December, January through June, and imagery months December, January through June. Lexical column order starts with January and would misorder the season. Join monthly weather by `obs_id` and actual `month`; retain imagery masks instead of treating a missing scene as zero reflectance. The weather extension supplies these data but does not train a GRU.
 
 Pipeline: raw audit → harmonized labels and eligibility → frozen imagery/splits → weather snapshots and unit/season/grid conversion → feature tables → training-only transforms → inner tuning → outer predictions → paired metrics. Release manifests pin all inputs and outputs. Changed code/data requires a new output directory; never overwrite old results.
 
 ```bash
-python scripts/reproduce_zimbabwe.py weather  # offline; new output destination
-python scripts/reproduce_zimbabwe.py weather-models
-python scripts/reproduce_zimbabwe.py compact
-python scripts/reproduce_zimbabwe.py verify-weather
-python scripts/reproduce_zimbabwe.py verify-compact
-python scripts/reproduce_zimbabwe.py candidate  # exploratory benchmark check; no refitting
+python scripts/verification/reproduce_zimbabwe.py weather  # offline; new output destination
+python scripts/verification/reproduce_zimbabwe.py weather-models
+python scripts/verification/reproduce_zimbabwe.py compact
+python scripts/verification/reproduce_zimbabwe.py verify-weather
+python scripts/verification/reproduce_zimbabwe.py verify-compact
+python scripts/verification/reproduce_zimbabwe.py candidate  # exploratory benchmark check; no refitting
 ```
 
 To rebuild earlier stages, run step 8, then step 9, then step 10 using their pinned inputs. **Do not run step 6 on the team database:** it would remove the existing Presto rows. The required database SHA-256 is `e192b9d6021fdae020f9b08123b98648dc4b5274989635927c709a5607cdcd60`; frozen label SHA-256 is `49aae383c4489aa98e9e7fe8c31cda6bf1cd752adc8e9540cffdc147a5e0ef92`.

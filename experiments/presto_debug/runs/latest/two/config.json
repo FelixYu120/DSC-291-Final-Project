@@ -1,0 +1,34 @@
+{
+  "stage": "two",
+  "seed": 20261108,
+  "epochs": 500,
+  "weight_decay": 0.0,
+  "dropout": 0.0,
+  "cohort": "zimbabwe_lacuna_2022_2023",
+  "train_ids": [
+    "zimbabwe:002b9802-b084-47a9-9ba6-0e87a828b826",
+    "zimbabwe:0052277a-e7f7-4964-b02b-f985f6f56a4e"
+  ],
+  "validation_ids": [],
+  "train_folds": [
+    "2",
+    "3",
+    "4"
+  ],
+  "validation_fold": null,
+  "fold0_used": false,
+  "target_units": "tonnes per hectare",
+  "mse_units": "(tonnes per hectare)^2",
+  "target_mean_train": 0.0,
+  "target_scale_train": 1.0,
+  "target_transform": "identity",
+  "setting": "retrospective full season; not a forecast",
+  "singleton_bn": null,
+  "database_sha256": "5f36d91bfafa0bf7ddf71457d85c2f385861b0b5a667863e149f5228d28a1e44",
+  "weights_sha256": "559c9d76f525bdf2dd3774da8b1e7f1510769b73baacac12e9e4d8d5c67fbe65",
+  "script_sha256": "94115d7932dd1839ffad802c1fbb26ed3cfddf77eb10aabfaac6a6cea97681e8",
+  "labels_sha256": "2b157317bd5af770e1347aaea82c8f6986bb5f92b13a4dacc0c81a3ba8669b1a",
+  "split_sha256": "253f437d30a3742779e164c6b30fda5d613d5fe38decccf2b45ce21d95288dff",
+  "torch_version": "2.14.1+cpu",
+  "threshold_mse": 0.01
+}

@@ -8,8 +8,10 @@ import pytest
 from cropyield import ROOT
 from cropyield.data.handoff import (
     COHORT,
+    TEAM_ROLES,
     explicit_split,
     load_handoff,
+    partition_order,
     publish_release,
     read_raw,
     reconcile_labels,
@@ -130,3 +132,36 @@ def test_loader_verifies_hashes_aligns_ids_and_never_includes_leakage_columns(tm
     frame.to_parquet(tmp_path / "model_table.parquet", index=True)
     with pytest.raises(ValueError, match="hash mismatch"):
         load_handoff(tmp_path)
+
+
+def test_team_roles_cross_validate_folds_1_to_4_and_hold_back_fold_0(raw_and_labels):
+    """Release v2 follows docs/EVALUATION.md: folds 1-4 are one cross-validation pool, fold 0 is held back."""
+    _, labels = raw_and_labels
+    primary = labels[labels.include_primary]
+    source = pd.read_csv(ROOT / f"data/splits/{COHORT}__s1_cc2km.csv", dtype={"fold": str, "group_id": str})
+    explicit, stats = explicit_split(source, primary, TEAM_ROLES, "s1_cc2km")
+    assert stats["rows"] == {"cv": 1504, "holdout": 376}
+    assert set(explicit.loc[explicit.partition.eq("holdout"), "fold"]) == {"0"}
+    assert set(explicit.loc[explicit.partition.eq("cv"), "fold"]) == {"1", "2", "3", "4"}
+    fold_pairs = {k: v for k, v in stats["minimum_distance_km"].items() if k.startswith("fold")}
+    assert len(fold_pairs) == 10 and min(fold_pairs.values()) >= 2
+
+
+def test_only_the_two_reviewed_role_schemes_are_accepted():
+    assert partition_order(ROLES) == ["train", "validation", "test"]
+    assert partition_order(TEAM_ROLES) == ["cv", "holdout"]
+    with pytest.raises(ValueError, match="separately reviewed protocol"):
+        partition_order({**TEAM_ROLES, "1": "validation"})
+
+
+def test_loader_restricts_the_team_holdout_like_the_legacy_test(tmp_path):
+    frame = pd.DataFrame({"obs_id": ["a", "b"], "yield_t_ha": [1., 2.], **{f: [1., 2.] for f in FEATURES}})
+    frame.to_parquet(tmp_path / "model_table.parquet", index=False)
+    split = pd.DataFrame({"obs_id": ["a", "b"], "partition": ["cv", "holdout"], "group_id": ["A", "B"]})
+    split.to_csv(tmp_path / "split_s1_cc2km.csv", index=False)
+    manifest = {"outputs": {name: {"sha256": sha256(tmp_path / name)}
+                             for name in ["model_table.parquet", "split_s1_cc2km.csv"]}}
+    (tmp_path / "manifest.json").write_text(json.dumps(manifest))
+    assert load_handoff(tmp_path, partition="cv")[0].index.tolist() == ["a"]
+    with pytest.raises(ValueError, match="restricted"):
+        load_handoff(tmp_path, partition="holdout")

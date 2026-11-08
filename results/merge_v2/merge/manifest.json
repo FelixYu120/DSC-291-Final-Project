@@ -1,0 +1,161 @@
+{
+  "config": {
+    "auxiliary_buffer_km": 2.0,
+    "auxiliary_cohort": "zimbabwe_2024",
+    "bootstrap_draws": 2000,
+    "calendar_months": [
+      12,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "dropped_from_v1": {
+      "pooled_positive_sensitivity": "identical to pooled_adaptive: include_primary 2024 rows hold no zeros",
+      "pooled_zero_weight_sensitivity": "identical to pooled_adaptive: include_primary 2024 rows hold no zeros"
+    },
+    "evaluation_status": "exploratory_nested_spatial_cross_validation_not_a_new_blind_test",
+    "experiment": "zimbabwe_merge_v2",
+    "inner_folds": 3,
+    "methods": [
+      "train_mean",
+      "lacuna_only",
+      "pooled_naive",
+      "pooled_intercept",
+      "pooled_adaptive",
+      "lacuna_tree",
+      "pooled_tree"
+    ],
+    "minimum_clear_months": 4,
+    "prediction_setting": "retrospective_yield_estimation",
+    "primary_method": "pooled_adaptive",
+    "primary_reference": "lacuna_only",
+    "reserved_fold": 0,
+    "ridge_alphas": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0,
+      1000.0
+    ],
+    "seed": 20261107,
+    "source_weight_ratios": [
+      0.0,
+      0.1,
+      0.3,
+      1.0
+    ],
+    "split_family": "s1_cc2km",
+    "target_cohort": "zimbabwe_lacuna_2022_2023",
+    "target_folds": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "target_year": 2023,
+    "training_rows": "include_primary",
+    "tree_iterations": 120,
+    "tree_leaf_nodes": [
+      7,
+      15
+    ]
+  },
+  "inputs": {
+    "configs/team_database_v1.json": "c57a284f6334cc824284c85c327a79a5123b305ae4de818eb099de1ffd257b95",
+    "configs\\zimbabwe_merge_v2.json": "e88a7504c95987649f04db5f058dc18e4f1517eb50a4981790b74c7166b8d5bd",
+    "data/cropyield.duckdb": "e192b9d6021fdae020f9b08123b98648dc4b5274989635927c709a5607cdcd60",
+    "data/processed/labels_v1.parquet": "49aae383c4489aa98e9e7fe8c31cda6bf1cd752adc8e9540cffdc147a5e0ef92",
+    "data/raw/vision_guided_yield_estimation/metadata.csv": "bbd1451564a24f0e2a7f7c6966cb13b5f9ae7948bd0608068310ef7c4867e003",
+    "data/raw/zimbabwe/Lacuna_Yield_data_geojson-2023.geojson": "0dc4301509072c4306c951d88cf7cc6e0832c46aab921d237341c17bc6bb78cd",
+    "data/splits/manifest.json": "b8abf5e47c59d7e6c93620742de65ca5ba6a332d3a701eedc61a67d2533af53f",
+    "data/splits/zimbabwe_lacuna_2022_2023__s1_cc2km.csv": "253f437d30a3742779e164c6b30fda5d613d5fe38decccf2b45ce21d95288dff",
+    "docs/ZIMBABWE_MERGE_PROTOCOL.md": "417f144aa3dd48984a1f6783ab7eb9d58406771c39a8d6ec5964f6caff6d8fc7",
+    "requirements.txt": "758d3b0fe92e4efa02aa1f9e5d67f18aacb868c8df2a13d09b1880cc1ee5a061",
+    "scripts/step9_compare_zimbabwe_merge.py": "7419af0ca1456d0d71e8c6d6461b225ca3507e9595a94b515596a5a5e359661b",
+    "src/cropyield/data/handoff.py": "070fcfb23db4167374ad40f88bf76ef2b400aff546f4190422e6836cd8231b77",
+    "src/cropyield/data/labels.py": "1e993aa24beb74c348b64268642b1774ecd8dbe3bbba10757940ffa3bee6b21d",
+    "src/cropyield/data/xy.py": "41743292fd48c3df77d08a616aa5d20ef6c8bb4a618c5e6f28dc6cd083f69048",
+    "src/cropyield/eval/splits.py": "138dd5cd18abb26da00f6cb6fb1c2615a46e0ee0f8cb7ad91b3f98abde789a85",
+    "src/cropyield/experiments/zimbabwe_merge.py": "ebff7a50dfb6dca15550908906c47045ff44f331368f53f586e47b7e3e694fd6"
+  },
+  "outputs": {
+    "PROTOCOL.md": {
+      "bytes": 12647,
+      "sha256": "39d371055aa08084b982e1046bdb5f726e6e815ccb4b157e44a1f06cec19a9c1"
+    },
+    "RESULTS.md": {
+      "bytes": 6324,
+      "sha256": "c46e56ddb5cc7b3ea561e5f3644f85510ceacd9307f90cc24211e052094f158e"
+    },
+    "combined_data.csv": {
+      "bytes": 1737399,
+      "sha256": "27511fb5a861c8a34a351a15c978c7d4d99437880a49a569bde806809b127b88"
+    },
+    "combined_data.parquet": {
+      "bytes": 915358,
+      "sha256": "7d8c603e1ca50093ad2e1d41e6c74cc3670f8b49abc1af8c5ad9be641f4cb7e5"
+    },
+    "comparison.png": {
+      "bytes": 102667,
+      "sha256": "67b0e2938b290b7cad08e844946b6a03384892e3054d12063df05e84ff02e0f2"
+    },
+    "data_summary.json": {
+      "bytes": 928,
+      "sha256": "aec1f899e6b0560571151bed273cc56f5a8d4ee57f76bd3c94136732018de42e"
+    },
+    "fold_metrics.csv": {
+      "bytes": 2632,
+      "sha256": "5322da5191b82123c42a29f270827801a1fe0a6d8b396c49e9517acfbf37901e"
+    },
+    "harmonized_labels.parquet": {
+      "bytes": 802492,
+      "sha256": "6234cbc4149c6c1fde2a4d6b313a9729e6906680a5171aa9a6361411e09b656a"
+    },
+    "metrics.csv": {
+      "bytes": 708,
+      "sha256": "db039e7753a7c3f21f934ea6959bdd5bca29209f9243405fc1a77bbf3c85c4eb"
+    },
+    "paired_differences.csv": {
+      "bytes": 648,
+      "sha256": "2fae7b4abc90f541195743e9a0cb3f47469fdb228936d066d93c8782fe2c200c"
+    },
+    "predictions.csv": {
+      "bytes": 902933,
+      "sha256": "1636cec09167135338969139649b2b3c1b718dab75c4369897539183c9ac9b1f"
+    },
+    "selected_parameters.csv": {
+      "bytes": 1624,
+      "sha256": "a6e4ae178e54de8e9207c494e0805ee5c94146af5f2c93751c26bc938f950202"
+    },
+    "source_2024_audit.csv": {
+      "bytes": 1105945,
+      "sha256": "4bbda4f9e4b5a5da3b819decadc1b563a24a69fc1f3e929971cd6c6f700d49b4"
+    },
+    "source_spatial_permissions.csv": {
+      "bytes": 3575173,
+      "sha256": "578ce12e952601db24d71579fb5ee56360a86024292a4ac5b393fd4c64b0961c"
+    },
+    "target_memberships.csv": {
+      "bytes": 1253975,
+      "sha256": "90f1dc5e484b0fe507a232f101a45c434e9f8364942575ae708403b932373870"
+    },
+    "tuning.csv": {
+      "bytes": 10005,
+      "sha256": "0ebfccf5547e8cc442cfa5c4a45584374e2b1cb3b80000edf3cab0a86ef992fb"
+    }
+  },
+  "python": "3.12.10",
+  "versions": {
+    "duckdb": "1.5.5",
+    "matplotlib": "3.11.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1"
+  }
+}

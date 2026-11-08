@@ -9,11 +9,15 @@ from cropyield import ROOT
 from cropyield.data.xy import FEATURES
 from cropyield.experiments.zimbabwe_merge import (
     CONFIG,
+    ZERO_POLICY_METHODS,
     audit_2024,
     predict_model,
     prepare_training,
     purge_source,
+    require_training_rows,
+    run_experiment,
     run_folds,
+    training_rows,
 )
 
 
@@ -108,3 +112,60 @@ def test_fold_zero_cannot_be_opted_into_comparison(config):
     combined = pd.DataFrame({"domain": ["lacuna"], "feature_eligible": [True], "fold": [0]})
     with pytest.raises(ValueError, match="Fold 0"):
         run_folds(combined, {**config, "target_folds": [0, 1, 2, 3, 4]})
+
+
+V2 = ROOT / "configs/zimbabwe_merge_v2.json"
+
+
+def test_v2_config_changes_only_the_training_rows_and_the_identical_arms(config):
+    v2 = json.loads(V2.read_text())
+    assert training_rows(config) == "all_screened" and training_rows(v2) == "include_primary"
+    assert not set(v2["methods"]) & set(ZERO_POLICY_METHODS)
+    assert set(v2["dropped_from_v1"]) == set(ZERO_POLICY_METHODS)
+    assert v2["methods"] == [m for m in config["methods"] if m not in ZERO_POLICY_METHODS]
+    changed = {"experiment", "training_rows", "methods", "dropped_from_v1", "zero_sensitivity_weight"}
+    assert {k: v for k, v in v2.items() if k not in changed} == {k: v for k, v in config.items() if k not in changed}
+
+
+def test_v2_training_pool_rejects_a_row_outside_include_primary():
+    combined = pd.DataFrame({"domain": ["lacuna", "zimbabwe_2024"], "feature_eligible": [True, True],
+                             "fold": [1, -1], "include_primary": [True, False]})
+    v2 = json.loads(V2.read_text())
+    with pytest.raises(ValueError, match="include_primary"):
+        run_folds(combined, v2)
+    with pytest.raises(ValueError, match="include_primary"):
+        require_training_rows(combined.drop(columns="include_primary"), v2)
+    require_training_rows(combined, {})  # the v1 legacy pool keeps its old behaviour
+
+
+def test_v2_refuses_zero_policy_arms_that_would_duplicate_the_primary(tmp_path):
+    v2 = json.loads(V2.read_text())
+    path = tmp_path / "config.json"
+    path.write_text(json.dumps({**v2, "methods": [*v2["methods"], "pooled_positive_sensitivity"]}))
+    with pytest.raises(ValueError, match="Zero-policy"):
+        run_experiment(tmp_path / "out", path)
+    path.write_text(json.dumps({**v2, "training_rows": "everything"}))
+    with pytest.raises(ValueError, match="Unknown training_rows"):
+        run_experiment(tmp_path / "out", path)
+
+
+V2_RUNS = ["data/runs/zimbabwe_merge_v2", "data/runs/zimbabwe_transfer_diagnosis_v2",
+           "data/runs/zimbabwe_weather_v2", "data/runs/zimbabwe_weather_compact_v2"]
+
+
+@pytest.mark.parametrize("name", V2_RUNS)
+def test_saved_v2_training_pools_hold_only_include_primary_rows(name):
+    run = ROOT / name
+    if not (run / "manifest.json").is_file():
+        pytest.skip(f"{name} is not built on this copy (data/runs is git-ignored)")
+    assert training_rows(json.loads((run / "manifest.json").read_text())["config"]) == "include_primary"
+    labels = pd.read_parquet(ROOT / "data/processed/labels_v1.parquet").set_index("obs_id")
+    permission = pd.read_csv(run / "source_spatial_permissions.csv")
+    membership = pd.read_csv(run / "target_memberships.csv")
+    pool = set(permission.loc[permission.allowed_by_spatial_rule, "obs_id"]) | set(membership.loc[membership.role.eq("fit"), "obs_id"])
+    assert len(pool) > 3000 and labels.loc[sorted(pool), "include_primary"].all()
+    assert labels.loc[sorted(set(permission.obs_id) | set(membership.obs_id)), "include_primary"].all()
+    # Nothing else is withheld: every include_primary 2024 row with imagery features is a source candidate.
+    eligible = pd.read_parquet(ROOT / "data/runs/zimbabwe_merge_v2/combined_data.parquet").query("feature_eligible")
+    primary_2024 = labels.index[labels.cohort.eq("zimbabwe_2024") & labels.include_primary]
+    assert set(permission.obs_id) == set(primary_2024) & set(eligible.obs_id)

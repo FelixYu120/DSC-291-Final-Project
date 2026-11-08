@@ -28,7 +28,7 @@ def refresh_kenya_fingerprint(directory):
 
 @pytest.fixture
 def completed_reviews(tmp_path, monkeypatch):
-    spec = importlib.util.spec_from_file_location("assemble_quality_variant", ROOT / "scripts/assemble_quality_variant.py")
+    spec = importlib.util.spec_from_file_location("assemble_quality_variant", ROOT / "scripts/quality/assemble_quality_variant.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     kenya_dir, clouds, areas = (tmp_path / name for name in ("kenya", "clouds", "areas"))

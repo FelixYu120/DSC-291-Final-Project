@@ -17,8 +17,11 @@ The builder needs the original provider files, committed labels/splits, and **th
 `data/cropyield.duckdb`. Use the team's shared file; do not run step 6 on it. The builder verifies its complete
 SHA-256 before opening it read-only. It needs no network and downloads no imagery.
 
-Output: [`data/processed/zimbabwe_midterm_v1/`](../data/processed/zimbabwe_midterm_v1/).
-Read the generated [audit report](../data/processed/zimbabwe_midterm_v1/audit_report.md) first.
+Output: [`data/processed/zimbabwe_midterm_v2/`](../data/processed/zimbabwe_midterm_v2/).
+Read the generated [audit report](../data/processed/zimbabwe_midterm_v2/audit_report.md) first.
+Release v2 has the same rows and folds as release v1 (`data/processed/zimbabwe_midterm_v1/`). Only the fold
+roles differ: v1 named fold 1 "validation" and folds 2–4 "train", which is not the team protocol; v2 names
+folds 1–4 "cv" and fold 0 "holdout". v1 stays published unchanged for the experiments that cite it.
 
 To verify reproduction independently without changing the release:
 
@@ -39,7 +42,7 @@ Git commit **and actual generator/input hashes**, so uncommitted code is not mis
 | `cleaned_labels.parquet` / `.csv` | 2,266 | Screened 2022 and 2023 labels, with the exact 44-column frozen schema; 2022 retained and explicitly excluded from primary modeling |
 | `model_table.parquet` / `.csv` | 1,880 | Primary 2023 observations, `obs_id`, target `yield_t_ha`, and exactly 10 seasonal satellite predictors |
 | `monthly_features.parquet` / `.csv` | 16,920 | Nine months per primary field, including missing months; ten bands, five indices, missingness and acquisition date |
-| `split_s1_cc2km.csv` | 1,880 | Primary spatial split with explicit train/validation/test roles |
+| `split_s1_cc2km.csv` | 1,880 | Primary spatial split: original `fold`, and `partition` = cv (folds 1–4) or holdout (fold 0) |
 | `split_s2_region.csv` | 1,880 | Separate Admin1-holdout sensitivity analysis with explicit roles |
 | `monthly_coverage.csv` | Calculated | Counts by month and coverage state |
 | `label_summary.csv`, `feature_quality.csv` | Calculated | Descriptive label statistics and feature missingness/ranges; no transformations fitted |
@@ -95,17 +98,19 @@ November 4 meeting makes Zimbabwe the midterm focus; use the handoff configurati
 The independent reconstruction must agree with the frozen labels on IDs, yields, both coordinates, raw row positions,
 dates, management, Admin1 and inclusion flags. Any disagreement stops the release rather than updating a frozen file.
 
-## Training, validation and test use
+## Cross-validation and the held-back fold
 
-The release converts the existing assignments to roles, without shuffling:
+The release labels the existing folds, without shuffling. This is the team protocol of `docs/EVALUATION.md`:
 
-| Existing fold | Role | Primary split rows |
-|---|---|---:|
-| 2, 3, 4 | Train | 1,128 |
-| 1 | Validation | 376 |
-| 0 | Historical restricted test | 376 |
+| Existing fold | Partition | Use | Primary split rows |
+|---|---|---|---:|
+| 1, 2, 3, 4 | cv | Cross-validation: fit on three folds, predict the fourth, score the pooled out-of-fold predictions | 1,504 |
+| 0 | holdout | Held back; only one pre-registered final test may score it | 376 |
 
-The primary `s1_cc2km` split uses connected components at 2 km. Every pair of different partitions is checked to
+Release v1 labelled the same folds train (2–4, 1,128 rows), validation (1, 376) and test (0, 376). A model tuned on
+fold 1 alone and scored there is not comparable with the team's pooled scores over folds 1–4, so use v2.
+
+The primary `s1_cc2km` split uses connected components at 2 km. Every pair of folds is checked to
 have at least 2 km separation. This is a distance-based new-location test; components are not surveyed villages.
 Use the split's **`group_id`**, not `cleaned_labels.cluster_2km`: the latter was formed using excluded observations
 as well, which can connect otherwise separate retained groups.
@@ -115,13 +120,13 @@ labels. Admin1 mixes administrative levels and does not guarantee a distance buf
 separations; do not claim all cross-partition distances exceed 2 km for this family.
 
 **Prior evaluation matters.** Historical baseline runs have already evaluated these observations. Fold 0 is not a
-fresh blind test. The November 1 decision forbids scoring new model arms on fold 0 in any family. The builder creates
-the requested explicit partitions while retaining that restriction; it does not reset history by changing a seed.
-Develop new models using the training and validation data, and label results appropriately. A fresh confirmatory
+fresh blind test. The November 1 decision forbids scoring new model arms on fold 0 in any family. The builder labels
+the partitions while retaining that restriction; it does not reset history by changing a seed.
+Develop new models by cross-validation over folds 1–4, and label results appropriately. A fresh confirmatory
 test needs genuinely unexamined observations or an explicitly revised team protocol, not a renamed old fold.
 
-Fit preprocessing on the training partition, apply it unchanged to validation/test, and fit any tuning CV preprocessing
-inside each inner training fold. Group inner CV by the returned `group_id`. Compare models on identical observations
+Fit preprocessing on the training folds of each outer fold, apply it unchanged to the predicted fold, and fit any
+tuning CV preprocessing inside each inner training fold. Group inner CV by the returned `group_id`. Compare models on identical observations
 and split families. Report RMSE/MAE in t/ha, bias and R², with ranking metrics as secondary results and uncertainty
 resampled by spatial group. Never randomly split months of the same field across partitions.
 
@@ -130,17 +135,20 @@ resampled by spatial group. Never randomly split months of the same field across
 ```python
 from cropyield.data.handoff import load_handoff
 
-X_train, y_train, train_groups = load_handoff(partition="train")
-X_val, y_val, val_groups = load_handoff(partition="validation")
+from pathlib import Path
+import pandas as pd
 
-assert X_train.index.equals(y_train.index)
-assert set(X_train.index).isdisjoint(X_val.index)
-# Fit preprocessing and model on X_train/y_train only.
-# Use train_groups for grouped internal CV.
+release = Path("data/processed/zimbabwe_midterm_v2")
+X, y, groups = load_handoff(release, partition="cv")          # folds 1-4
+folds = pd.read_csv(release / "split_s1_cc2km.csv", dtype={"fold": str}).set_index("obs_id").fold.loc[X.index]
+for fold in ["1", "2", "3", "4"]:
+    train, test = folds.ne(fold), folds.eq(fold)
+    # Fit preprocessing and model on X[train] only (grouped inner CV on groups[train]); predict X[test].
+# Score the pooled out-of-fold predictions of the 1,504 fields.
 ```
 
-The loader verifies output hashes and returns only the explicit predictor allowlist. Test access raises an error by
-default. `allow_historical_test=True` exists solely to reproduce already permitted historical baselines; it does not
+The loader verifies output hashes and returns only the explicit predictor allowlist. Holdout (fold 0) access raises an
+error by default. `allow_historical_test=True` exists solely to reproduce already permitted historical baselines; it does not
 authorize scoring new arms. The files are visible research data, not an access-control system.
 
 For Pamely's monthly sequence work:
@@ -149,14 +157,15 @@ For Pamely's monthly sequence work:
 from pathlib import Path
 import pandas as pd
 
-release = Path("data/processed/zimbabwe_midterm_v1")
+release = Path("data/processed/zimbabwe_midterm_v2")
 monthly = pd.read_parquet(release / "monthly_features.parquet")
-assignment = pd.read_csv(release / "split_s1_cc2km.csv")
-monthly = monthly.merge(assignment[["obs_id", "partition"]], on="obs_id", validate="many_to_one")
-train_monthly = monthly[monthly.partition.eq("train")].sort_values(["obs_id", "time_index"])
+assignment = pd.read_csv(release / "split_s1_cc2km.csv", dtype={"fold": str})
+monthly = monthly.merge(assignment[["obs_id", "fold", "partition"]], on="obs_id", validate="many_to_one")
+cv_monthly = monthly[monthly.partition.eq("cv")].sort_values(["obs_id", "time_index"])
+# Cross-validate over cv_monthly.fold (1-4); fold 0 (holdout) stays out.
 # time_index: 0=October, ..., 8=June. Retain missing masks.
 # Derive per-feature finite masks as well: an index denominator can make an index missing.
-# Any imputation parameters are fitted on training observations only.
+# Any imputation parameters are fitted on the training folds only.
 ```
 
 Yield appears once per field in `model_table`, not repeated in the exported monthly predictors. A dense sequence
@@ -178,7 +187,7 @@ part of that feature list. Presto requires its own band order, normalization and
 - **Administrative grouping:** Admin1 includes towns/province labels as well as districts. Describe grouping honestly.
 - **Repeated coordinates:** preserve and group; unresolved farmer identities prevent definitive deduplication or claims
   of independent repeated-year farms. Do not count fields inside a nearby cluster as statistically independent.
-- **Small regional holdout:** the fixed `s2_region` test contains only two Admin1 groups, and validation only three.
+- **Small regional holdout:** in `s2_region`, fold 0 contains only two Admin1 groups, and fold 1 only three.
   Group-level uncertainty is poorly determined from so few groups. Treat this single partition as a sensitivity
   check, not a precise national generalization estimate; the primary split has substantially more spatial groups.
 - **Population:** the primary sample is pure-stand rainfed maize from one harvest year and selected collection sites.

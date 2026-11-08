@@ -1,0 +1,111 @@
+{
+  "admin_units_primary": 20,
+  "cleaned_labels": 2266,
+  "clear_months_by_year": [
+    {
+      "months_with_data": 3,
+      "records": 101,
+      "season_year": 2022
+    },
+    {
+      "months_with_data": 4,
+      "records": 68,
+      "season_year": 2022
+    },
+    {
+      "months_with_data": 4,
+      "records": 16,
+      "season_year": 2023
+    },
+    {
+      "months_with_data": 5,
+      "records": 263,
+      "season_year": 2023
+    },
+    {
+      "months_with_data": 6,
+      "records": 691,
+      "season_year": 2023
+    },
+    {
+      "months_with_data": 7,
+      "records": 1127,
+      "season_year": 2023
+    }
+  ],
+  "crop_counts": {
+    "Maize/Corn": 2269,
+    "Sorghum": 217,
+    "Soybeans": 212,
+    "Wheat": 304
+  },
+  "exact_coordinate_reuse_primary": 14,
+  "intercrop_exclusions": 212,
+  "invalid_dates_raw": 0,
+  "irrigation_exclusions": 5,
+  "model_rows": 1880,
+  "near_duplicate_primary": 16,
+  "outside_window_primary": 2,
+  "postharvest_fields": 1810,
+  "postharvest_scenes": 3934,
+  "preplanting_fields": 152,
+  "primary_labels": 1880,
+  "raw_maize": 2269,
+  "screened_2022": 169,
+  "screened_2023": 2097,
+  "source_records": 3002,
+  "splits": {
+    "s1_cc2km": {
+      "groups": {
+        "cv": 232,
+        "holdout": 57
+      },
+      "minimum_distance_km": {
+        "cv_to_holdout": 2.010758283552836,
+        "fold0_to_fold1": 2.010758283552836,
+        "fold0_to_fold2": 2.054231843844448,
+        "fold0_to_fold3": 2.081950087463072,
+        "fold0_to_fold4": 2.0487324670704297,
+        "fold1_to_fold2": 2.254422638268932,
+        "fold1_to_fold3": 2.022120756081833,
+        "fold1_to_fold4": 2.0385903028498276,
+        "fold2_to_fold3": 2.008740455008135,
+        "fold2_to_fold4": 2.0048022977159343,
+        "fold3_to_fold4": 2.070814472771326
+      },
+      "new_models_may_score_test": false,
+      "rows": {
+        "cv": 1504,
+        "holdout": 376
+      },
+      "test_status": "historical_previously_evaluated"
+    },
+    "s2_region": {
+      "groups": {
+        "cv": 18,
+        "holdout": 2
+      },
+      "minimum_distance_km": {
+        "cv_to_holdout": 1.6677181534971144,
+        "fold0_to_fold1": 1.6677181534971144,
+        "fold0_to_fold2": 33.51264202225398,
+        "fold0_to_fold3": 58.659127365590116,
+        "fold0_to_fold4": 3.4647189970713668,
+        "fold1_to_fold2": 53.15270845629601,
+        "fold1_to_fold3": 20.535107598505043,
+        "fold1_to_fold4": 43.909545764605745,
+        "fold2_to_fold3": 26.25273912555056,
+        "fold2_to_fold4": 11.101013075091162,
+        "fold3_to_fold4": 39.20797868446884
+      },
+      "new_models_may_score_test": false,
+      "rows": {
+        "cv": 1502,
+        "holdout": 378
+      },
+      "test_status": "historical_previously_evaluated"
+    }
+  },
+  "unit_mismatch_rows": 3,
+  "zero_yield_primary": 28
+}

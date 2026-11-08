@@ -44,7 +44,7 @@ not establish future-season, new-country or broad regional performance. The froz
 From the repository root:
 
 ```bash
-python scripts/run_baselines.py
+python scripts/baselines/spatial_baselines.py
 ```
 
 A second full run produced **exactly identical predictions, scores, confidence intervals and selected

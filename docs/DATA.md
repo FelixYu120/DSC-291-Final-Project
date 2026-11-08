@@ -13,8 +13,8 @@ the 169 screened 2022 rows and 4 for the other 68; earlier descriptions of "no i
 **November 7 pooling extension:** Felix authorized a [Zimbabwe merge experiment](ZIMBABWE_MERGE_PROTOCOL.md).
 The full harmonized catalog has 2,266 Lacuna + 4,332 Zimbabwe 2024 labels. Its modeling comparison uses the
 unchanged 1,880 primary Lacuna 2023 population and 4,330 source rows with sufficient December–June imagery
-before fold-specific spatial buffering. Valid source zeros are retained; `include_primary` remains historical
-metadata, not the new source eligibility rule. The old no-pooling/parked decisions below describe the frozen baseline.
+before fold-specific spatial buffering. v1 kept the 1,874 source zeros, which broke the training-row rule;
+v2 (`data/runs/zimbabwe_merge_v2/`, 8 Nov) trains only on `include_primary` rows (2,458; 2,456 with imagery). The old no-pooling/parked decisions below describe the frozen baseline.
 
 **November 7 weather extension:** `data/processed/zimbabwe_weather_v1/` preserves the full 6,598-label catalog and
 adds 46 NASA POWER MERRA-2 weather predictors, with 1991–2020 normals, explicit 0.5° × 0.625° grid mapping,
@@ -52,7 +52,7 @@ preceding October–December. The full weather catalog is retained; choosing few
 | **Malawi 2023** | one 10×10 m cut (`cc_ey_t`), shelled, 13 % moisture; nested 5×5 m cut `subc_ey_t` reads a median +17 % higher | walked polygon, median 0.59 ha | cut 17–26 May 2023; no planting date | 260 | none in the file: 2 km clusters (53) | 2.44 t/ha / 0 % |
 | Lacuna 2023 (second) | one 8×5 m cut (40 m²), "dry weight", t/ha = dry kg × 0.25; moisture and grain-vs-cob not stated; unit provisional | point | planting and harvest date per row | 2,097; 1,880 pure stand rainfed | `Admin1` 20 (mixes districts, towns, one province) | 3.02 t/ha / 1.3 % |
 | Zimbabwe 2024 (parked) | mean of 2 boxes of 40 m², threshed and dried; moisture not stated | point; pilot points on bare soil | no dates; photo-filename date only | 2,458 positive of 4,332 | none (the paper's 87 zones are not released) | 0.09 t/ha / 43 % |
-| Malawi 2022 (dropped) | mean of 2 cuts of 5×5 m, moisture-metered, basis not stated | polygon, EPSG:20936, 27 m datum accuracy | cut 30 Apr – 19 May 2022 | 529 | 3 districts by latitude | 2.42 t/ha / 0.6 % |
+| Malawi 2022 (v1 dropped; **data v2: in**, role second) | mean of 2 cuts of 5×5 m; `AVG_YLD` equals mean(2·kernwt·(100 − mc)/87) of the two cuts for 529 of 529 fields, so t/ha at 13 % moisture (inferred, not provider-confirmed); a different cut from Malawi 2023, so never pool the two | polygon, EPSG:20936; v1 positions use EPSG:1117 (27 m stated accuracy), v2 uses EPSG:1113 (44 m), about 24 m W and 24 m N of v1, chosen by a label-free within-field NDVI test | cut 30 Apr – 19 May 2022 | 529 | 3 districts by latitude; v2 `s1_cc2km` 97 clusters | 2.42 t/ha / 0.6 % |
 | Lacuna 2022 (dropped) | as Lacuna 2023 | point | as Lacuna 2023 | 156 | `Admin1` 6 | 1.46 t/ha / 0 % |
 
 Sources: Malawi metadata sheets and the 2023 sampling-frame methodology in `data/raw/malawi*/`; OAF
@@ -77,8 +77,16 @@ neither visit timing nor the drought alone validates or invalidates an individua
 - **2022 gap.** Collection 1 holds almost no scenes for January–November 2022 over our tiles (ESA
   reprocessing backlog). This drops Malawi 2022 and Lacuna 2022 and removes October–November 2022 from Malawi
   2023 and Lacuna 2023; those months are before or at planting, so the core is not hurt. Filling 2022 needs
-  the older `sentinel-2-l2a` collection (−1000 offset per item) or GEE `COPERNICUS/S2_SR_HARMONIZED`; not
-  planned.
+  the older `sentinel-2-l2a` collection (−1000 offset per item) or GEE `COPERNICUS/S2_SR_HARMONIZED`.
+  **Data v2 fills Malawi 2022 from the older collection** (offset 0 only for the 4 measured processing-baseline
+  cases; any other case is rejected unread): 529 of 529 fields have at least 4 clear months, March is clear for 89 %.
+  Lacuna 2022 and October–November 2022 of Malawi 2023 and Lacuna 2023 stay empty. So the Malawi 2022 season
+  means include October–November and the Malawi 2023 ones do not: compare the two seasons by rank only.
+- **Data v2 top-up.** Up to 24 photos tried per cloudy month, every v1 scene kept: 624 new clear
+  scenes, 522 model field-months cloudy → clear (Lacuna 205, Kenya 176, Zimbabwe 2024 90, Malawi 2023 51). The
+  6,048 `no_scene` field-months (Kenya February 2019, October–November 2022) are catalogue gaps that more tries cannot fill.
+- **Labels next to the pixels.** Each chip folder's `record.json` stores the yield and the audit row, and the view
+  `monthly` has a `yield_kg_ha` column. Never use these as model inputs; take X from `load_xy` or the index columns.
 - **Early 2019 gap.** The same holds for Kenya 2019: our first scene is 23 March 2019. At a test point Collection
   1 has 0 scenes in January and February 2019, the older collection has 6 each. So Kenya 2019 has at most 7
   months, Kenya 2020 has 8. This is a catalogue gap, not a download fault, and it makes `*_season_mean` less
@@ -111,7 +119,8 @@ training fold.
 
 - Kenya: `intercropping == "0"` (cohort filter of `cohorts.py`). **Lacuna: `intercropping == "no"` and no
   irrigated rows.** This rule lives in `include_primary` (`src/cropyield/data/labels.py`), not in `cohorts.py`,
-  so the download still covers all 2,266 Lacuna rows; 225 intercropped and 5 irrigated rows are excluded.
+  so the download still covers all 2,266 Lacuna rows; 225 intercropped and 5 irrigated rows are excluded
+  (`exclusion_reason` counts 212 intercropped, because the 13 intercropped 2022 rows carry the 2022 reason first).
 - Finite yield, 0 ≤ yield ≤ 15,000 kg/ha; valid geometry inside the country.
 - Malawi 2023: target is `cc_ey_t` only; the nested cut is never a second row.
 - Zimbabwe 2024: zeros excluded.

@@ -1,0 +1,44 @@
+{
+  "all_unique_series": {
+    "bands_all_unique_series": 39113,
+    "indices_all_unique_series": 19799
+  },
+  "arms": 22,
+  "candidate_rows": 6212,
+  "diagnostic_target_calendar_postharvest_fields": 65,
+  "missing_feature_rows_by_variant": {
+    "bands_v0_mean": 0,
+    "bands_v1_calendar_mean": 0,
+    "bands_v2_max": 0,
+    "bands_v3_median": 0,
+    "bands_v3_mode": 0,
+    "indices_v0_mean": 0,
+    "indices_v1_calendar_mean": 0,
+    "indices_v2_max": 0,
+    "indices_v3_median": 0,
+    "indices_v3_mode": 0,
+    "legacy_indices_mean_max": 0
+  },
+  "mode_tied_interval_series": {
+    "bands_mode_interval_tied_series": 180,
+    "indices_mode_interval_tied_series": 0
+  },
+  "model_variants": [
+    "v0_mean",
+    "v1_calendar_mean",
+    "v2_max",
+    "v3_median",
+    "v3_mode"
+  ],
+  "source_excluded_not_include_primary": 1874,
+  "source_excluded_reasons": {
+    "zimbabwe_2024_zero_likely_not_measured": 1874
+  },
+  "source_excluded_zero_yield": 1874,
+  "source_feature_eligible": 4330,
+  "source_training_pool": 2456,
+  "target_evaluation": 1504,
+  "target_reserved": 376,
+  "training_rows": "include_primary",
+  "window_anchor": "calendar"
+}

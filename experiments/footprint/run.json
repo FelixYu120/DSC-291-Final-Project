@@ -1,0 +1,19 @@
+{
+  "started": "2026-11-08T06:44:11+0100",
+  "commit": "archive/felix-branch-2026-11-07-9-gaf7eac7d844cb7ddc4dcdc281d22fa894174edc8",
+  "seed": 20261029,
+  "draws": 2000,
+  "plan_sha256": "09dcdbe34b4699e97a046108c334db37518a8e880c29ac0bd1c0e389f172512e",
+  "windows_sha256": "cb3f3dfcbb68a98be0ff1cac08634336dc648e90716d087ecc23a5e3ed0cb2bf",
+  "labels_sha256": "2b157317bd5af770e1347aaea82c8f6986bb5f92b13a4dacc0c81a3ba8669b1a",
+  "database": {
+    "file": "data/v2/cropyield.duckdb",
+    "bytes": 22818816,
+    "sha256": "5f36d91bfafa0bf7ddf71457d85c2f385861b0b5a667863e149f5228d28a1e44"
+  },
+  "split_sha256": {
+    "zimbabwe_lacuna_2022_2023": "253f437d30a3742779e164c6b30fda5d613d5fe38decccf2b45ce21d95288dff",
+    "zimbabwe_2024": "f96a188ad708c2fe9a8e3721e4517b2da3f85a823ca9b485e8d2a36cdb384d61"
+  },
+  "finished": "2026-11-08T07:04:47+0100"
+}

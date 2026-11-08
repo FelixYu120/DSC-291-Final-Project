@@ -1,4 +1,13 @@
-"""Same-split V0–V3 satellite aggregation comparison with explicit crop-date windows."""
+"""Same-split V0–V3 satellite aggregation comparison.
+
+Two config switches select the design; an absent key keeps the published v1 behaviour:
+
+- ``window_anchor``: ``"crop_dates"`` (v1) builds V1 from each field's survey planting/harvest dates;
+  ``"calendar"`` (v2, team rule) is label-free: V1 is December–March for every source and the crop-date
+  variant cannot be a model candidate. Crop-date counts survive only as ``diagnostic_`` audit columns.
+- ``training_rows``: ``"all_screened"`` (v1) trains on every feature-eligible 2024 row, recorded zeros
+  included; ``"include_primary"`` (v2, team rule) admits only ``labels_v1.include_primary`` rows.
+"""
 from __future__ import annotations
 
 import importlib.metadata
@@ -27,11 +36,60 @@ from cropyield.data.xy import FEATURES
 from cropyield.experiments.zimbabwe_diagnosis import BANDS, INDICES, TrainingTransform
 from cropyield.experiments.zimbabwe_merge import predict_model, score_predictions
 
-CONFIG = ROOT / "configs/zimbabwe_aggregation_v1.json"
-OUTPUT = ROOT / "data/runs/zimbabwe_aggregation_v1"
+CONFIG = ROOT / "configs/zimbabwe_aggregation_v2.json"
+OUTPUT = ROOT / "data/runs/zimbabwe_aggregation_v2"
 PRIOR = ROOT / "data/runs/zimbabwe_merge_v1"
 PROTOCOL = ROOT / "docs/zimbabwe/AGGREGATION_PROTOCOL.md"
 VARIANTS = ["v0_mean", "v1_preharvest_mean", "v1_calendar_mean", "v2_max", "v3_median", "v3_mode"]
+CROP_DATE_VARIANT = "v1_preharvest_mean"
+CALENDAR_VARIANTS = [v for v in VARIANTS if v != CROP_DATE_VARIANT]
+WINDOW_ANCHORS = ("crop_dates", "calendar")
+TRAINING_ROWS = ("all_screened", "include_primary")
+SOURCE_TRAINING_ROWS = {"all_screened": 4330, "include_primary": 2456}
+# Under the calendar rule these date-based audit columns stay as explicitly labelled diagnostics only.
+DIAGNOSTIC_COLUMNS = {"preharvest_start": "diagnostic_crop_date_window_start",
+                      "preharvest_cutoff": "diagnostic_crop_date_window_end",
+                      "has_harvest_date": "diagnostic_has_harvest_date",
+                      "has_plant_date": "diagnostic_has_plant_date",
+                      "n_preharvest": "diagnostic_n_crop_date_window",
+                      "n_calendar_on_or_after_harvest": "diagnostic_n_calendar_on_or_after_harvest",
+                      "n_before_harvest_but_preplant": "diagnostic_n_before_harvest_but_preplant"}
+
+
+def window_anchor(config):
+    """'crop_dates' = v1 survey-date V1 window; 'calendar' = v2 label-free windows. Absent = v1."""
+    anchor = config.get("window_anchor", "crop_dates")
+    require(anchor in WINDOW_ANCHORS, f"Unknown window_anchor: {anchor}")
+    return anchor
+
+
+def model_variants(config):
+    """Variants that may become model candidates, in canonical order."""
+    variants = list(config.get("variants", VARIANTS))
+    require(set(variants) <= set(VARIANTS), "Unknown aggregation variant")
+    if window_anchor(config) == "calendar":
+        require(CROP_DATE_VARIANT not in variants,
+                "Survey crop dates cannot anchor a model window under the calendar rule")
+    return [v for v in VARIANTS if v in variants]
+
+
+def training_rows(config):
+    """'all_screened' = v1 pool (2024 zeros included); 'include_primary' = team rule. Absent = v1."""
+    rule = config.get("training_rows", "all_screened")
+    require(rule in TRAINING_ROWS, f"Unknown training_rows rule: {rule}")
+    return rule
+
+
+def require_training_rows(rows, ids, config):
+    """Under the team rule every row that can enter a fit has labels_v1.include_primary = True."""
+    if training_rows(config) == "include_primary":
+        ids = list(ids)
+        require("include_primary" in rows.columns and rows.loc[ids, "include_primary"].eq(True).all(),
+                "Training pool holds rows outside labels_v1.include_primary")
+
+
+def default_output(config):
+    return ROOT / "data/runs" / config["experiment"]
 
 
 def _hsm(sorted_values):
@@ -59,6 +117,7 @@ def aggregate_monthly(monthly, rows, config):
     require(not monthly.duplicated(["obs_id", "month"]).any(), "Duplicate monthly key")
     require(set(monthly.obs_id).issubset(rows.index), "Unknown monthly observation")
     require(config["calendar_months"] == [12, 1, 2, 3, 4, 5, 6], "Use the common December–June season")
+    anchor, variants = window_anchor(config), model_variants(config)
     dates = pd.DataFrame(index=rows.index)
     dates["season_start"] = pd.to_datetime((rows.season_year-1).astype(str) + "-12-01")
     dates["season_end"] = pd.to_datetime(rows.season_year.astype(str) + "-07-01")
@@ -95,12 +154,16 @@ def aggregate_monthly(monthly, rows, config):
         for variant, mask, stat in [("v0_mean", usable, "mean"), ("v1_preharvest_mean", preharvest, "mean"),
                                     ("v1_calendar_mean", calendar, "mean"), ("v2_max", usable, "max"),
                                     ("v3_median", usable, "median")]:
-            frames[f"{family}_{variant}"] = frame.loc[mask].groupby("obs_id")[columns].agg(stat).reindex(rows.index)
-        frames[f"{family}_v3_mode"] = grouped.agg(half_sample_mode).reindex(rows.index)
+            if variant in variants:  # the crop-date window never becomes a calendar-rule feature
+                frames[f"{family}_{variant}"] = frame.loc[mask].groupby("obs_id")[columns].agg(stat).reindex(rows.index)
+        if "v3_mode" in variants:
+            frames[f"{family}_v3_mode"] = grouped.agg(half_sample_mode).reindex(rows.index)
         all_unique = grouped.agg(lambda x: len(x.dropna()) > 1 and x.nunique() == x.notna().sum())
         tied = grouped.agg(lambda x: _hsm(np.sort(x.dropna().to_numpy(float)))[1])
         audit[f"{family}_all_unique_series"] = all_unique.sum(axis=1).reindex(rows.index, fill_value=0)
         audit[f"{family}_mode_interval_tied_series"] = tied.sum(axis=1).reindex(rows.index, fill_value=0)
+    if anchor == "calendar":
+        audit = audit.rename(columns=DIAGNOSTIC_COLUMNS)
     return frames, audit
 
 
@@ -112,6 +175,13 @@ def load_inputs(config):
     rows = pd.read_parquet(PRIOR/"combined_data.parquet").set_index("obs_id").sort_index()
     labels = pd.read_parquet(ROOT/"data/processed/labels_v1.parquet").set_index("obs_id")
     rows = rows.join(labels[["plant_date", "harvest_date"]], validate="one_to_one")
+    require(rows.include_primary.eq(labels.loc[rows.index, "include_primary"]).all(),
+            "Merge include_primary differs from labels_v1")
+    rule = training_rows(config)
+    if rule == "include_primary":
+        rows["label_exclusion_reason"] = labels.loc[rows.index, "exclusion_reason"]
+        # Target rows are all include_primary; 2024 rows also need common-window features.
+        rows["training_pool"] = rows.include_primary.eq(True) & (rows.domain.eq("lacuna") | rows.feature_eligible)
     with duckdb.connect(str(ROOT/"data/cropyield.duckdb"), read_only=True) as con:
         con.register("selected", rows.reset_index()[["obs_id", "season_year"]])
         monthly = con.execute("""SELECT b.*, v.ndvi,v.gcvi,v.mtci,v.ndvi705,v.ndvi740, sc.acquired
@@ -132,13 +202,22 @@ def load_inputs(config):
     require(target.sum() == 1880 and (target & rows.fold.eq(0)).sum() == 376, "Target count changed")
     require((rows.domain.eq("zimbabwe_2024") & rows.feature_eligible).sum() == 4330, "Source count changed")
     require(set(permission.obs_id) == set(rows.index[rows.domain.eq("zimbabwe_2024") & rows.feature_eligible]), "Source permissions differ")
+    require(rows.loc[target, "include_primary"].all(), "Target rows outside include_primary")
+    if rule == "include_primary":
+        # Buffer distances depend on source and protected coordinates only, so the frozen
+        # decisions stay valid after dropping rows; nothing is recomputed.
+        pool = rows.index[rows.domain.eq("zimbabwe_2024") & rows.training_pool]
+        require(len(pool) == SOURCE_TRAINING_ROWS[rule], "include_primary source count changed")
+        permission = permission[permission.obs_id.isin(pool)].reset_index(drop=True)
     return rows, features, audit, monthly, membership, permission
 
 
-def make_context(rows, x, fit_ids, source_ids, query_ids):
+def make_context(rows, x, fit_ids, source_ids, query_ids, config=None):
     require(rows.loc[fit_ids].domain.eq("lacuna").all() and rows.loc[query_ids].domain.eq("lacuna").all(), "Target context must be Lacuna")
     require(rows.loc[fit_ids].fold.ne(0).all() and rows.loc[query_ids].fold.ne(0).all(), "Fold zero exposure")
     require(rows.loc[source_ids].domain.eq("zimbabwe_2024").all(), "Invalid source context")
+    if config is not None:
+        require_training_rows(rows, list(fit_ids) + list(source_ids), config)
     fit = TrainingTransform().fit(x.loc[fit_ids])
     return {"xt": fit.transform(x.loc[fit_ids]), "xs": fit.transform(x.loc[source_ids]),
             "xq": fit.transform(x.loc[query_ids]), "yt": rows.loc[fit_ids].yield_t_ha.to_numpy(float),
@@ -148,6 +227,7 @@ def make_context(rows, x, fit_ids, source_ids, query_ids):
 def run_models(rows, features, membership, permission, config):
     predictions, selections, trials, gaps = [], [], [], []
     saved = pd.read_csv(PRIOR/"predictions.csv", dtype={"group_id": str})
+    rule = training_rows(config)
     for outer in config["target_folds"]:
         split_ids = []
         for inner in range(4):
@@ -159,7 +239,7 @@ def run_models(rows, features, membership, permission, config):
             require(set(rows.loc[fit_ids].group_id).isdisjoint(rows.loc[query_ids].group_id), "Spatial group leakage")
             split_ids.append((fit_ids, p.obs_id.tolist(), query_ids))
         for feature_name, x in features.items():
-            contexts = [make_context(rows, x, *ids) for ids in split_ids]
+            contexts = [make_context(rows, x, *ids, config=config) for ids in split_ids]
             truth = np.concatenate([rows.loc[ids[2]].yield_t_ha.to_numpy() for ids in split_ids[1:]])
             for training in config["training_sets"]:
                 method = f"{feature_name}_{training}"
@@ -176,7 +256,9 @@ def run_models(rows, features, membership, permission, config):
                 query = split_ids[0][2]
                 pred = predict_model(contexts[0], kind, params, config)
                 train_pred = predict_model({**contexts[0], "xq": contexts[0]["xt"]}, kind, params, config)
-                if feature_name == "legacy_indices_mean_max":
+                # The step 9 pooled control trained on every 2024 row; under include_primary only
+                # the Lacuna-only control can (and must) reproduce its saved predictions.
+                if feature_name == "legacy_indices_mean_max" and (kind == "lacuna_only" or rule == "all_screened"):
                     expected = saved[saved.method.eq(kind) & saved.outer_fold.eq(outer)].set_index("obs_id").loc[query]
                     np.testing.assert_allclose(pred, expected.prediction_t_ha, atol=1e-9, rtol=0)
                     pred = expected.prediction_t_ha.to_numpy()  # retain original saved controls exactly
@@ -248,25 +330,30 @@ def input_hashes(config_path):
     return {p: sha256(ROOT/p) for p in sorted(set(paths))}
 
 
-def plot_results(path, metrics):
+VARIANT_LABELS = {"v0_mean": "V0 / V3 mean", "v1_preharvest_mean": "V1 crop dates", "v1_calendar_mean": "V1 calendar",
+                  "v2_max": "V2 max", "v3_median": "V3 median", "v3_mode": "V3 mode estimate"}
+
+
+def plot_results(path, metrics, variants=VARIANTS, merged_label="Lacuna + 2024",
+                 title="Satellite aggregation: same 1,504 Lacuna fields · Ridge\nExploratory spatial validation; fold 0 excluded"):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    names = ["V0 / V3 mean", "V1 crop dates", "V1 calendar", "V2 max", "V3 median", "V3 mode estimate"]
+    names = [VARIANT_LABELS[v] for v in variants]
     scores = metrics.set_index("method")
     fig, axes = plt.subplots(1, 2, figsize=(12, 5.5), layout="constrained")
     for family, ax in zip(["bands", "indices"], axes, strict=True):
         for training, offset, color in [("target", -.18, "#3973ac"), ("merged", .18, "#13806a")]:
-            values = [scores.loc[f"{family}_{v}_{training}", "rmse_t_ha"] for v in VARIANTS]
-            ax.barh(np.arange(6)+offset, values, height=.34, label="Lacuna only" if training == "target" else "Lacuna + 2024", color=color)
+            values = [scores.loc[f"{family}_{v}_{training}", "rmse_t_ha"] for v in variants]
+            ax.barh(np.arange(len(variants))+offset, values, height=.34, label="Lacuna only" if training == "target" else merged_label, color=color)
             for i, value in enumerate(values):
                 ax.text(value+.01, i+offset, f"{value:.3f}", va="center", fontsize=8)
-        ax.set_yticks(np.arange(6), names)
+        ax.set_yticks(np.arange(len(variants)), names)
         ax.invert_yaxis()
         ax.set(xlabel="RMSE (t/ha); lower is better", title="10 reflectance bands" if family == "bands" else "5 vegetation indices")
         ax.set_xlim(0, max(scores.rmse_t_ha)*1.13)
     fig.legend(*axes[0].get_legend_handles_labels(), loc="outside lower center", ncol=2)
-    fig.suptitle("Satellite aggregation: same 1,504 Lacuna fields · Ridge\nExploratory spatial validation; fold 0 excluded", fontsize=13)
+    fig.suptitle(title, fontsize=13)
     fig.savefig(path, dpi=160, metadata={"Software": "cropyield aggregation"})
     plt.close(fig)
 
@@ -318,13 +405,97 @@ def write_report(path, metrics, contrasts, summary, selected):
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
-def run_experiment(output=OUTPUT, config_path=CONFIG):
+def write_report_v2(path, metrics, contrasts, summary, selected, config):
+    """Release summary for the team-rule design: calendar windows and include_primary training rows."""
+    scores = metrics.set_index("method")
+    variants = model_variants(config)
+    primary = contrasts[contrasts.primary_comparison].iloc[0]
+    pairs = contrasts.set_index(["method", "reference"])
+    lines = [f"# Satellite aggregation V0–V3 ({config['experiment']}): results", "",
+             ("All models use Ridge and the same 1,504 Lacuna 2023 development fields. RMSE is in t/ha (lower is better); "
+              "R² is pooled out-of-fold (higher is better). Fold 0 was neither fit nor scored. Results are exploratory, not a new blind test."), "",
+             "## Team-rule changes from v1", "",
+             ("- **Label-free windows.** No survey date (planting, harvest, crop cut) is a model input or a window anchor. "
+              "The v1 crop-date window `v1_preharvest_mean` is not a model candidate; V1 is the December 1 – April 1 calendar mean for both sources. "
+              "`window_audit.csv` keeps crop-date counts only as `diagnostic_` columns that no model or headline uses."),
+             (f"- **Training rows follow `labels_v1.include_primary`.** Merged arms may use {summary['source_training_pool']:,} Zimbabwe 2024 rows "
+              f"(v1: {summary['source_feature_eligible']:,}). The {summary['source_excluded_not_include_primary']:,} removed rows are recorded zeros "
+              "(`zimbabwe_2024_zero_likely_not_measured`). Lacuna-only arms already used only include_primary rows; their predictions equal v1."),
+             "- Unchanged: evaluation fields, outer folds 1–4 of `s1_cc2km`, inner folds, 2 km source buffer, alpha and source-weight grids, seed and 2,000 bootstrap draws.", "",
+             (f"Primary contrast (10 bands, December–March calendar mean minus full-season mean, Lacuna only): **{primary.delta_rmse_t_ha:+.4f} t/ha**, "
+              f"95% spatial-group interval **[{primary.ci_low:+.4f}, {primary.ci_high:+.4f}]**."), "",
+             "| Aggregation | Bands: Lacuna RMSE | R² | Bands: merged RMSE | R² | Indices: Lacuna RMSE | R² | Indices: merged RMSE | R² |",
+             "|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    for variant in variants + ["legacy"]:
+        feature = "legacy_indices_mean_max" if variant == "legacy" else None
+        cells = []
+        for family in ["bands", "indices"]:
+            for training in ["target", "merged"]:
+                name = f"{feature}_{training}" if feature else f"{family}_{variant}_{training}"
+                cells += ["—", "—"] if feature and family == "bands" else [f"{scores.loc[name, 'rmse_t_ha']:.4f}", f"{scores.loc[name, 'r2']:.4f}"]
+        label = "index mean + max control (10 features)" if feature else variant
+        lines.append(f"| {label} | " + " | ".join(cells) + " |")
+    lines += ["", "Merged minus Lacuna-only, same predictors (paired RMSE difference and 95% spatial-group interval):", "",
+              "| Predictors | Δ RMSE | Interval | Folds using 2024 |", "|---|---:|---|---:|"]
+    for feature in [f"{family}_{variant}" for family in ["bands", "indices"] for variant in variants] + ["legacy_indices_mean_max"]:
+        row = pairs.loc[(f"{feature}_merged", f"{feature}_target")]
+        used = int(selected[selected.method.eq(f"{feature}_merged")].source_used.gt(0).sum())
+        lines.append(f"| {feature} | {row.delta_rmse_t_ha:+.4f} | [{row.ci_low:+.4f}, {row.ci_high:+.4f}] | {used} of 4 |")
+    lines += ["", ("V0 and V3 mean are identical, so fitted once. Median and mode are separate models. The Lacuna-only index mean+max "
+                   "control reproduces the saved step 9 predictions exactly; its merged twin is refitted on include_primary 2024 rows."), "",
+              ("The calendar cutoff includes on/after-harvest scenes for "
+               f"{summary['diagnostic_target_calendar_postharvest_fields']} evaluation fields (diagnostic from recorded harvest dates; not a model input)."), "",
+              "![Aggregation comparison](comparison.png)", "",
+              "## Files", "",
+              "- `observations.csv`: candidates with `include_primary`, `label_exclusion_reason` and `training_pool`; crop dates are metadata only.",
+              "- `training_rows_audit.csv`: every candidate row and whether it may enter a fit.",
+              "- `features.parquet` / `feature_dictionary.json`: label-free predictors only; `window_audit.csv`: counts and `diagnostic_` crop-date columns.",
+              "- `target_memberships.csv`, `source_spatial_permissions.csv`: frozen v1 copies; the source table is filtered to include_primary rows at fit time.",
+              "- `predictions.csv`, `metrics.csv`, `fold_metrics.csv`, `paired_differences.csv`, `tuning.csv`, `selected_parameters.csv`, `training_outer_diagnostics.csv`.",
+              "- `PROTOCOL.md`, `manifest.json`: fixed design, input/output hashes and software versions.", ""]
+    path.write_text("\n".join(lines), encoding="utf-8")
+
+
+def make_summary_v2(rows, features, audit, development, config):
+    source = rows.domain.eq("zimbabwe_2024") & rows.feature_eligible
+    pool = rows.domain.eq("zimbabwe_2024") & rows.training_pool
+    eligible = development | pool
+    dropped = source & ~pool
+    return {"candidate_rows": len(rows), "window_anchor": window_anchor(config), "training_rows": training_rows(config),
+            "target_evaluation": int(development.sum()), "target_reserved": 376,
+            "source_feature_eligible": int(source.sum()), "source_training_pool": int(pool.sum()),
+            "source_excluded_not_include_primary": int(dropped.sum()),
+            "source_excluded_reasons": {str(k): int(v) for k, v in rows.loc[dropped, "label_exclusion_reason"].value_counts().items()},
+            "source_excluded_zero_yield": int((dropped & rows.yield_t_ha.eq(0)).sum()),
+            "model_variants": model_variants(config), "arms": len(features)*2,
+            "missing_feature_rows_by_variant": {name: int((~np.isfinite(frame.loc[eligible].to_numpy()).all(axis=1)).sum())
+                                                for name, frame in features.items()},
+            "diagnostic_target_calendar_postharvest_fields": int(audit.loc[development, "diagnostic_n_calendar_on_or_after_harvest"].gt(0).sum()),
+            "all_unique_series": {name: int(audit.loc[eligible, name].sum()) for name in audit if name.endswith("all_unique_series")},
+            "mode_tied_interval_series": {name: int(audit.loc[eligible, name].sum()) for name in audit if name.endswith("mode_interval_tied_series")}}
+
+
+def run_experiment(output=None, config_path=CONFIG):
     config = json.loads(config_path.read_text())
+    output = default_output(config) if output is None else output
+    anchor, rule = window_anchor(config), training_rows(config)
     require(config["target_folds"] == [1, 2, 3, 4] and config["reserved_fold"] == 0, "Preserve reserved fold and development splits")
-    require(config["variants"] == VARIANTS and config["feature_families"] == ["bands", "indices"], "Unexpected feature design")
+    expected_variants = VARIANTS if anchor == "crop_dates" else CALENDAR_VARIANTS
+    require(config["variants"] == expected_variants and config["feature_families"] == ["bands", "indices"], "Unexpected feature design")
+    if anchor == "calendar":
+        require(CROP_DATE_VARIANT not in config["primary_method"] + config["primary_reference"],
+                "A crop-date window cannot be a headline comparison")
     before = input_hashes(config_path)
     rows, features, audit, monthly, membership, permission = load_inputs(config)
     development = rows.domain.eq("lacuna") & rows.fold.isin(config["target_folds"])
+    if rule == "include_primary" or anchor == "calendar":
+        require(rule == "include_primary" and anchor == "calendar", "v2 releases apply both team rules together")
+        summary = make_summary_v2(rows, features, audit, development, config)
+        with threadpool_limits(limits=1):
+            predictions, selected, tuning, gaps = run_models(rows, features, membership, permission, config)
+            metrics, folds, contrasts = evaluate(predictions, config)
+        return publish(output, config, config_path, before, rows, features, audit, monthly, summary,
+                       predictions, selected, tuning, gaps, metrics, folds, contrasts)
     eligible = development | (rows.domain.eq("zimbabwe_2024") & rows.feature_eligible)
     missing = {name: int((~np.isfinite(frame.loc[eligible].to_numpy()).all(axis=1)).sum()) for name, frame in features.items()}
     summary = {"candidate_rows": len(rows), "target_evaluation": int(development.sum()), "target_reserved": 376,
@@ -340,11 +511,22 @@ def run_experiment(output=OUTPUT, config_path=CONFIG):
     with threadpool_limits(limits=1):
         predictions, selected, tuning, gaps = run_models(rows, features, membership, permission, config)
         metrics, folds, contrasts = evaluate(predictions, config)
+    return publish(output, config, config_path, before, rows, features, audit, monthly, summary,
+                   predictions, selected, tuning, gaps, metrics, folds, contrasts)
+
+
+def publish(output, config, config_path, before, rows, features, audit, monthly, summary,
+            predictions, selected, tuning, gaps, metrics, folds, contrasts):
+    v2 = training_rows(config) == "include_primary"
     with tempfile.TemporaryDirectory(prefix="zimbabwe-aggregation-") as temporary:
         stage = Path(temporary)
-        for name, table in {"observations": rows.reset_index(), "window_audit": audit.reset_index(), "predictions": predictions,
-                            "selected_parameters": selected, "tuning": tuning, "training_outer_diagnostics": gaps,
-                            "metrics": metrics, "fold_metrics": folds, "paired_differences": contrasts}.items():
+        tables = {"observations": rows.reset_index(), "window_audit": audit.reset_index(), "predictions": predictions,
+                  "selected_parameters": selected, "tuning": tuning, "training_outer_diagnostics": gaps,
+                  "metrics": metrics, "fold_metrics": folds, "paired_differences": contrasts}
+        if v2:
+            tables["training_rows_audit"] = rows.reset_index()[["obs_id", "domain", "season_year", "yield_t_ha", "include_primary",
+                                                                "label_exclusion_reason", "feature_eligible", "fold", "training_pool"]]
+        for name, table in tables.items():
             csv_write(table, stage/f"{name}.csv")
         for name in ["target_memberships.csv", "source_spatial_permissions.csv"]:
             (stage/name).write_bytes((PRIOR/name).read_bytes())
@@ -355,8 +537,14 @@ def run_experiment(output=OUTPUT, config_path=CONFIG):
         json_write(dictionary, stage/"feature_dictionary.json")
         json_write(summary, stage/"data_summary.json")
         (stage/"PROTOCOL.md").write_bytes(PROTOCOL.read_bytes())
-        write_report(stage/"RESULTS.md", metrics, contrasts, summary, selected)
-        plot_results(stage/"comparison.png", metrics)
+        if v2:
+            write_report_v2(stage/"RESULTS.md", metrics, contrasts, summary, selected, config)
+            plot_results(stage/"comparison.png", metrics, model_variants(config), "Lacuna + 2024 include_primary",
+                         "Satellite aggregation v2: same 1,504 Lacuna fields · Ridge · calendar windows, include_primary rows\n"
+                         "Exploratory spatial validation; fold 0 excluded")
+        else:
+            write_report(stage/"RESULTS.md", metrics, contrasts, summary, selected)
+            plot_results(stage/"comparison.png", metrics)
         require(before == input_hashes(config_path), "Inputs changed during the run")
         manifest = {"config": config, "inputs": before, "base_git_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
                     "source_hashes_record_actual_working_tree": True, "python": platform.python_version(),

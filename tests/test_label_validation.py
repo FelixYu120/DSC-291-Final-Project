@@ -57,6 +57,8 @@ def raw_case(tmp_path, monkeypatch):
          "lat": -18., "lon": 30., "admin_unit": "region", "cut1_kg_ha": np.nan, "cut2_kg_ha": np.nan},
         {"cohort": "malawi_2023", "source_row": 1, "source_id": "m1", "yield_kg_ha": 3000.,
          "lat": -13., "lon": 33., "admin_unit": None, "cut1_kg_ha": 3000., "cut2_kg_ha": 4000.},
+        {"cohort": "malawi_2022", "source_row": 1, "source_id": "m22", "yield_kg_ha": 1500.,
+         "lat": -12., "lon": 33.5, "admin_unit": None, "cut1_kg_ha": np.nan, "cut2_kg_ha": np.nan},
     ])
     oaf = pd.DataFrame([{"source_row": 2, "unique_id": "k1", "yield_kg_ph": 1000.,
                          "yield_kg_pa": 1000 * module.ACRE_HA, "field_latitude": 0.5, "field_longitude": 34.5}])
@@ -64,9 +66,11 @@ def raw_case(tmp_path, monkeypatch):
                             "raw_lat": -18., "raw_lon": 30.}])
     malawi = pd.DataFrame([{"source_id": "m1", "cc_ey_t": 3., "subc_ey_t": 4.}])
     monkeypatch.setattr(module, "malawi_2023_raw", lambda: malawi)
+    # Data v2 also checks Malawi 2022 (AVG_YLD in t/ha) against its shapefile.
+    monkeypatch.setattr(module, "malawi_2022_raw", lambda: pd.DataFrame([{"source_id": "m22", "AVG_YLD": 1.5}]))
     monkeypatch.setattr(module, "RAW_DIR", tmp_path)
     entries = []
-    for name in ("OAF_WORKBOOK", "LACUNA_GEOJSON", "MALAWI_2023_ZIP"):
+    for name in ("OAF_WORKBOOK", "LACUNA_GEOJSON", "MALAWI_2023_ZIP", "MALAWI_2022_ZIP"):
         path = tmp_path / name
         path.write_text(name)
         monkeypatch.setattr(module, name, path)

@@ -92,3 +92,15 @@ remain limitations. A fresh future season and better local measurements would be
 Sources: [POWER monthly API](https://power.larc.nasa.gov/docs/services/api/temporal/monthly/),
 [POWER meteorological source and validation](https://power.larc.nasa.gov/docs/methodology/data/sources_meteorology/),
 [POWER data services and native resolution](https://power.larc.nasa.gov/docs/services/).
+
+## v2 amendment (8 November 2026): training rows follow `include_primary`
+
+v1 trained on the v1 merge pool: all 4,332 screened 2024 rows, the 1,874 recorded zeros included. The team excludes
+those zeros (`labels_v1.include_primary`). `configs/zimbabwe_weather_v2.json` sets `"training_rows": "include_primary"`
+and names v2 upstream releases: `merge_run` (`data/runs/zimbabwe_merge_v2`), `diagnosis_run`
+(`data/runs/zimbabwe_transfer_diagnosis_v2`, for the saved no-weather controls) and `weather_release`
+(`data/processed/zimbabwe_weather_v2`). Step 11 v2 enriches the v2 catalog offline from the same committed NASA POWER
+cache (`data/raw/nasa_power_zimbabwe_v1`); weather values depend only on cell and season, not on labels. Step 12 v2
+checks that every upstream release uses the same rule and stops if a fit pool holds a row outside `include_primary`.
+Without the keys, the code keeps the v1 behaviour. Splits, buffer, grids, seed, draws and windows are unchanged.
+The weather window is the fixed October–June calendar of `labels_v1.season_year`; no survey date is an input or anchor.

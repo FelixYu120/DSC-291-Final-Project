@@ -3,7 +3,8 @@
 The database is rebuilt from scratch on every run. Labels come from the committed audit CSVs
 (cropyield.data.cohorts), imagery tables from the chip folders the downloader wrote under
 data/imagery/sentinel2, and the MOSAIKS tables from the parquet files under data/features/mosaiks
-when they exist. presto_embeddings stays empty: Presto is not on the data path.
+when they exist. presto_embeddings stays empty: Presto is not on the data path. (The v1 team copy
+holds Presto rows that a later process added, so this script refuses to overwrite a file with Presto rows.)
 One observation is one field in one season, keyed everywhere by ``obs_id = "<dataset>:<source_id>"``.
 
 The SQL lives in sql/ (read sql/README.md): schema.sql creates the tables, views.sql the views.
@@ -50,7 +51,7 @@ import pyarrow.parquet as pq
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from cropyield.data.cohorts import AUDIT_DIR, COHORTS, load_cohort  # noqa: E402
-from cropyield.data.labels import LABELS_PATH  # noqa: E402
+from cropyield.data.labels import LABELS_PATH, LABELS_V2_PATH, V2_DIR, audit_dir  # noqa: E402
 from cropyield.features.indices import vegetation_indices  # noqa: E402
 from cropyield.satellite.chips import FAILED_DOWNLOAD, Chip, read_chip  # noqa: E402
 from cropyield.satellite.monthly import MonthlySeries, month_range, monthly_series  # noqa: E402
@@ -59,6 +60,9 @@ from cropyield.satellite.records import Download, field_mask, match_downloads  #
 DEFAULT_DB = ROOT / "data" / "cropyield.duckdb"
 DEFAULT_IMAGERY = ROOT / "data" / "imagery" / "sentinel2"
 DEFAULT_MOSAIKS = ROOT / "data" / "features" / "mosaiks"
+# Data v2 (docs/DECISIONS.md, 5 Nov 2026): its own database, chips and MOSAIKS folder; v1 is never read or written.
+V2_DEFAULTS = {"db": V2_DIR / "cropyield.duckdb", "imagery_dir": ROOT / "data" / "imagery" / "sentinel2_v2",
+               "mosaiks_dir": ROOT / "data" / "features" / "mosaiks_v2"}
 SCHEMA_FILE = ROOT / "sql" / "schema.sql"
 VIEWS_FILE = ROOT / "sql" / "views.sql"
 BANDS = ("B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B11", "B12")
@@ -87,11 +91,11 @@ def label_dates(rows: pd.DataFrame) -> pd.Series:
     return pd.to_datetime(text, format="mixed")  # providers mix ISO, "2023/05/17 08:55" and "3/15/2022 9:30"
 
 
-def field_polygons(datasets) -> dict[tuple[str, str], str]:
-    """GeoJSON geometry text per (dataset, source_id) from data/audit/<dataset>_candidates_wgs84.geojson."""
+def field_polygons(datasets, version: int = 1) -> dict[tuple[str, str], str]:
+    """GeoJSON geometry text per (dataset, source_id) from <audit dir>/<dataset>_candidates_wgs84.geojson."""
     polygons = {}
     for dataset in datasets:
-        path = AUDIT_DIR / f"{dataset}_candidates_wgs84.geojson"
+        path = audit_dir(dataset, version) / f"{dataset}_candidates_wgs84.geojson"
         if not path.exists():
             continue  # point datasets have no polygon file
         for feature in json.loads(path.read_text(encoding="utf-8"))["features"]:
@@ -99,11 +103,11 @@ def field_polygons(datasets) -> dict[tuple[str, str], str]:
     return polygons
 
 
-def labels_frame() -> pd.DataFrame:
+def labels_frame(version: int = 1) -> pd.DataFrame:
     """One row per observation of every cohort, with the columns of the labels table."""
-    rows = pd.concat([load_cohort(name) for name in COHORTS], ignore_index=True)
-    polygons = field_polygons(rows["dataset"].unique())
-    frozen = pd.read_parquet(LABELS_PATH, columns=["obs_id", "include_primary", "exclusion_reason"]).set_index("obs_id")
+    rows = pd.concat([load_cohort(name, audit_dir(name, version)) for name in COHORTS], ignore_index=True)
+    polygons = field_polygons(rows["dataset"].unique(), version)
+    frozen = pd.read_parquet(LABELS_V2_PATH if version == 2 else LABELS_PATH, columns=["obs_id", "include_primary", "exclusion_reason"]).set_index("obs_id")
     return pd.DataFrame({
         "obs_id": rows["obs_id"],
         "cohort": rows["cohort"],
@@ -329,10 +333,25 @@ def insert(con: duckdb.DuckDBPyConnection, table: str, frame: pd.DataFrame | pa.
     return con.execute(f"SELECT count(*) FROM {table}").fetchone()[0]
 
 
+def holds_presto(db: Path) -> bool:
+    """True when ``db`` has rows in presto_embeddings, like the team database: a build would delete them."""
+    if not db.exists():
+        return False
+    with duckdb.connect(str(db), read_only=True) as con:
+        tables = {name for (name,) in con.execute("SELECT table_name FROM duckdb_tables()").fetchall()}
+        return "presto_embeddings" in tables and con.execute("SELECT count(*) FROM presto_embeddings").fetchone()[0] > 0
+
+
 def build_database(db: Path, imagery_dir: Path, mosaiks_dir: Path = DEFAULT_MOSAIKS,
-                   workers: int = 1) -> dict[str, int]:
+                   workers: int = 1, version: int = 1) -> dict[str, int]:
     """Create ``db`` from scratch and return the row count of every table."""
-    frames: dict = {"labels": labels_frame()}
+    if holds_presto(db):
+        raise PermissionError(f"{db} holds Presto embeddings that a build would delete (the team database is "
+                              "never rebuilt). Pass another --db.")
+    v1_paths = {DEFAULT_DB.resolve(), DEFAULT_IMAGERY.resolve(), DEFAULT_MOSAIKS.resolve()}
+    if version == 2 and {Path(p).resolve() for p in (db, imagery_dir, mosaiks_dir)} & v1_paths:
+        raise PermissionError("--version 2 must not read or write the v1 database, chips or MOSAIKS folder")
+    frames: dict = {"labels": labels_frame(version)}
     downloads = match_downloads(frames["labels"], imagery_dir)
     frames.update(imagery_frames(downloads, workers))
     frames["presto_embeddings"] = pd.DataFrame()
@@ -358,16 +377,25 @@ def build_database(db: Path, imagery_dir: Path, mosaiks_dir: Path = DEFAULT_MOSA
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--db", type=Path, default=DEFAULT_DB, help="database file to (re)create")
-    parser.add_argument("--imagery-dir", type=Path, default=DEFAULT_IMAGERY, help="folder holding run-*/records/")
-    parser.add_argument("--mosaiks-dir", type=Path, default=DEFAULT_MOSAIKS,
+    parser.add_argument("--version", type=int, choices=(1, 2), default=1,
+                        help="2: labels_v2 and the v2 defaults (data/v2/cropyield.duckdb, data/imagery/sentinel2_v2, "
+                             "data/features/mosaiks_v2)")
+    parser.add_argument("--db", type=Path, help="database file to (re)create")
+    parser.add_argument("--imagery-dir", type=Path, help="folder holding run-*/records/")
+    parser.add_argument("--mosaiks-dir", type=Path,
                         help="folder holding monthly.parquet, season.parquet and params.json")
     parser.add_argument("--workers", type=int, default=1,
                         help="processes that read the chips")
     args = parser.parse_args(argv)
+    defaults = V2_DEFAULTS if args.version == 2 else {"db": DEFAULT_DB, "imagery_dir": DEFAULT_IMAGERY,
+                                                      "mosaiks_dir": DEFAULT_MOSAIKS}
+    for name, value in defaults.items():
+        if getattr(args, name) is None:
+            setattr(args, name, value)
     started = time.perf_counter()
     try:
-        counts = build_database(args.db, args.imagery_dir, mosaiks_dir=args.mosaiks_dir, workers=args.workers)
+        counts = build_database(args.db, args.imagery_dir, mosaiks_dir=args.mosaiks_dir, workers=args.workers,
+                                version=args.version)
     except PermissionError as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 1

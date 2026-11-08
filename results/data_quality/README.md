@@ -29,7 +29,7 @@ tree. Detailed local outputs are under `data/runs/data_quality/2026-11-03-final/
 Reproduce from the repository root:
 
 ```bash
-python scripts/audit_data_quality.py
+python scripts/quality/audit_data_quality.py
 ```
 
 The command creates a new timestamped report and runs no models. See

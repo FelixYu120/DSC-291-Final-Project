@@ -46,3 +46,20 @@ def test_inner_selection_ignores_any_outer_score_metadata():
     trials = [(2.,{"ratio":0,"outer_error":0}), (1.,{"ratio":.1,"outer_error":100})]
     assert select_inner(trials)[1]["ratio"]==.1
     assert select_inner([(1.,{"ratio":0}),(1.,{"ratio":1})])[1]["ratio"]==0
+
+
+def test_v2_compact_fit_indices_reject_a_source_row_outside_include_primary():
+    import json
+
+    from cropyield import ROOT
+    from cropyield.experiments.zimbabwe_weather_compact import fit_indices
+    rows = pd.DataFrame({"fold": [1, 1, 2, 2, -1], "group_id": ["a", "a", "b", "b", "auxiliary"],
+                         "feature_eligible": True, "include_primary": [True, True, True, True, False]},
+                        index=["t1", "t2", "t3", "t4", "s1"])
+    membership = pd.DataFrame({"obs_id": ["t3", "t4", "t1", "t2"], "outer_fold": 1, "inner_fold": 0,
+                               "role": ["fit", "fit", "evaluation", "evaluation"]})
+    permission = pd.DataFrame({"obs_id": ["s1"], "outer_fold": [1], "inner_fold": [0],
+                               "minimum_distance_to_protected_km": [5.], "allowed_by_spatial_rule": [True]})
+    config = json.loads((ROOT / "configs/zimbabwe_weather_compact_v2.json").read_text())
+    with pytest.raises(ValueError, match="include_primary"):
+        fit_indices(rows, membership, permission, 1, config)

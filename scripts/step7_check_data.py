@@ -1,6 +1,7 @@
-"""What the database holds for the labels_v1 model rows: the numbers behind the imagery section of docs/DATA.md.
+"""What the database holds for the labels_v1 (or labels_v2) model rows: the numbers behind the imagery section of docs/DATA.md.
 
     python scripts/step7_check_data.py [--db data/cropyield.duckdb] [--min-clear-months 4]
+    python scripts/step7_check_data.py --version 2      # labels_v2 rows on data/v2/cropyield.duckdb
 
 Reads the database only. Run it after every rebuild. It prints the coverage, the clear share per
 calendar month, the range of each index, how much haze is left in the "clear" months, which month is
@@ -19,7 +20,7 @@ from scipy.stats import rankdata
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from cropyield.data.labels import LABELS_PATH  # noqa: E402
+from cropyield.data.labels import LABELS_PATH, LABELS_V2_PATH  # noqa: E402
 
 COHORT_ORDER = ["malawi_2023", "kenya_oaf_2019_2020", "zimbabwe_lacuna_2022_2023", "zimbabwe_2024", "malawi_2022"]
 INDICES = ["ndvi", "gcvi", "mtci", "ndvi705", "ndvi740"]
@@ -132,12 +133,16 @@ def cohort_levels(con: duckdb.DuckDBPyConnection, min_clear: int) -> pd.DataFram
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--db", type=Path, default=ROOT / "data" / "cropyield.duckdb")
+    parser.add_argument("--version", type=int, choices=(1, 2), default=1,
+                        help="2: the labels_v2 rows, by default on data/v2/cropyield.duckdb")
+    parser.add_argument("--db", type=Path)
     parser.add_argument("--min-clear-months", type=int, default=4)
     args = parser.parse_args(argv)
+    labels = LABELS_V2_PATH if args.version == 2 else LABELS_PATH
+    db = args.db or ROOT / "data" / ("v2" if args.version == 2 else "") / "cropyield.duckdb"
     pd.set_option("display.width", 200, "display.max_rows", 500, "display.max_columns", 50)
-    with duckdb.connect(str(args.db), read_only=True) as con:
-        con.execute(MODEL_ROWS.format(labels=LABELS_PATH.as_posix()))
+    with duckdb.connect(str(db), read_only=True) as con:
+        con.execute(MODEL_ROWS.format(labels=labels.as_posix()))
         sections = {
             "Coverage of the primary rows": coverage_table(con, args.min_clear_months),
             "Clear share per month": clear_share_by_month(con),
