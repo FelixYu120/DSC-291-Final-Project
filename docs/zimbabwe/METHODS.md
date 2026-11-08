@@ -1,5 +1,7 @@
 # Zimbabwe data merging weather enrichment and evaluation
 
+For the manuscript, use the audited [data sources and preparation section](../paper/DATA_SOURCES_AND_PREPARATION.md). It specifies the provider-specific screening tolerances, single-grid-cell Zimbabwe satellite support, archived `mtci` formula and the distinction between inferred 2024 area normalization and independently documented cut area.
+
 **Smaller weather sets recover some lost accuracy, but they do not establish a better overall model.** All comparisons use the same 1,504 Lacuna fields and frozen spatial splits. RMSE is in t/ha; lower is better.
 
 | Weather features added | Lacuna-only trees | Merged trees |
@@ -49,7 +51,7 @@ All source and derived-file SHA-256 hashes are recorded in the release manifests
 
 ## Cleaning and physical conversions
 
-Reconcile raw IDs, coordinates and outcomes with frozen labels. Check unique source IDs, usable cuts, nonnegative dry weights, dry ≤ wet weight, conversion consistency, yields within the inherited 0–15 t/ha screen, and a coarse Zimbabwe coordinate envelope. These are validation screens, not proof of field-level accuracy.
+Reconcile raw IDs, coordinates and outcomes with frozen labels. Check unique source IDs, usable cuts, nonnegative dry weights, dry ≤ wet weight where both are available, conversion consistency and a coarse Zimbabwe coordinate envelope. Lacuna's raw yield screen is 0–30 t/ha; its original primary-model policy additionally excludes yields above 15 t/ha. The 2024 yield screen is 0–15 t/ha. These are validation screens, not proof of field-level accuracy.
 
 Three Lacuna records imply dry kg × 0.5 instead of × 0.25 for 40 m². Exclude them; unknown area/weight errors cannot be repaired by guessing. Of the remaining 2,266 labels, 169 are from 2022 and 2,097 from 2023. Sequentially remove 212 intercropped and five irrigated 2023 records to obtain 1,880 primary fields. Keep 28 primary zero yields; retain nearby coordinates in shared spatial groups. The 2022 records remain catalog-only.
 
@@ -57,14 +59,14 @@ The 5,055 raw maize records include **723 missing labels**, which are excluded w
 
 Box conversion and average comparisons use an absolute tolerance of 0.000001 t/ha. The independently screened IDs, coordinates and outcomes must reconcile with the frozen screened labels. All row-level reasons remain available in `source_2024_audit.csv`.
 
-For dry grain mass and an area in square metres:
+For reported dry mass and an area in square metres:
 
 ```text
 yield_kg_ha = w × 10,000 / 40 = 250 × w
 yield_t_ha  = yield_kg_ha / 1,000 = 0.25 × w
 ```
 
-Both sources already report area-normalized yields. For 2024, independently verify each box, then average available box yields. Do not divide the already averaged field yield by two. Models and metrics use t/ha; storage also preserves kg/ha. Lacuna's raw-unit provisional flag remains visible even though the arithmetic supports the chosen interpretation.
+Both sources already report area-normalized yields. For 2024, verify each box's numerical consistency with the 40 m² conversion, then average available box yields. The released CSV has no cut-area field and the associated paper's methods section does not state 40 m², so this checks arithmetic rather than independently establishing physical sampled area. Do not divide the already averaged field yield by two. Models and metrics use t/ha; storage also preserves kg/ha. Lacuna's raw-unit provisional flag remains visible even though the arithmetic supports the chosen interpretation.
 
 A physical moisture correction would require measured moisture values: `Y_target = Y_observed × (100 − m_observed)/(100 − m_target)`. Those values are absent, so no moisture conversion is applied. Grain/cob basis, drying completeness and sampling variability are not solved by changing units. Two cuts may reduce sampling noise, but the available evidence does not justify a universal precision multiplier. Statistical adaptation addresses some differences in distributions; it does not certify measurement equivalence.
 

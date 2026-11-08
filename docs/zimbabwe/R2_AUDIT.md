@@ -97,6 +97,14 @@ Monthly measurements are spatial **medians of clear field pixels from one
 selected Sentinel-2 scene per month**. These experiments aggregate those
 monthly values over time; they do not average every daily scene.
 
+For the Zimbabwe point geometries specifically, every accepted observation has
+one valid sampled grid cell, so this spatial median reduces to one value rather
+than a whole-field statistic. The archived `mtci` predictor uses
+`(B08 - B05) / (B05 - B04)`; substituting the Sentinel-2 MTCI definition with B06
+would change the predictors. The [manuscript audit](../paper/DATA_SOURCES_AND_PREPARATION.md)
+documents the exact formulas and sampling support. Whether this accounts for
+another implementation's scores cannot be established without its feature code.
+
 Two feature families are fitted separately:
 
 - Ten reflectance bands: B02, B03, B04, B05, B06, B07, B08, B8A, B11, B12.

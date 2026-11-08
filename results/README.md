@@ -3,6 +3,8 @@
 This page indexes the results across the repository. Zimbabwe experiment reports stay with their frozen datasets
 under `data/runs/`; each report is named **`RESULTS.md`**. They are linked here rather than duplicated or relocated.
 
+For the paper and team handoff, use the [one-page results summary](../docs/paper/RESULTS_SUMMARY.md), [complete appendix](../docs/paper/RESULTS_APPENDIX.md) and [full-precision ledger](../docs/paper/RESULTS_LEDGER.csv). The ledger distinguishes reused controls from different predictions and keeps the separate 2024 source-diagnostic population explicit.
+
 ## Zimbabwe experiments
 
 | Experiment | Readable report | Scores | Predictions |

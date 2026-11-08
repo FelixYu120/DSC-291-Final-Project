@@ -1,0 +1,72 @@
+{
+  "all_numeric_checks_passed": true,
+  "analysis_snapshot": "a8f31fb",
+  "target_arm_rows": 149,
+  "source_diagnostic_rows": 6,
+  "recomputed_metric_checks": 465,
+  "summary_rows_verified": 10,
+  "target_evaluation_fields_per_arm": 1504,
+  "references_in_first_citation_order": 13,
+  "frozen_release_outputs_unchanged": 158,
+  "scientific_models_refitted": false,
+  "model_pipeline_changed": false,
+  "source_files": {
+    "docs/paper/DATA_SOURCES_AND_PREPARATION.md": "b183c51f4ef3223490ceb1054f1b3820a79ea8b14768ef4c32d01c002fb21120",
+    "docs/paper/README.md": "efef31e3a8012d399e124d8c94c770450ecd72689970392d7c37ad19530d2d96",
+    "docs/paper/REFERENCES.bib": "c35ecbb40552a459dbd0ecb32bd229a2160ab3531096494d11b9bcc7fa89172d",
+    "docs/paper/RESULTS_APPENDIX.md": "8e8bed898cbea1792a1ce66d5736c07782cb8fa13eeb8fcd4b4d6b3d835dc856",
+    "docs/paper/RESULTS_LEDGER.csv": "c6b4c44f16feef93950e4f9e81f6328ec854308db28d405bf359fc2df373dd8c",
+    "docs/paper/RESULTS_SUMMARY.md": "65d4c203b2dfbebd1a4b2af20355f22c8374aa4e1b86479d5422ec30ee4ef2a7",
+    "docs/paper/data_sources_and_preparation.docx": "2b1ac980e5e040eccec9e9165601dc6c62127370c28924cc2e86abeac40079aa",
+    "docs/paper/results_summary_one_page.docx": "df2a195798ae613b4af5a138dd6d220c78c1ea7d63c0675d46a4edda0d4d3964"
+  },
+  "document_builder_sha256": "797f31cfa5733c13730fb57b33b7f14243097e8798a1edb1b598b6f235d40b07",
+  "documents": {
+    "docs/paper/data_sources_and_preparation.docx": {
+      "sha256": "2b1ac980e5e040eccec9e9165601dc6c62127370c28924cc2e86abeac40079aa",
+      "rendered_pages": 5,
+      "editable_fraction_count": 6,
+      "all_rendered_pages_visually_inspected": true,
+      "layout_findings": "No clipped text, overlapping content, split table rows or stray pages. Equations and tables are readable.",
+      "qa_pdf_sha256": "6f10582f0fd50af02c45a97c734daed6abcc2c2818d960ccae256deca9da6c1a",
+      "qa_page_image_sha256": {
+        "page-1.png": "84c4fb38e5fbe4b659c061dfd65938eb034c79a6cc01b8602a62cde2d4d75368",
+        "page-2.png": "80a664da65708f68f64e4145c34377306401d37f5b0155e950da07bb823857f8",
+        "page-3.png": "a0d42232af353589a4fefa4409defc9896ab75d6c86aadee95723a1608fd85f9",
+        "page-4.png": "683fcb77c46fd4a589929e2c231d4471dd9582ac13848e4ce8b976d5d01d2672",
+        "page-5.png": "be13f7b7270fab83ac1f62531cf5ac97b761c2cf17991e1019eba98dc97068c0"
+      }
+    },
+    "docs/paper/results_summary_one_page.docx": {
+      "sha256": "df2a195798ae613b4af5a138dd6d220c78c1ea7d63c0675d46a4edda0d4d3964",
+      "rendered_pages": 1,
+      "editable_fraction_count": 0,
+      "all_rendered_pages_visually_inspected": true,
+      "layout_findings": "No clipped text, overlapping content, split table rows or stray pages. Equations and tables are readable.",
+      "qa_pdf_sha256": "f760818050a534251890386c60147887c5e63f3ac3301bf0118293ceef0652a7",
+      "qa_page_image_sha256": {
+        "page-1.png": "23b219ac7f14ad47fb2b567e71748de9a29d3c74948d3b21f886597143a73c8e"
+      }
+    }
+  },
+  "bibliography_entries": 13,
+  "review": {
+    "processing_code_and_source_data_reviewed": true,
+    "primary_sources_and_citations_reviewed": true,
+    "results_independently_recomputed_from_saved_predictions": true,
+    "duplicate_controls_identified_in_ledger": true,
+    "review_type": "Repository and primary-source audit with independent agent review; not journal peer review.",
+    "corrected_method_descriptions": [
+      "provider-specific yield thresholds and tolerances",
+      "2024 physical crop-cut area remains unverified despite consistent normalization",
+      "point geometry and single-grid-cell satellite support",
+      "actual B08-based archived mtci formula",
+      "shared versus adaptive Ridge preprocessing",
+      "Presto representation comparison input differences"
+    ]
+  },
+  "renderer": {
+    "name": "documents skill render_docx.py",
+    "sha256": "876d5993324e2faaaa96a68a4f7504642e9a07e6df265b385b2baa03b231369e"
+  }
+}

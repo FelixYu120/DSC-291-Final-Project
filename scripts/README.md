@@ -21,6 +21,8 @@ These commands require the shared team database. The Zimbabwe notebook's default
 The recorded-code runner requires full Git history, verifies original inputs/outputs and writes a new destination.
 See [reproduction details](../docs/zimbabwe/REPRODUCING.md). Do not rebuild the shared database: step 6 would remove its Presto embeddings.
 
+The document-only [build_paper_documents.py](build_paper_documents.py) creates the two editable documents in [docs/paper](../docs/paper/README.md) from reviewed text. It requires `python-docx`; it does not fit models or modify scientific releases. Document rendering and visual inspection remain required after changing the text.
+
 ## Zimbabwe pipeline: steps 8–13
 
 The stage files remain the implementation entry points. Current main has newer shared validators than the published

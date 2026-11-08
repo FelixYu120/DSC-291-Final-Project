@@ -4,6 +4,8 @@ This is the entry point for Felix's data preparation and the subsequent merge/we
 Read the [one-page Ridge summary](SUMMARY.md), then follow [Data Guide 2](../../notebooks/data_guide_2_zimbabwe.ipynb)
 for the complete walkthrough. [METHODS.md](METHODS.md) contains the current concise findings and technical appendix.
 
+The [paper folder](../paper/README.md) contains Felix and Florian's manuscript section, a one-page team summary and every saved result with repeated controls identified.
+
 ## Work added, in order
 
 Paths below are relative to the repository root. Scripts are the original stage entry points;

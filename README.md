@@ -16,6 +16,7 @@ and tests whether rainfall and temperature improve prediction. Earlier Malawi/Ke
 | Find `RESULTS.md`, scores and predictions | [Results directory](results/README.md) |
 | Reproduce an existing experiment | [Reproduction guide](docs/zimbabwe/REPRODUCING.md) |
 | Check how the V0–V3 R² values were calculated | [R² audit and Claude review packet](docs/zimbabwe/R2_AUDIT.md) |
+| Write the paper or share all results with the team | [Manuscript section, one-page summary and complete results](docs/paper/README.md) |
 
 The basic merge experiment uses **10 vegetation-index features with Ridge**, not MOSAIKS. Naive pooling hurts;
 source-aware adjustment removes most of that penalty, but adding 2024 has not established a reliable accuracy gain.
