@@ -6,35 +6,33 @@
   "recomputed_metric_checks": 465,
   "summary_rows_verified": 10,
   "target_evaluation_fields_per_arm": 1504,
-  "references_in_first_citation_order": 13,
+  "references_in_first_citation_order": 6,
   "frozen_release_outputs_unchanged": 158,
   "scientific_models_refitted": false,
   "model_pipeline_changed": false,
   "source_files": {
-    "docs/paper/DATA_SOURCES_AND_PREPARATION.md": "b183c51f4ef3223490ceb1054f1b3820a79ea8b14768ef4c32d01c002fb21120",
-    "docs/paper/README.md": "efef31e3a8012d399e124d8c94c770450ecd72689970392d7c37ad19530d2d96",
+    "docs/paper/DATA_SOURCES_AND_PREPARATION.md": "1fb78fc61ac86650b393cd9cd5247a7bddd7bc0b2e0cf4b12a0180d04661cf7d",
+    "docs/paper/README.md": "362df04439ffbdf4573398efd81048b6b7977e6819a69072426aab4edc1b335a",
     "docs/paper/REFERENCES.bib": "c35ecbb40552a459dbd0ecb32bd229a2160ab3531096494d11b9bcc7fa89172d",
-    "docs/paper/RESULTS_APPENDIX.md": "8e8bed898cbea1792a1ce66d5736c07782cb8fa13eeb8fcd4b4d6b3d835dc856",
+    "docs/paper/RESULTS_APPENDIX.md": "f5a7ae2f465b3713da160aa30957ed609163ad42ee63d3605b588dda180a5158",
     "docs/paper/RESULTS_LEDGER.csv": "c6b4c44f16feef93950e4f9e81f6328ec854308db28d405bf359fc2df373dd8c",
     "docs/paper/RESULTS_SUMMARY.md": "65d4c203b2dfbebd1a4b2af20355f22c8374aa4e1b86479d5422ec30ee4ef2a7",
-    "docs/paper/data_sources_and_preparation.docx": "2b1ac980e5e040eccec9e9165601dc6c62127370c28924cc2e86abeac40079aa",
+    "docs/paper/SUPPLEMENTARY_METHODS.md": "b6b68b71bff3e5a498d564bf8d1a3379b95bc2a8f6269924d1850100bc791a56",
+    "docs/paper/data_sources_and_preparation.docx": "08d3dccff5126fda333773188b14b801a53134dab2d5e0026f384770ccdc2694",
     "docs/paper/results_summary_one_page.docx": "df2a195798ae613b4af5a138dd6d220c78c1ea7d63c0675d46a4edda0d4d3964"
   },
-  "document_builder_sha256": "797f31cfa5733c13730fb57b33b7f14243097e8798a1edb1b598b6f235d40b07",
+  "document_builder_sha256": "4515679463e576bbbcb7072d6d5e772750023d68c8921bbfef41499e53b35cd7",
   "documents": {
     "docs/paper/data_sources_and_preparation.docx": {
-      "sha256": "2b1ac980e5e040eccec9e9165601dc6c62127370c28924cc2e86abeac40079aa",
-      "rendered_pages": 5,
-      "editable_fraction_count": 6,
+      "sha256": "08d3dccff5126fda333773188b14b801a53134dab2d5e0026f384770ccdc2694",
+      "rendered_pages": 2,
+      "editable_fraction_count": 0,
       "all_rendered_pages_visually_inspected": true,
-      "layout_findings": "No clipped text, overlapping content, split table rows or stray pages. Equations and tables are readable.",
-      "qa_pdf_sha256": "6f10582f0fd50af02c45a97c734daed6abcc2c2818d960ccae256deca9da6c1a",
+      "layout_findings": "Both pages inspected. No clipped text, overlapping content, orphan headings or stray pages. Weather section begins on page 2; references fit on page 2.",
+      "qa_pdf_sha256": "0a6ea286a2578c57476fd6d3a6a1b751660b1ec0ae0f3e31d842e901b93f5779",
       "qa_page_image_sha256": {
-        "page-1.png": "84c4fb38e5fbe4b659c061dfd65938eb034c79a6cc01b8602a62cde2d4d75368",
-        "page-2.png": "80a664da65708f68f64e4145c34377306401d37f5b0155e950da07bb823857f8",
-        "page-3.png": "a0d42232af353589a4fefa4409defc9896ab75d6c86aadee95723a1608fd85f9",
-        "page-4.png": "683fcb77c46fd4a589929e2c231d4471dd9582ac13848e4ce8b976d5d01d2672",
-        "page-5.png": "be13f7b7270fab83ac1f62531cf5ac97b761c2cf17991e1019eba98dc97068c0"
+        "page-1.png": "ac298e577d51e56dc1551fd55dfa3b95ca643bd2847402c3a35777a71de83358",
+        "page-2.png": "447be9c216db66c13f7bcaf863d9c66582287374324f02a3fd9cc11b4cdbd99f"
       }
     },
     "docs/paper/results_summary_one_page.docx": {
@@ -68,5 +66,24 @@
   "renderer": {
     "name": "documents skill render_docx.py",
     "sha256": "876d5993324e2faaaa96a68a4f7504642e9a07e6df265b385b2baa03b231369e"
-  }
+  },
+  "supplementary_references_in_first_citation_order": 13,
+  "numeric_verification_reused_from_commit": "55b7db1",
+  "numeric_input_and_output_file_hashes_rechecked": true,
+  "shortening_revision": {
+    "local_date": "2026-11-08",
+    "requested_page_range": [
+      1,
+      2
+    ],
+    "rendered_pages_including_references": 2,
+    "extracted_words_including_footer": 872,
+    "full_prior_manuscript_body_preserved_as": "docs/paper/SUPPLEMENTARY_METHODS.md",
+    "shortened_text_independently_reviewed_against_full_methods": true,
+    "results_summary_and_all_numeric_result_tables_unchanged": true,
+    "model_metrics_and_predictions_recomputed_this_revision": false,
+    "version_scope": "Original v1 methods, explicitly labeled; newer v2 methodology and results preserved separately.",
+    "integrated_upstream_commit": "96916e1"
+  },
+  "document_builder_path": "scripts/paper/build_paper_documents.py"
 }

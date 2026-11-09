@@ -136,8 +136,8 @@ For the Zimbabwe point geometries specifically, every accepted observation has
 one valid sampled grid cell, so this spatial median reduces to one value rather
 than a whole-field statistic. The archived `mtci` predictor uses
 `(B08 - B05) / (B05 - B04)`; substituting the Sentinel-2 MTCI definition with B06
-would change the predictors. The [manuscript audit](../paper/DATA_SOURCES_AND_PREPARATION.md)
-documents the exact formulas and sampling support. Whether this accounts for
+would change the predictors. The [supplementary methods](../paper/SUPPLEMENTARY_METHODS.md)
+document the exact formulas and sampling support. Whether this accounts for
 another implementation's scores cannot be established without its feature code.
 
 Two feature families are fitted separately:

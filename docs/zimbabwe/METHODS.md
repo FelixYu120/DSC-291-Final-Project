@@ -1,6 +1,6 @@
 # Zimbabwe data merging weather enrichment and evaluation
 
-For the manuscript, use the audited [data sources and preparation section](../paper/DATA_SOURCES_AND_PREPARATION.md). It specifies the provider-specific screening tolerances, single-grid-cell Zimbabwe satellite support, archived `mtci` formula and the distinction between inferred 2024 area normalization and independently documented cut area. (Felix, 7 Nov: these files quote the **v1** runs; the rule-compliant v2 values are in [the results notebook](../../notebooks/lacuna_results_consensus.ipynb), section 6.1)
+The concise [data sources and preparation section](../paper/DATA_SOURCES_AND_PREPARATION.md) describes the original **v1** experiments. The [supplementary methods](../paper/SUPPLEMENTARY_METHODS.md) retain their screening tolerances, satellite support and feature formulas. For the rule-compliant v2 analysis, use the corrections below and [the results notebook](../../notebooks/lacuna_results_consensus.ipynb), section 6.1.
 
 ## v2 correction (8 November 2026): training rows follow `include_primary`
 

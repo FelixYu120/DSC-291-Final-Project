@@ -31,7 +31,7 @@ The primary compact-weather contrast does not establish a merging benefit; the f
 
 ## Complete target results
 
-The “Repeated predictions” column marks numerical equivalence to an earlier row. Full earlier-release references are in the ledger. All rows in the following six tables have **n = 1,504**. Feature counts are input counts before provider feature augmentation; tree models may additionally include a source indicator. Archived index names, including the implementation-specific `mtci` ratio, are defined explicitly in the [manuscript section](DATA_SOURCES_AND_PREPARATION.md).
+The “Repeated predictions” column marks numerical equivalence to an earlier row. Full earlier-release references are in the ledger. All rows in the following six tables have **n = 1,504**. Feature counts are input counts before provider feature augmentation; tree models may additionally include a source indicator. Archived index names, including the implementation-specific `mtci` ratio, are defined explicitly in the [supplementary methods](SUPPLEMENTARY_METHODS.md).
 
 ### Step 9 Initial harmonization and source adaptation
 

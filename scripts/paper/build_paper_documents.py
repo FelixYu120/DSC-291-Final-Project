@@ -151,7 +151,7 @@ def add_table(document, lines, compact):
     document.add_paragraph().paragraph_format.space_after = Pt(0)
 
 
-def build(source, target, compact=False):
+def build(source, target, compact=False, page_break_before=()):
     document = Document()
     section = document.sections[0]
     section.page_width = Inches(8.5)
@@ -207,7 +207,10 @@ def build(source, target, compact=False):
         if line.startswith("# "):
             inline(document.add_paragraph(style="Title"), line[2:])
         elif line.startswith("## "):
-            inline(document.add_paragraph(style="Heading 1"), line[3:])
+            paragraph = document.add_paragraph(style="Heading 1")
+            if line[3:] in page_break_before:
+                paragraph.paragraph_format.page_break_before = True
+            inline(paragraph, line[3:])
         elif line.startswith("### "):
             inline(document.add_paragraph(style="Heading 2"), line[4:])
         else:
@@ -232,5 +235,6 @@ def build(source, target, compact=False):
 
 
 if __name__ == "__main__":
-    build(PAPER / "DATA_SOURCES_AND_PREPARATION.md", PAPER / "data_sources_and_preparation.docx")
+    build(PAPER / "DATA_SOURCES_AND_PREPARATION.md", PAPER / "data_sources_and_preparation.docx",
+          page_break_before=("Weather enrichment",))
     build(PAPER / "RESULTS_SUMMARY.md", PAPER / "results_summary_one_page.docx", compact=True)
