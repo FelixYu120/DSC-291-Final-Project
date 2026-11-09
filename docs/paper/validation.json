@@ -11,28 +11,28 @@
   "scientific_models_refitted": false,
   "model_pipeline_changed": false,
   "source_files": {
-    "docs/paper/DATA_SOURCES_AND_PREPARATION.md": "1fb78fc61ac86650b393cd9cd5247a7bddd7bc0b2e0cf4b12a0180d04661cf7d",
-    "docs/paper/README.md": "362df04439ffbdf4573398efd81048b6b7977e6819a69072426aab4edc1b335a",
+    "docs/paper/DATA_SOURCES_AND_PREPARATION.md": "8666016f0da99b3774231e579b826e8ebf7b81e6ee8c61cdec69eb596c825f6d",
+    "docs/paper/README.md": "cf849f1e93d5e651d824449c92f4273326fef2472e69c07f0fecf3c5f67a8ab8",
     "docs/paper/REFERENCES.bib": "c35ecbb40552a459dbd0ecb32bd229a2160ab3531096494d11b9bcc7fa89172d",
     "docs/paper/RESULTS_APPENDIX.md": "f5a7ae2f465b3713da160aa30957ed609163ad42ee63d3605b588dda180a5158",
     "docs/paper/RESULTS_LEDGER.csv": "c6b4c44f16feef93950e4f9e81f6328ec854308db28d405bf359fc2df373dd8c",
     "docs/paper/RESULTS_SUMMARY.md": "65d4c203b2dfbebd1a4b2af20355f22c8374aa4e1b86479d5422ec30ee4ef2a7",
     "docs/paper/SUPPLEMENTARY_METHODS.md": "b6b68b71bff3e5a498d564bf8d1a3379b95bc2a8f6269924d1850100bc791a56",
-    "docs/paper/data_sources_and_preparation.docx": "08d3dccff5126fda333773188b14b801a53134dab2d5e0026f384770ccdc2694",
+    "docs/paper/data_sources_and_preparation.docx": "014dc8f52fbca38c85d084e2904c995c11e52b7a86b5c23cfc1f0a3266ce940b",
     "docs/paper/results_summary_one_page.docx": "df2a195798ae613b4af5a138dd6d220c78c1ea7d63c0675d46a4edda0d4d3964"
   },
-  "document_builder_sha256": "4515679463e576bbbcb7072d6d5e772750023d68c8921bbfef41499e53b35cd7",
+  "document_builder_sha256": "f2915833d42e63b903f285f9a89292e1a7dd320228d1079e12084d80d820746b",
   "documents": {
     "docs/paper/data_sources_and_preparation.docx": {
-      "sha256": "08d3dccff5126fda333773188b14b801a53134dab2d5e0026f384770ccdc2694",
+      "sha256": "014dc8f52fbca38c85d084e2904c995c11e52b7a86b5c23cfc1f0a3266ce940b",
       "rendered_pages": 2,
       "editable_fraction_count": 0,
       "all_rendered_pages_visually_inspected": true,
-      "layout_findings": "Both pages inspected. No clipped text, overlapping content, orphan headings or stray pages. Weather section begins on page 2; references fit on page 2.",
-      "qa_pdf_sha256": "0a6ea286a2578c57476fd6d3a6a1b751660b1ec0ae0f3e31d842e901b93f5779",
+      "layout_findings": "Both pages inspected. NASA weather begins on page 2, and all six references fit. No clipped text, overlapping content, orphan headings or stray pages.",
+      "qa_pdf_sha256": "d6a9eb41c9c183201747a879d58f0649c36920a613ec0978b7e404d9095ae405",
       "qa_page_image_sha256": {
-        "page-1.png": "ac298e577d51e56dc1551fd55dfa3b95ca643bd2847402c3a35777a71de83358",
-        "page-2.png": "447be9c216db66c13f7bcaf863d9c66582287374324f02a3fd9cc11b4cdbd99f"
+        "page-1.png": "bfb141f5892506209503446651b218c3f032cffde3afe68b410ab7159646fc14",
+        "page-2.png": "7d9d8cc9b6958769c8de25db7f3d883681d22ad33e3336388a56f0c516b93747"
       }
     },
     "docs/paper/results_summary_one_page.docx": {
@@ -85,5 +85,16 @@
     "version_scope": "Original v1 methods, explicitly labeled; newer v2 methodology and results preserved separately.",
     "integrated_upstream_commit": "96916e1"
   },
-  "document_builder_path": "scripts/paper/build_paper_documents.py"
+  "document_builder_path": "scripts/paper/build_paper_documents.py",
+  "weather_and_processing_revision": {
+    "local_date": "2026-11-09",
+    "version_scope": "Original v1 analysis retained",
+    "rendered_pages_including_references": 2,
+    "extracted_words_including_footer": 1031,
+    "weather_source_and_recipe_checked_against_supplement_and_code": true,
+    "independent_factual_review_passed": true,
+    "more_conversational_wording": true,
+    "results_and_supplement_unchanged": true,
+    "model_metrics_and_predictions_recomputed_this_revision": false
+  }
 }

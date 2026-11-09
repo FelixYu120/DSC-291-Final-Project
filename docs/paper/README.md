@@ -49,3 +49,5 @@ The archived MTCI-style feature is described by its actual formula. Changing it 
 The score ledger was independently checked against saved predictions for sample count, uniqueness, RMSE, MAE and R². The manuscript was separately reviewed against processing code and primary sources. Frozen experiments were not rerun or rewritten for this writing task.
 
 8 November 2026: the shortened manuscript uses the relocated builder in `scripts/paper/`. The verification receipt records this builder and the two-page render; numeric verification remains tied to the unchanged v1 result files.
+
+9 November 2026: the two-page section uses more conversational wording and expands the NASA POWER source, coordinate matching, rainfall conversion, climate reference periods, seasonal features and data-preparation sequence. Its v1 scope and all reported model results remain unchanged.

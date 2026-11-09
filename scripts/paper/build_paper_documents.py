@@ -236,5 +236,5 @@ def build(source, target, compact=False, page_break_before=()):
 
 if __name__ == "__main__":
     build(PAPER / "DATA_SOURCES_AND_PREPARATION.md", PAPER / "data_sources_and_preparation.docx",
-          page_break_before=("Weather enrichment",))
+          page_break_before=("NASA rainfall and temperature data",))
     build(PAPER / "RESULTS_SUMMARY.md", PAPER / "results_summary_one_page.docx", compact=True)
