@@ -10,6 +10,15 @@ and fold-0 scores, Felix's v1 and v2 runs, why the two teams' numbers differ, an
 number with a committed counterpart is checked against it, and so is every number in its answer
 section. Needs both team databases; takes about three minutes.
 
+## Figures for the midterm report
+
+[midterm_figures.ipynb](midterm_figures.ipynb): 39 figures in three parts (data and maps, architecture, results), each
+with a short text and a caption draft, so that the team can pick a few for each part. It writes each figure to
+`report/figures/midterm/` as PNG (300 dpi) and PDF, and one overview sheet for each part. It needs
+`data/v2/cropyield.duckdb`, the data v2 image chips for six figures, and the public map files that
+[midterm_get_basemap.py](midterm_get_basemap.py) fetches into `data/imagery/basemap/` (git-ignored, about 45 MB). It
+opens the database read-only and takes about five minutes. The saved outputs show every figure without a run.
+
 ## Reading order
 
 1. [Data Guide 1](data_guide.ipynb): the original multi-country foundation, provider measurements,
