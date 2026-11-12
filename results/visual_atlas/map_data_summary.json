@@ -31,6 +31,32 @@
       "records_in_sparse_cells": 224
     }
   },
+  "yield_detail_windows": [
+    {
+      "panel": "B",
+      "provider_area": "Guruve",
+      "records": 107,
+      "unique_locations": 107,
+      "bounds_laea_m": [
+        103081.61626821599,
+        241657.54388905165,
+        163081.616268216,
+        271657.54388905165
+      ]
+    },
+    {
+      "panel": "C",
+      "provider_area": "Shurugwi",
+      "records": 288,
+      "unique_locations": 284,
+      "bounds_laea_m": [
+        36473.80535162713,
+        -103742.30198590874,
+        96473.80535162713,
+        -73742.30198590874
+      ]
+    }
+  ],
   "weather": {
     "grid_latitude_degrees": 0.5,
     "grid_longitude_degrees": 0.625,

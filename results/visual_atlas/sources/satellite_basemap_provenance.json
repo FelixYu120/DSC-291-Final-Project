@@ -1,0 +1,104 @@
+{
+  "title": "EOxCloudless 2016 Sentinel-2 satellite imagery for the Zimbabwe atlas",
+  "publisher": "EOX IT Services GmbH",
+  "product": "s2cloudless (2016 vintage), geographic WMS layer",
+  "purpose": "Static geographic context reused for all harvest seasons. Model inputs and acquisition dates are documented separately.",
+  "attribution": "EOxCloudless https://cloudless.eox.at by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2016)",
+  "license": "Creative Commons Attribution 4.0 International",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "provider_capabilities": "https://tiles.maps.eox.at/map?service=WMS&request=GetCapabilities",
+  "capabilities_sha256": "cda7d110b1884a6803f26a65d9ee9d8b55772bc19c143fccfbaa734803af58ec",
+  "documentation": "https://cloudless.eox.at/documentation/usage",
+  "retrieved_local_date": "2026-11-11",
+  "source_crs": "EPSG:4326; WMS 1.1.1 uses longitude, latitude for this layer.",
+  "raster_crs_proj4": "+proj=laea +lat_0=-19 +lon_0=29.5 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs=True",
+  "processing": "Provider-rendered JPEG cropped by bounding box, converted to luminance with Pillow L (0.299R + 0.587G + 0.114B rounded), bilinearly reprojected to the atlas equal-area grid, then stored as an 8-bit single-band JPEG-compressed GeoTIFF (quality 90). The map renderer applies a shared charcoal or light tonal ramp. The pixel size below describes the atlas export.",
+  "software": {
+    "Pillow": "13.0.0",
+    "rasterio": "1.5.2",
+    "GDAL": "3.8.5"
+  },
+  "regions": {
+    "country": {
+      "file": "eox_zimbabwe_2016.tif",
+      "source_wms_url": "https://tiles.maps.eox.at/map?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&LAYERS=s2cloudless&STYLES=&SRS=EPSG:4326&BBOX=24.25,-23.25,34.25,-14.75&WIDTH=3200&HEIGHT=2720&FORMAT=image/jpeg",
+      "source_jpeg_sha256": "877fc860d5626ae4bfc77cc2b7e6545a36414ddf931b9b9d2a5866a1b11bb05f",
+      "source_wgs84_bbox": [
+        24.25,
+        -23.25,
+        34.25,
+        -14.75
+      ],
+      "source_width_height": [
+        3200,
+        2720
+      ],
+      "laea_bounds_left_bottom_right_top": [
+        -514150.0,
+        -438200.0,
+        430150.0,
+        431550.0
+      ],
+      "width_height": [
+        2698,
+        2485
+      ],
+      "pixel_spacing_metres": 350,
+      "sha256": "83d31727d6da6c7101f9863c9e2125bbc3fa108aad44cc74c84ab47c5190624e"
+    },
+    "guruve": {
+      "file": "eox_guruve_2016.tif",
+      "source_wms_url": "https://tiles.maps.eox.at/map?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&LAYERS=s2cloudless&STYLES=&SRS=EPSG:4326&BBOX=30.25,-17.03,31.25,-16.33&WIDTH=2000&HEIGHT=1400&FORMAT=image/jpeg",
+      "source_jpeg_sha256": "4513c2e8196657c5a404792afa89711e346b6c6317153177394c3d2e93cb7262",
+      "source_wgs84_bbox": [
+        30.25,
+        -17.03,
+        31.25,
+        -16.33
+      ],
+      "source_width_height": [
+        2000,
+        1400
+      ],
+      "laea_bounds_left_bottom_right_top": [
+        85082.0,
+        222623.0,
+        181112.0,
+        290658.0
+      ],
+      "width_height": [
+        1746,
+        1237
+      ],
+      "pixel_spacing_metres": 55,
+      "sha256": "b1a94df8cef9fd7199c774c7e7c12f914afb4e9896dc711c33028c89b186f838"
+    },
+    "shurugwi": {
+      "file": "eox_shurugwi_2016.tif",
+      "source_wms_url": "https://tiles.maps.eox.at/map?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&LAYERS=s2cloudless&STYLES=&SRS=EPSG:4326&BBOX=29.63,-20.15,30.64,-19.45&WIDTH=2020&HEIGHT=1400&FORMAT=image/jpeg",
+      "source_jpeg_sha256": "22a7e30ec1a49264add78e5f0aca396563a8174cb5fb25d7b7e4949f76110b1c",
+      "source_wgs84_bbox": [
+        29.63,
+        -20.15,
+        30.64,
+        -19.45
+      ],
+      "source_width_height": [
+        2020,
+        1400
+      ],
+      "laea_bounds_left_bottom_right_top": [
+        18474.0,
+        -122777.0,
+        114504.0,
+        -54742.0
+      ],
+      "width_height": [
+        1746,
+        1237
+      ],
+      "pixel_spacing_metres": 55,
+      "sha256": "e0df524e67f32de82fdfbbd08a05b23bd1bc0ecf3c68c6f485c77c5e9f71c148"
+    }
+  }
+}

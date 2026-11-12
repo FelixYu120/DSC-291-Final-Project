@@ -71,6 +71,8 @@ class FigureItem:
     title: str
     mime: str
     data: bytes
+    figure_type: str
+    description: str
 
 
 class Gallery:
@@ -79,20 +81,28 @@ class Gallery:
         self.items: dict[str, FigureItem] = {}
         self.rows: list[dict[str, str]] = []
         self._ids: dict[str, str] = {}
+        # Bind the descriptions to the reviewed image bytes: aliases share captions
+        # and a newly inserted notebook cell cannot silently inherit the wrong one.
+        with Path(__file__).with_name("atlas_gallery_captions.csv").open(encoding="utf-8", newline="") as f:
+            self._captions = {row["sha256"]: (row["figure_type"], row["description"])
+                              for row in csv.DictReader(f)}
 
     def add(self, group, title, path, location, data, mime="image/png", status="Saved", recipe="", archive_hash=""):
         digest = hashlib.sha256(data).hexdigest()
         if digest not in self._ids:
             figure_id = f"G{len(self.items) + 1:03d}"
             self._ids[digest] = figure_id
-            self.items[figure_id] = FigureItem(figure_id, group, title, mime, data)
+            figure_type, description = self._captions.get(digest, ("", ""))
+            self.items[figure_id] = FigureItem(figure_id, group, title, mime, data, figure_type, description)
         figure_id = self._ids[digest]
+        item = self.items[figure_id]
         self.rows.append({
             "figure_id": figure_id, "group": group, "title": title, "status": status,
             "source": path, "location": location, "source_url": self.snapshot.url(path),
             "recipe": recipe, "sha256": digest, "source_commit": self.snapshot.commit,
             "archived_render_sha256": archive_hash,
             "matches_archived_render": str(archive_hash == digest).lower() if archive_hash else "",
+            "figure_type": item.figure_type, "description": item.description,
         })
         return figure_id
 
@@ -278,13 +288,15 @@ def collect_gallery(root, ref=SOURCE_REF):
     return gallery
 
 
-def show_figure(gallery, figure_id):
+def show_figure(gallery, figure_id, *, with_caption=True):
     """Display the original full-resolution figure (or reconstructed chart)."""
     item = gallery.items[figure_id]
     if item.mime == "image/svg+xml":
         display(SVG(data=item.data.decode()))
     else:
         display(NotebookImage(data=item.data))
+    if with_caption and item.description:
+        display(Markdown(f"**{figure_id} · {item.figure_type}.** {item.description}"))
 
 
 def _sheet(items):
@@ -319,12 +331,13 @@ def show_gallery(gallery, group=None):
             if chunk[0].mime == "image/svg+xml":
                 for item in chunk:
                     display(Markdown(f"**{item.figure_id} · {item.title}**"))
-                    show_figure(gallery, item.figure_id)
+                    show_figure(gallery, item.figure_id, with_caption=False)
             else:
                 display(NotebookImage(data=_sheet(chunk), format="jpeg", width=1150))
             links = []
             for item in chunk:
                 sources = [row for row in gallery.rows if row["figure_id"] == item.figure_id]
                 refs = [f"[{Path(row['source']).name} · {row['location']}]({row['source_url']})" for row in sources]
-                links.append(f"- **{item.figure_id}** {' · '.join(refs)}")
-            display(Markdown("\n".join(links)))
+                caption = f"{item.description} " if item.description else ""
+                links.append(f"- **{item.figure_id}** {caption}{' · '.join(refs)}")
+            display(Markdown("\n\n".join(links)))
