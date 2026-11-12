@@ -1,0 +1,101 @@
+{
+  "cartography": "Lambert azimuthal equal-area, centered at 19\u00b0 S, 29.5\u00b0 E, WGS84",
+  "yield_grid_metres": 25000,
+  "minimum_records_for_cell_mean": 5,
+  "observed_yield": {
+    "2022": {
+      "screened_or_scored_records": 169,
+      "inside_outline": 169,
+      "outside_outline": 0,
+      "colored_cells": 11,
+      "records_in_colored_cells": 147,
+      "sparse_cells": 10,
+      "records_in_sparse_cells": 22
+    },
+    "2023": {
+      "screened_or_scored_records": 2097,
+      "inside_outline": 2097,
+      "outside_outline": 0,
+      "colored_cells": 68,
+      "records_in_colored_cells": 2057,
+      "sparse_cells": 15,
+      "records_in_sparse_cells": 40
+    },
+    "2024": {
+      "screened_or_scored_records": 4332,
+      "inside_outline": 4280,
+      "outside_outline": 52,
+      "colored_cells": 228,
+      "records_in_colored_cells": 4056,
+      "sparse_cells": 97,
+      "records_in_sparse_cells": 224
+    }
+  },
+  "weather": {
+    "grid_latitude_degrees": 0.5,
+    "grid_longitude_degrees": 0.625,
+    "archived_cells_each_year": 97,
+    "cells_intersecting_boundary": 97,
+    "reference_years": [
+      1991,
+      2020
+    ],
+    "months": [
+      1,
+      2,
+      3
+    ],
+    "years": {
+      "2022": {
+        "rain_pct": {
+          "min": 74.10652786133417,
+          "median": 113.67958990514208,
+          "max": 195.45675610341044
+        },
+        "temp_anomaly": {
+          "min": -1.3664296296296299,
+          "median": -0.4595888888888881,
+          "max": 0.4052037037037042
+        }
+      },
+      "2023": {
+        "rain_pct": {
+          "min": 63.61373606336235,
+          "median": 110.70432191043867,
+          "max": 198.0479465115392
+        },
+        "temp_anomaly": {
+          "min": -1.5055518518518507,
+          "median": -0.6424148148148148,
+          "max": 0.14911111111111208
+        }
+      },
+      "2024": {
+        "rain_pct": {
+          "min": 30.108462150556647,
+          "median": 62.162826838852816,
+          "max": 135.77538882185854
+        },
+        "temp_anomaly": {
+          "min": 0.08201831501831534,
+          "median": 1.344395604395604,
+          "max": 2.37201098901099
+        }
+      }
+    }
+  },
+  "predictions": {
+    "screened_or_scored_records": 1504,
+    "inside_outline": 1504,
+    "outside_outline": 0,
+    "colored_cells": 56,
+    "records_in_colored_cells": 1444,
+    "sparse_cells": 22,
+    "records_in_sparse_cells": 60,
+    "prediction_file": "experiments/presto_finetune/runs/zimbabwe_lacuna_2022_2023/predictions.csv",
+    "prediction_column": "A1",
+    "error_sign": "predicted minus measured",
+    "field_rmse_t_ha": 1.785212473059653,
+    "field_r2": 0.190525290248876
+  }
+}

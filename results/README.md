@@ -6,6 +6,7 @@ This page indexes the results across the repository. The v1 Zimbabwe reports sta
 
 | Folder or file | What it holds | Written by | Status |
 |---|---|---|---|
+| [Visual atlas](visual_atlas/README.md) | Zimbabwe yield, weather, imagery and model figures, with a source index for the repository gallery | [Atlas notebook](../notebooks/zimbabwe_visual_atlas.ipynb) | descriptive figures and archived model predictions |
 | [baseline_table.md](baseline_table.md), `baseline_scores.csv` | R0/R1/A1 on `s1_cc2km`, data v1, all five folds | `scripts/baselines/baseline_table.py` | history (scores fold 0) |
 | [v2/](v2/baseline_table.md) | R0/R1/A1 on data v2, folds 1–4; [v1 against v2 comparison](v2/data_v2_comparison.md) | `scripts/baselines/baseline_table.py --version 2`, `scripts/baselines/compare_data_v2.py` | current |
 | [merge_v2/](merge_v2/README.md), [weather_v2/](weather_v2/README.md), [aggregation_v2/](aggregation_v2/RESULTS.md), [multiyear_v2/](multiyear_v2/RESULTS.md) | Zimbabwe experiments, rule-compliant runs | steps 9–15, `scripts/verification/` | current |
