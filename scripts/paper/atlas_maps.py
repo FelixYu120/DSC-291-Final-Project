@@ -11,11 +11,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import shapely
-from matplotlib.collections import PatchCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize
-from matplotlib.patches import ConnectionPatch, Patch
-from matplotlib.patches import Polygon as MplPolygon
+from matplotlib.patches import ConnectionPatch
 from pyproj import Transformer
+from scipy.ndimage import distance_transform_edt, map_coordinates
 from shapely.geometry import box, shape
 from shapely.ops import transform
 
@@ -25,9 +24,7 @@ else:  # Supports direct execution from the repository root.
     from atlas_basemap import BASEMAP_CREDIT, draw_basemap
 
 YEARS = (2022, 2023, 2024)
-CELL_METRES = 25_000
-MIN_RECORDS = 5
-SPARSE = "#e2e1d5"
+DETAIL_CANDIDATE_GRID_METRES = 25_000
 CALLOUT = "#ffdb91"
 INK = "#213b42"
 MUTED = "#52666a"
@@ -71,51 +68,32 @@ def _field_grid(fields, country):
     selected = fields.loc[inside].copy()
     x, y = PROJECT.transform(selected.lon, selected.lat)
     selected["x"], selected["y"] = x, y
-    selected["gx"] = np.floor(x / CELL_METRES).astype(int)
-    selected["gy"] = np.floor(y / CELL_METRES).astype(int)
     return selected
 
 
-def _cell_means(frame, values):
-    groups = frame.groupby(["gx", "gy"], sort=True)
-    return groups[values].mean().join(groups.size().rename("n")).reset_index()
+def _point_means(frame, columns):
+    """Keep recorded positions; average measurements only at exactly matching coordinates."""
+    groups = frame.groupby(["lat", "lon"], sort=True)
+    means = groups[columns].mean()
+    coordinates = groups[["x", "y"]].first()
+    points = means.join(coordinates).join(groups.size().rename("n")).reset_index()
+    # A fixed, value-independent layer order keeps the comparison panels aligned in dense clusters.
+    return points.sample(frac=1, random_state=190, ignore_index=True)
 
 
-def _yield_cells(cells, country):
-    polygons = []
-    for row in cells.itertuples():
-        x, y = row.gx * CELL_METRES, row.gy * CELL_METRES
-        polygons.append(
-            box(x, y, x + CELL_METRES, y + CELL_METRES).intersection(country)
-        )
-    return polygons
-
-
-def _polygons(geom):
-    if geom.is_empty:
-        return []
-    if geom.geom_type == "Polygon":
-        return [MplPolygon(np.asarray(geom.exterior.coords), closed=True)]
-    if geom.geom_type in ("MultiPolygon", "GeometryCollection"):
-        return [patch for part in geom.geoms for patch in _polygons(part)]
-    return []
-
-
-def _draw_cells(ax, geoms, values, cmap, norm, *, opacity=1.0):
-    patches, colors, edges, widths = [], [], [], []
-    palette = mpl.colormaps[cmap] if isinstance(cmap, str) else cmap
-    for geom, value in zip(geoms, values, strict=True):
-        parts = _polygons(geom)
-        patches.extend(parts)
-        measured = np.isfinite(value)
-        face = (*palette(norm(value))[:3], opacity) if measured else (0, 0, 0, 0)
-        colors.extend([face] * len(parts))
-        edges.extend([("#ffffff70" if measured else SPARSE)] * len(parts))
-        widths.extend([0.22 if measured else 0.55] * len(parts))
-    ax.add_collection(
-        PatchCollection(
-            patches, facecolors=colors, edgecolors=edges, linewidths=widths, zorder=2
-        )
+def _draw_field_points(ax, points, column, cmap, norm, *, size=7):
+    """Draw a single unshifted symbol per measured position in the equal-area projection."""
+    return ax.scatter(
+        points.x,
+        points.y,
+        c=points[column],
+        s=size,
+        cmap=cmap,
+        norm=norm,
+        marker="o",
+        linewidths=0.28 if size >= 10 else 0.18,
+        edgecolors="#fff9e3bb",
+        zorder=4,
     )
 
 
@@ -199,21 +177,6 @@ def _base(ax, country, cities, *, root, bounds=None, locator=False, tone="dark")
         arrow.set_path_effects([pe.withStroke(linewidth=2.0, foreground="#263334ac")])
 
 
-def _heading(fig, title, subtitle):
-    fig.text(
-        0.045,
-        0.957,
-        title,
-        ha="left",
-        va="top",
-        family="DejaVu Serif",
-        fontsize=21,
-        weight="bold",
-        color=INK,
-    )
-    fig.text(0.046, 0.862, subtitle, ha="left", va="top", fontsize=10.4, color=MUTED)
-
-
 def _colorbar(fig, rect, cmap, norm, label, ticks, *, extend="neither"):
     bar = fig.colorbar(
         mpl.cm.ScalarMappable(norm=norm, cmap=cmap),
@@ -228,30 +191,6 @@ def _colorbar(fig, rect, cmap, norm, label, ticks, *, extend="neither"):
     return bar
 
 
-def _visibility_key(fig, rect):
-    handles = [
-        Patch(
-            facecolor="#737c7c", edgecolor=SPARSE, label="Outlined cell  ·  1–4 fields"
-        ),
-        Patch(
-            facecolor="#596265",
-            edgecolor="#959f9f",
-            label="Basemap alone  ·  no cell mean",
-        ),
-    ]
-    fig.legend(
-        handles=handles,
-        loc="center left",
-        bbox_to_anchor=rect,
-        ncols=1,
-        frameon=False,
-        fontsize=8.2,
-        labelcolor=INK,
-        handlelength=1.35,
-        borderaxespad=0,
-    )
-
-
 def _panel_title(ax, title, detail):
     ax.set_title(title, fontsize=11.2, loc="left", weight="bold", color=INK, pad=13)
     ax.text(
@@ -259,16 +198,15 @@ def _panel_title(ax, title, detail):
     )
 
 
-def _support(source_count, frame, cells):
-    eligible = cells.n >= MIN_RECORDS
+def _support(source_count, frame, points):
+    repeated = points.n.gt(1)
     return {
         "screened_or_scored_records": int(source_count),
         "inside_outline": len(frame),
         "outside_outline": int(source_count - len(frame)),
-        "colored_cells": int(eligible.sum()),
-        "records_in_colored_cells": int(cells.loc[eligible, "n"].sum()),
-        "sparse_cells": int((~eligible).sum()),
-        "records_in_sparse_cells": int(cells.loc[~eligible, "n"].sum()),
+        "unique_locations": len(points),
+        "locations_with_repeat_records": int(repeated.sum()),
+        "records_at_repeat_locations": int(points.loc[repeated, "n"].sum()),
     }
 
 
@@ -279,7 +217,9 @@ def _select_detail_windows(frame):
     Stable grid order breaks ties, so the choice depends only on survey locations.
     """
     width, height = 60000, 30000
-    centers = frame.groupby(["gx", "gy"], sort=True)[["x", "y"]].median()
+    candidate_cells = [np.floor(frame.x / DETAIL_CANDIDATE_GRID_METRES),
+                       np.floor(frame.y / DETAIL_CANDIDATE_GRID_METRES)]
+    centers = frame.groupby(candidate_cells, sort=True)[["x", "y"]].median()
     inverse = Transformer.from_crs(PROJECT.target_crs, "EPSG:4326", always_xy=True)
     windows = []
     for north in (True, False):
@@ -331,34 +271,28 @@ def _observed_map(root, fields, mapped, country, cities):
     )
     norm = Normalize(0, YIELD_LIMIT)
     yearly = {year: mapped.loc[mapped.season_year.eq(year)] for year in YEARS}
-    yearly_cells = {
-        year: _cell_means(frame, ["yield_t_ha"]) for year, frame in yearly.items()
+    yearly_points = {
+        year: _point_means(frame, ["yield_t_ha"]) for year, frame in yearly.items()
     }
     summary = {
         str(year): _support(
-            fields.season_year.eq(year).sum(), yearly[year], yearly_cells[year]
+            fields.season_year.eq(year).sum(), yearly[year], yearly_points[year]
         )
         for year in YEARS
     }
 
-    def draw_grid(ax, year, locator=False):
-        cells = yearly_cells[year]
+    def draw_locations(ax, year, locator=False):
         _base(ax, country, cities, root=root, locator=locator)
-        _draw_cells(
-            ax,
-            _yield_cells(cells, country),
-            cells.yield_t_ha.where(cells.n >= MIN_RECORDS),
-            YIELD_CMAP,
-            norm,
-            opacity=0.96,
+        _draw_field_points(
+            ax, yearly_points[year], "yield_t_ha", YIELD_CMAP, norm, size=8.5 if locator else 4.1
         )
 
     overview = fig.add_axes([0.045, 0.452, 0.459, 0.433])
-    draw_grid(overview, 2023, locator=True)
+    draw_locations(overview, 2023, locator=True)
     _panel_title(
         overview,
         "A   Lacuna 2023",
-        "National view  ·  mean measured yield in 25 km cells",
+        f"National view  ·  {len(yearly_points[2023]):,} recorded locations",
     )
     zoom_summary = []
     windows = _select_detail_windows(yearly[2023])
@@ -366,24 +300,10 @@ def _observed_map(root, fields, mapped, country, cities):
         ("B", "C"), windows, (0.687, 0.449), strict=True
     ):
         left, low, right, high = bounds
-        # A legend color always represents a recorded location or a measured-cell mean.
         zoom = fig.add_axes([0.561, bottom, 0.393, 0.190])
         _base(zoom, country, cities, root=root, bounds=bounds)
-        points = records.groupby(
-            ["x", "y"], as_index=False, sort=True
-        ).yield_t_ha.mean()
-        zoom.scatter(
-            points.x,
-            points.y,
-            c=points.yield_t_ha,
-            cmap=YIELD_CMAP,
-            norm=norm,
-            s=27,
-            edgecolors="#fff9e3",
-            linewidths=0.42,
-            alpha=0.98,
-            zorder=4,
-        )
+        points = _point_means(records, ["yield_t_ha"])
+        _draw_field_points(zoom, points, "yield_t_ha", YIELD_CMAP, norm, size=18)
         _scale(zoom, bounds, 10000)
         area = str(records.admin_unit.mode().iat[0]).title()
         _panel_title(
@@ -451,7 +371,7 @@ def _observed_map(root, fields, mapped, country, cities):
     fig.text(
         0.552,
         0.41,
-        "Regional dots show yield at the recorded field location.",
+        "Each dot marks a recorded crop-cut location.",
         fontsize=9.2,
         color=INK,
     )
@@ -464,18 +384,18 @@ def _observed_map(root, fields, mapped, country, cities):
     )
     for i, year in enumerate(YEARS):
         ax = fig.add_axes([0.043 + i * 0.318, 0.083, 0.283, 0.235])
-        draw_grid(ax, year)
+        draw_locations(ax, year)
         provider = "Lacuna" if year < 2024 else "Vision-Guided"
         _panel_title(
             ax,
             f"{year}   {provider}",
-            f"{len(yearly[year]):,} records inside outline  ·  {summary[str(year)]['colored_cells']} colored cells",
+            f"{len(yearly[year]):,} records  ·  {len(yearly_points[year]):,} distinct locations",
         )
     fig.text(
         0.046,
         0.054,
-        "Colored squares average at least five crop cuts. Outlined squares contain one to four. "
-        "Exposed satellite imagery shows where the survey has no mapped mean.",
+        "Dots show sampled field positions. Closely spaced dots overlap at national scale. "
+        "The detail panels enlarge two dense clusters on the same yield scale.",
         fontsize=8.7,
         color=INK,
     )
@@ -483,7 +403,7 @@ def _observed_map(root, fields, mapped, country, cities):
         0.046,
         0.034,
         f"The 2024 catalog includes {fields.loc[fields.season_year.eq(2024), 'yield_t_ha'].eq(0).sum():,} recorded zeros. "
-        f"Its national map excludes {summary['2024']['outside_outline']} locations outside the generalized boundary.",
+        f"Its national map excludes {summary['2024']['outside_outline']} records outside the generalized boundary.",
         fontsize=8.1,
         color=MUTED,
     )
@@ -539,16 +459,56 @@ def _weather_values(root, locations):
     return table
 
 
+def _weather_shading(weather, country):
+    """Interpolate adjacent POWER cell centers for display within their archived footprint."""
+    cells = weather.drop_duplicates("weather_grid_id").set_index("weather_grid_id")
+    lon_min, lat_min = cells.weather_grid_lon.min(), cells.weather_grid_lat.min()
+    # Pad the native array so the outer half of each edge cell remains in view.
+    col = np.rint((cells.weather_grid_lon.to_numpy() - lon_min) / 0.625).astype(int) + 1
+    row = np.rint((cells.weather_grid_lat.to_numpy() - lat_min) / 0.5).astype(int) + 1
+    native = np.zeros((row.max() + 2, col.max() + 2), dtype=float)
+    native[row, col] = 1
+    if native.sum() != len(cells):
+        raise ValueError("A native POWER cell has more than one grid ID.")
+
+    xmin, ymin, xmax, ymax = country.bounds
+    width = 640
+    height = round(width * (ymax - ymin) / (xmax - xmin))
+    dx, dy = (xmax - xmin) / width, (ymax - ymin) / height
+    x, y = np.meshgrid(xmin + (np.arange(width) + .5) * dx,
+                       ymin + (np.arange(height) + .5) * dy)
+    inverse = Transformer.from_crs(PROJECT.target_crs, "EPSG:4326", always_xy=True)
+    lon, lat = inverse.transform(x, y)
+    positions = np.stack(((lat - lat_min) / .5 + 1, (lon - lon_min) / .625 + 1))
+    footprint = map_coordinates(native, positions, order=0, prefilter=False) > 0
+    weights = map_coordinates(native, positions, order=1, prefilter=False)
+    inside_country = shapely.intersects_xy(country, x, y)
+    # A soft shoulder inside the footprint keeps the gaps legible against the imagery.
+    edge_distance = distance_transform_edt(footprint, sampling=(dy, dx))
+    alpha = .87 * (1 - np.exp(-(edge_distance / 24_000) ** 2)) * weights * inside_country
+    layers = {}
+    for year, group in weather.groupby("season_year"):
+        aligned = group.set_index("weather_grid_id").loc[cells.index]
+        for name in ("rain_pct", "temp_anomaly"):
+            values = np.zeros_like(native)
+            values[row, col] = aligned[name].to_numpy()
+            weighted = map_coordinates(values, positions, order=1, prefilter=False)
+            layers[year, name] = np.divide(weighted, weights, out=np.zeros_like(weighted), where=weights > 0)
+
+    cx, cy = PROJECT.transform(cells.weather_grid_lon.to_numpy(), cells.weather_grid_lat.to_numpy())
+    mark = shapely.intersects_xy(country, cx, cy)
+    return (xmin, xmax, ymin, ymax), alpha, layers, (cx[mark], cy[mark])
+
+
 def _weather_map(root, fields, country, cities):
     weather = _weather_values(root, fields)
     cells = weather.drop_duplicates("weather_grid_id")
-    geometries = {}
-    for row in cells.itertuples():
-        lon, lat = row.weather_grid_lon, row.weather_grid_lat
-        rect = box(lon - 0.3125, lat - 0.25, lon + 0.3125, lat + 0.25)
-        projected = transform(PROJECT.transform, rect.segmentize(0.05))
-        geometries[row.weather_grid_id] = projected.intersection(country)
-    visible = sum(not g.is_empty for g in geometries.values())
+    extent, alpha, layers, centers = _weather_shading(weather, country)
+    visible = 0
+    for cell in cells.itertuples():
+        lon, lat = cell.weather_grid_lon, cell.weather_grid_lat
+        rect = box(lon - .3125, lat - .25, lon + .3125, lat + .25)
+        visible += transform(PROJECT.transform, rect.segmentize(.05)).intersects(country)
     fig = plt.figure(figsize=(12.4, 8.7), facecolor="white")
     fig.text(
         0.045,
@@ -571,10 +531,7 @@ def _weather_map(root, fields, country, cities):
     )
     rain_norm, temp_norm = Normalize(0, 200), Normalize(-2.5, 2.5)
     rain_cmap, temp_cmap = "BrBG", "RdBu_r"
-    uncovered = country.difference(shapely.union_all(list(geometries.values())))
     for col, year in enumerate(YEARS):
-        d = weather.loc[weather.season_year.eq(year)]
-        outlines = [geometries[key] for key in d.weather_grid_id]
         for level, (name, cmap, norm) in enumerate(
             [("rain_pct", rain_cmap, rain_norm), ("temp_anomaly", temp_cmap, temp_norm)]
         ):
@@ -587,17 +544,12 @@ def _weather_map(root, fields, country, cities):
                 locator=level == 0 and col == 0,
                 tone="light",
             )
-            ax.add_collection(
-                PatchCollection(
-                    _polygons(uncovered),
-                    facecolors="none",
-                    edgecolors="#606e6d88",
-                    linewidths=0,
-                    hatch="///",
-                    zorder=1,
-                )
+            ax.imshow(
+                layers[year, name], extent=extent, origin="lower", interpolation="nearest",
+                cmap=cmap, norm=norm, alpha=alpha, zorder=2, aspect="equal",
             )
-            _draw_cells(ax, outlines, d[name], cmap, norm, opacity=0.77)
+            ax.scatter(*centers, s=2.1, color="#29434980", edgecolors="white",
+                       linewidths=.16, zorder=2.5)
             if level == 0:
                 ax.set_title(
                     str(year),
@@ -636,7 +588,7 @@ def _weather_map(root, fields, country, cities):
     fig.text(
         0.046,
         0.043,
-        "Top row shows seasonal rainfall. Bottom row shows day-weighted temperature departures. Hatching marks land outside the archived weather footprint.",
+        "Dots mark POWER cell centers inside Zimbabwe (0.5° latitude × 0.625° longitude). Color blends adjacent values and fades at the archived coverage edge.",
         fontsize=8.2,
         color=MUTED,
     )
@@ -652,6 +604,8 @@ def _weather_map(root, fields, country, cities):
         "grid_longitude_degrees": 0.625,
         "archived_cells_each_year": len(cells),
         "cells_intersecting_boundary": visible,
+        "native_centers_inside_boundary": len(centers[0]),
+        "display_interpolation": "Local bilinear weights among available neighboring native centers, restricted to archived cell footprints inside Zimbabwe.",
         "reference_years": [1991, 2020],
         "months": [1, 2, 3],
         "years": {},
@@ -664,7 +618,7 @@ def _weather_map(root, fields, country, cities):
     return fig, summary
 
 
-def _prediction_map(root, fields, country_ll, country, cities):
+def _prediction_map(root, fields, country_ll, country, cities, detail):
     p = pd.read_csv(
         root / PREDICTIONS, usecols=["obs_id", "fold", "season_year", "y_t_ha", "A1"]
     )
@@ -685,61 +639,63 @@ def _prediction_map(root, fields, country_ll, country, cities):
             "Prediction observations, target yields or development folds do not match the mapping source"
         )
     mapped = _field_grid(p, country_ll)
-    cells = _cell_means(mapped, ["yield_t_ha", "A1"])
-    cells["error"] = cells.A1 - cells.yield_t_ha
-    eligible = cells.n >= MIN_RECORDS
-    yield_limit = YIELD_LIMIT
-    error_limit = max(1, np.ceil(cells.loc[eligible, "error"].abs().max()))
-    y_norm, error_norm = Normalize(0, yield_limit), Normalize(-error_limit, error_limit)
-    fig = plt.figure(figsize=(12.4, 5.9), facecolor="white")
-    grid = fig.add_gridspec(
-        1, 3, left=0.045, right=0.97, top=0.735, bottom=0.245, wspace=0.07
-    )
-    _heading(
-        fig,
-        "Measured and predicted maize yield on the same fields",
-        f"Lacuna 2023  ·  {len(p):,} spatially held-out field predictions  ·  seasonal vegetation-index Ridge (A1)",
-    )
-    geo = _yield_cells(cells, country)
-    for i, (title, detail, key, cmap, norm) in enumerate(
-        [
-            ("Measured", "Mean crop-cut yield", "yield_t_ha", YIELD_CMAP, y_norm),
-            ("Predicted", "Mean out-of-fold estimate", "A1", YIELD_CMAP, y_norm),
-            (
-                "Prediction error",
-                "Predicted minus measured",
-                "error",
-                "RdBu_r",
-                error_norm,
-            ),
-        ]
-    ):
+    points = _point_means(mapped, ["yield_t_ha", "A1"])
+    points["error"] = points.A1 - points.yield_t_ha
+    y_norm = Normalize(0, YIELD_LIMIT)
+    error_limit = max(1, np.ceil(points.error.abs().quantile(0.95)))
+    error_norm = Normalize(-error_limit, error_limit)
+    bounds = detail["bounds_laea_m"]
+    west, south, east, north = bounds
+    zoom_points = points.loc[points.x.between(west, east) & points.y.between(south, north)]
+    zoom_records = int(zoom_points.n.sum())
+    fig = plt.figure(figsize=(12.4, 9.0), facecolor="white")
+    fig.text(.045, .947, "Measured and predicted maize yield on the same fields",
+             fontsize=21, family="DejaVu Serif", weight="bold", color=INK)
+    fig.text(.046, .906, f"Lacuna 2023  ·  {len(p):,} spatially held-out records  ·  "
+             f"{len(points):,} measured locations  ·  seasonal vegetation-index Ridge (A1)", fontsize=10, color=MUTED)
+    grid = fig.add_gridspec(2, 3, left=.045, right=.97, top=.815, bottom=.222,
+                            height_ratios=[1.8, 1], wspace=.06, hspace=.28)
+    for i, (title, subtitle, key, cmap, norm) in enumerate([
+            ("Measured", "Crop-cut yield at the recorded position", "yield_t_ha", YIELD_CMAP, y_norm),
+            ("Predicted", "Held-out estimate at the same position", "A1", YIELD_CMAP, y_norm),
+            ("Prediction error", "Predicted minus measured yield", "error", "RdBu_r", error_norm)]):
         ax = fig.add_subplot(grid[0, i])
         _base(ax, country, cities, root=root, locator=i == 0)
-        _draw_cells(ax, geo, cells[key].where(eligible), cmap, norm, opacity=0.95)
-        _panel_title(ax, title, detail)
+        _draw_field_points(ax, points, key, cmap, norm, size=5.8)
+        _panel_title(ax, title, subtitle)
+        ax.add_patch(mpl.patches.Rectangle((west, south), east - west, north - south,
+                                           fill=False, edgecolor=CALLOUT, lw=1, zorder=7))
+        zoom = fig.add_subplot(grid[1, i])
+        _base(zoom, country, cities, root=root, bounds=bounds)
+        _draw_field_points(zoom, zoom_points, key, cmap, norm, size=17)
+        if i == 0:
+            _scale(zoom, bounds, 10000)
+        zoom.set_title(f"{detail['provider_area']} detail" if i == 0 else title + " detail",
+                       loc="left", fontsize=9.6, weight="bold", color=INK, pad=5)
     _colorbar(
         fig,
-        [0.048, 0.165, 0.34, 0.024],
+        [0.048, 0.151, 0.39, 0.015],
         YIELD_CMAP,
         y_norm,
-        "Mean yield (t/ha)",
-        np.arange(0, yield_limit + 1, 2),
+        "Observed and predicted yield (t/ha)",
+        np.arange(0, YIELD_LIMIT + 1, 2),
+        extend="max",
     )
     _colorbar(
         fig,
-        [0.465, 0.165, 0.25, 0.024],
+        [0.53, 0.151, 0.39, 0.015],
         "RdBu_r",
         error_norm,
-        "Mean error (t/ha)",
-        [-error_limit, 0, error_limit],
+        "Prediction error (t/ha)",
+        np.linspace(-error_limit, error_limit, 5),
+        extend="both",
     )
-    _visibility_key(fig, (0.745, 0.18))
-    s = _support(len(p), mapped, cells)
+    s = _support(len(p), mapped, points)
     fig.text(
         0.046,
         0.065,
-        f"Color covers {s['records_in_colored_cells']:,} fields in the same {s['colored_cells']} sampled cells. Red errors indicate overprediction and blue errors indicate underprediction.",
+        f"The lower row enlarges {zoom_records} held-out records at {len(zoom_points)} locations in {detail['provider_area']}. "
+        "Each dot averages records sharing its exact coordinates. Red indicates overprediction and blue underprediction.",
         fontsize=8.3,
         color=MUTED,
     )
@@ -755,6 +711,11 @@ def _prediction_map(root, fields, country_ll, country, cities):
             "prediction_file": PREDICTIONS.as_posix(),
             "prediction_column": "A1",
             "error_sign": "predicted minus measured",
+            "error_palette_limit_t_ha": float(error_limit),
+            "error_palette_rule": "95th percentile of absolute location errors, rounded up to a whole t/ha; colors extend at both ends",
+            "error_locations_outside_palette_limits": int(points.error.abs().gt(error_limit).sum()),
+            "detail_window": {"provider_area": detail["provider_area"], "records": zoom_records,
+                              "unique_locations": len(zoom_points), "bounds_laea_m": bounds},
             "field_rmse_t_ha": float(np.sqrt(((p.A1 - p.y_t_ha) ** 2).mean())),
             "field_r2": float(
                 1
@@ -795,7 +756,7 @@ def build_maps(repo_root, output_dir=None):
     ):
         measured, counts, details = _observed_map(root, fields, mapped, country, cities)
         weather, coverage = _weather_map(root, fields, country, cities)
-        predicted, matched = _prediction_map(root, fields, country_ll, country, cities)
+        predicted, matched = _prediction_map(root, fields, country_ll, country, cities, details[1])
     figures = {
         "yield_map": measured,
         "weather_map": weather,
@@ -814,8 +775,8 @@ def build_maps(repo_root, output_dir=None):
             )
         summary = {
             "cartography": "Lambert azimuthal equal-area, centered at 19° S, 29.5° E, WGS84",
-            "yield_grid_metres": CELL_METRES,
-            "minimum_records_for_cell_mean": MIN_RECORDS,
+            "yield_spatial_support": "Recorded GPS locations inside the national outline. Only exactly coincident coordinates share a dot, showing the mean of their records.",
+            "detail_window_selection": "Candidate centers are median positions in occupied 25 km cells. Each side of 19 degrees south contributes its most populated 60 km by 30 km window.",
             "observed_yield": counts,
             "yield_detail_windows": details,
             "weather": coverage,
