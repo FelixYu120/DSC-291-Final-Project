@@ -1,34 +1,31 @@
 {
   "cartography": "Lambert azimuthal equal-area, centered at 19\u00b0 S, 29.5\u00b0 E, WGS84",
-  "yield_grid_metres": 25000,
-  "minimum_records_for_cell_mean": 5,
+  "yield_spatial_support": "Recorded GPS locations inside the national outline. Only exactly coincident coordinates share a dot, showing the mean of their records.",
+  "detail_window_selection": "Candidate centers are median positions in occupied 25 km cells. Each side of 19 degrees south contributes its most populated 60 km by 30 km window.",
   "observed_yield": {
     "2022": {
       "screened_or_scored_records": 169,
       "inside_outline": 169,
       "outside_outline": 0,
-      "colored_cells": 11,
-      "records_in_colored_cells": 147,
-      "sparse_cells": 10,
-      "records_in_sparse_cells": 22
+      "unique_locations": 169,
+      "locations_with_repeat_records": 0,
+      "records_at_repeat_locations": 0
     },
     "2023": {
       "screened_or_scored_records": 2097,
       "inside_outline": 2097,
       "outside_outline": 0,
-      "colored_cells": 68,
-      "records_in_colored_cells": 2057,
-      "sparse_cells": 15,
-      "records_in_sparse_cells": 40
+      "unique_locations": 2089,
+      "locations_with_repeat_records": 8,
+      "records_at_repeat_locations": 16
     },
     "2024": {
       "screened_or_scored_records": 4332,
       "inside_outline": 4280,
       "outside_outline": 52,
-      "colored_cells": 228,
-      "records_in_colored_cells": 4056,
-      "sparse_cells": 97,
-      "records_in_sparse_cells": 224
+      "unique_locations": 4280,
+      "locations_with_repeat_records": 0,
+      "records_at_repeat_locations": 0
     }
   },
   "yield_detail_windows": [
@@ -62,6 +59,8 @@
     "grid_longitude_degrees": 0.625,
     "archived_cells_each_year": 97,
     "cells_intersecting_boundary": 97,
+    "native_centers_inside_boundary": 86,
+    "display_interpolation": "Local bilinear weights among available neighboring native centers, restricted to archived cell footprints inside Zimbabwe.",
     "reference_years": [
       1991,
       2020
@@ -114,13 +113,26 @@
     "screened_or_scored_records": 1504,
     "inside_outline": 1504,
     "outside_outline": 0,
-    "colored_cells": 56,
-    "records_in_colored_cells": 1444,
-    "sparse_cells": 22,
-    "records_in_sparse_cells": 60,
+    "unique_locations": 1497,
+    "locations_with_repeat_records": 7,
+    "records_at_repeat_locations": 14,
     "prediction_file": "experiments/presto_finetune/runs/zimbabwe_lacuna_2022_2023/predictions.csv",
     "prediction_column": "A1",
     "error_sign": "predicted minus measured",
+    "error_palette_limit_t_ha": 4.0,
+    "error_palette_rule": "95th percentile of absolute location errors, rounded up to a whole t/ha; colors extend at both ends",
+    "error_locations_outside_palette_limits": 33,
+    "detail_window": {
+      "provider_area": "Shurugwi",
+      "records": 170,
+      "unique_locations": 167,
+      "bounds_laea_m": [
+        36473.80535162713,
+        -103742.30198590874,
+        96473.80535162713,
+        -73742.30198590874
+      ]
+    },
     "field_rmse_t_ha": 1.785212473059653,
     "field_r2": 0.190525290248876
   }

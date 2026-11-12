@@ -81,18 +81,25 @@ class Gallery:
         self.items: dict[str, FigureItem] = {}
         self.rows: list[dict[str, str]] = []
         self._ids: dict[str, str] = {}
-        # Bind the descriptions to the reviewed image bytes: aliases share captions
-        # and a newly inserted notebook cell cannot silently inherit the wrong one.
+        # A saved figure has immutable source bytes. Rendering a chart from its
+        # source tables can change the PNG bytes across fonts or Matplotlib versions.
         with Path(__file__).with_name("atlas_gallery_captions.csv").open(encoding="utf-8", newline="") as f:
-            self._captions = {row["sha256"]: (row["figure_type"], row["description"])
-                              for row in csv.DictReader(f)}
+            rows = list(csv.DictReader(f))
+        self._captions = {r["sha256"]: (r["figure_type"], r["description"]) for r in rows}
+        self._render_captions = {
+            (r["render_source"], r["render_title"]): (r["figure_type"], r["description"])
+            for r in rows if r["render_source"]
+        }
 
     def add(self, group, title, path, location, data, mime="image/png", status="Saved", recipe="", archive_hash=""):
         digest = hashlib.sha256(data).hexdigest()
         if digest not in self._ids:
             figure_id = f"G{len(self.items) + 1:03d}"
             self._ids[digest] = figure_id
-            figure_type, description = self._captions.get(digest, ("", ""))
+            if status == "Reconstructed":
+                figure_type, description = self._render_captions[path, title]
+            else:
+                figure_type, description = self._captions[digest]
             self.items[figure_id] = FigureItem(figure_id, group, title, mime, data, figure_type, description)
         figure_id = self._ids[digest]
         item = self.items[figure_id]
@@ -179,7 +186,7 @@ def _embedded_documents(gallery):
     # Reviewed the PDF's ten images against the HTML export at the source revision.
     pages = [2, 3, 6, 7, 8, 9, 11, 12, 15, 16]
     titles = ["Yield histogram", "Yield versus yield divided by 100", "Training predictions", "Testing predictions",
-              "Feature importance", "Tuned feature importance", "Raster prediction", "Yield histogram",
+              "Feature importance", "Tuned feature importance", "Raster prediction", "Crop-mask class frequencies",
               "Crop mask feature importance", "Crop mask raster prediction"]
     for i, (figure, page, title) in enumerate(zip(figures, pages, titles, strict=True), 1):
         data = base64.b64decode(figure)
