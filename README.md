@@ -9,6 +9,7 @@ and tests whether rainfall and temperature improve prediction. Earlier Malawi/Ke
 
 | I want to… | Open |
 |---|---|
+| Browse the project's figures and explore Zimbabwe yield and weather maps | [Visual atlas notebook](notebooks/zimbabwe_visual_atlas.ipynb) · [Download the figures](results/visual_atlas/README.md) |
 | Read the one-page basic-feature Ridge summary | [Zimbabwe summary](docs/zimbabwe/SUMMARY.md) |
 | Find everything added for Zimbabwe, in step order | [Zimbabwe project guide](docs/zimbabwe/README.md) |
 | Walk through the data, methods and results | [Data Guide 2: Zimbabwe](notebooks/data_guide_2_zimbabwe.ipynb) |

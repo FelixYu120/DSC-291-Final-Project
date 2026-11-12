@@ -2,6 +2,8 @@
 
 For data files and reports, use the [Zimbabwe project guide](../docs/zimbabwe/README.md).
 
+The [Zimbabwe visual atlas](zimbabwe_visual_atlas.ipynb) opens with four described satellite-backed maps of measured yield, model error, greenness and weather, followed by four other Zimbabwe charts and a gallery of 106 visuals from the project, its archives and provider manuals. The notebook has saved previews, source links and a full-resolution figure selector. [Download the new figures or browse the source index](../results/visual_atlas/README.md).
+
 ## Start here for the results
 
 [lacuna_results_consensus.ipynb](lacuna_results_consensus.ipynb): every current Lacuna number in one place, rebuilt
