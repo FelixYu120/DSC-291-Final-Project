@@ -17,6 +17,10 @@ data/runs/
 # Added 2026-10-26: downloaded model checkpoints.
 data/models/
 
+# Optional extra-input downloads and notebook rebuilds stay outside Git.
+presto_extra_inputs_*/
+notebook_rebuild/
+
 # Added 2026-10-29: the project database, rebuilt by scripts/step6_build_database.py.
 data/*.duckdb
 data/*.duckdb.wal

@@ -1,0 +1,22 @@
+{
+  "era5_temperature_kelvin_range": [
+    286.12727858225503,
+    301.8829962836372
+  ],
+  "era5_monthly_precipitation_m_range": [
+    3.64868541922192e-05,
+    0.5689536067996706
+  ],
+  "chirps_era5_precipitation_correlation": 0.8514244812437208,
+  "alphaearth_dimensions": 64,
+  "alphaearth_vector_norm_min_median_max": [
+    0.9935412075171756,
+    1.0000875963327474,
+    1.0062448353349331
+  ],
+  "srtm_gee_vs_local_elevation_mean_absolute_difference_m": 0.16195939982347748,
+  "srtm_gee_vs_local_slope_mean_absolute_difference_deg": 0.43663822481895326,
+  "sentinel1_complete_rows": 704,
+  "sentinel1_complete_rows_pct": 3.4519956850053934,
+  "sentinel1_observations_with_all_9_months": 31
+}

@@ -50,4 +50,15 @@ python scripts/step7_check_data.py       # what the database holds, per cohort
 | `docs/` | plan, data notes, evaluation, related work, decisions and structure |
 | `_parked/` | everything that is not on the data path, safe and listed in `_parked/MANIFEST.csv` |
 
+### Additional Presto inputs
+
+Zimbabwe Sentinel-1, ERA5-Land, SRTM, CHIRPS, SoilGrids and AlphaEarth inputs are documented in
+[`docs/EXTRA_INPUTS.md`](docs/EXTRA_INPUTS.md). The reproducible construction workflow is shown in
+[`notebooks/06_build_extra_inputs.ipynb`](notebooks/06_build_extra_inputs.ipynb), and coverage and quality checks
+are shown in [`notebooks/05_extra_inputs_audit.ipynb`](notebooks/05_extra_inputs_audit.ipynb).
+
+The supporting scripts are under [`scripts/optional/extra_inputs/`](scripts/optional/extra_inputs/). Small audit
+summaries are committed under [`data/audit/extra_inputs/`](data/audit/extra_inputs/); field-level generated feature
+tables and downloaded rasters remain outside Git.
+
 Licences and attribution: `data/README.txt`. Keep the provider citations when you use or share the data.

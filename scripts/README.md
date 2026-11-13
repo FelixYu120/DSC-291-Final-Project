@@ -31,3 +31,10 @@ run step 6. `--status` shows the progress at any time. The SQL behind step 6 liv
 | `step7_check_data.py` | Prints what the database holds for the model rows: coverage, clear share per month, feature ranges, haze, greenest month, signal per cohort-year. | After every database build |
 
 The main install (`python -m pip install -r requirements.txt`) covers everything.
+
+## Optional Zimbabwe extra inputs
+
+The scripts in [`optional/extra_inputs/`](optional/extra_inputs/) reproduce the additional Sentinel-1,
+ERA5-Land, SRTM, CHIRPS, SoilGrids and AlphaEarth input workflow. These inputs are an experimental extension and
+do not modify the frozen label or split files. See [`../docs/EXTRA_INPUTS.md`](../docs/EXTRA_INPUTS.md) for data
+coverage, licences and modelling recommendations.
