@@ -8,7 +8,16 @@ aggregation error encountered in the Zimbabwe run.
 
 var FIELD_ASSET = 'projects/dsc190-crop-yield/assets/kenya_fields_2019_2020';
 var DRIVE_FOLDER = 'DSC291_Kenya_Presto';
-var fields = ee.FeatureCollection(FIELD_ASSET);
+// Rebuild point geometry from the canonical columns. This is robust to a CSV
+// asset uploaded without assigning X/Y columns, and also normalizes numeric
+// properties that Earth Engine may have inferred as strings.
+var fields = ee.FeatureCollection(FIELD_ASSET).map(function(feature) {
+  var lon = ee.Number.parse(ee.String(feature.get('lon')));
+  var lat = ee.Number.parse(ee.String(feature.get('lat')));
+  var year = ee.Number.parse(ee.String(feature.get('season_year')));
+  return ee.Feature(ee.Geometry.Point([lon, lat]), feature.toDictionary())
+    .set('season_year', year);
+});
 var allRegion = fields.geometry().bounds();
 
 var s1Base = ee.ImageCollection('COPERNICUS/S1_GRD')
@@ -110,6 +119,8 @@ var batches = [
 ];
 
 print('Kenya fields', fields.size());
+print('Kenya 2019 fields (must be 1768)', fields.filter(ee.Filter.eq('season_year', 2019)).size());
+print('Kenya 2020 fields (must be 2209)', fields.filter(ee.Filter.eq('season_year', 2020)).size());
 print('Expected rows across all exports', 31816);
 print('AlphaEarth 2019 tiles', ee.ImageCollection('GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL')
   .filterDate('2019-01-01', '2020-01-01').size());
