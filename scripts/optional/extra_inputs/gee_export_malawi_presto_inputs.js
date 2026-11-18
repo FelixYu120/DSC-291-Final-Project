@@ -8,7 +8,11 @@ field polygon. Six small tasks avoid the concurrent-aggregation limit.
 
 var FIELD_ASSET = 'projects/dsc190-crop-yield/assets/malawi_fields_2022_2023';
 var DRIVE_FOLDER = 'DSC291_Malawi_Presto';
-var fields = ee.FeatureCollection(FIELD_ASSET);
+// ESRI Shapefile DBF names are limited to ten characters, so the upload file
+// stores season_year as season_yr. Restore the canonical name immediately.
+var fields = ee.FeatureCollection(FIELD_ASSET).map(function(feature) {
+  return feature.set('season_year', feature.get('season_yr'));
+});
 var allRegion = fields.geometry().bounds();
 
 var s1Base = ee.ImageCollection('COPERNICUS/S1_GRD')
