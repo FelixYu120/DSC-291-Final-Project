@@ -12,6 +12,8 @@ Run commands from the repository root and keep the output directory outside Git.
 | `gee_export_zimbabwe_presto_inputs.js` | Export Sentinel-1, ERA5-Land, SRTM and AlphaEarth from Earth Engine. |
 | `gee_check_zimbabwe_nicfi.js` | Check optional NICFI mosaic coverage. |
 | `assemble_zimbabwe_extra_inputs.py` | Validate and combine all sources into monthly and static tables. |
+| `assemble_malawi_extra_inputs.py` | Validate and combine Malawi polygon-level Earth Engine and SoilGrids inputs. |
+| `build_malawi_extra_inputs_notebook.py` | Build the executed Malawi audit notebook, figures and English summary. |
 | `prepare_kenya_malawi_assets.py` | Build data-v2 Kenya point and Malawi polygon upload assets plus canonical month keys. |
 | `gee_export_kenya_presto_inputs.js` | Export Kenya Sentinel-1, ERA5-Land, CHIRPS, SRTM and AlphaEarth values. |
 | `gee_export_malawi_presto_inputs.js` | Export polygon-median Malawi Sentinel-1, ERA5-Land, CHIRPS, SRTM and AlphaEarth values. |
