@@ -37,7 +37,9 @@ def load_xy(cohort: str, data_dir: Path | None = None) -> tuple[pd.DataFrame, pd
         raise ValueError(f"{cohort!r} is not a cohort; the names are: {', '.join(COHORTS)}")
     database = Path(data_dir or os.environ.get("CROPYIELD_DATA_DIR") or ROOT / "data") / "cropyield.duckdb"
     if not database.exists():
-        raise FileNotFoundError(f"{database} is missing; run: python scripts/step6_build_database.py")
+        raise FileNotFoundError(f"{database} is missing; download the shared team cropyield.duckdb "
+                                "described in README.md and place it here. Do not rebuild the team "
+                                "database: rebuilding removes its Presto embeddings.")
     with duckdb.connect(str(database), read_only=True) as con:  # closes at once: an open file blocks a later build
         primary, no_chip = con.execute("""SELECT count(*), count(*) FILTER (WHERE NOT has_imagery)
                                           FROM master WHERE cohort = ? AND include_primary""", [cohort]).fetchone()

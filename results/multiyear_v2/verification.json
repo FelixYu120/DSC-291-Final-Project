@@ -1,0 +1,51 @@
+{
+  "all_checks_passed": true,
+  "catalog_rows": 6598,
+  "model_arms": 44,
+  "predictions": 66176,
+  "same_evaluation_ids_per_arm": 1504,
+  "model_arms_checked": 44,
+  "eligible_by_harvest_year": {
+    "2022": 0,
+    "2023": 2097,
+    "2024": 4330
+  },
+  "feature_sets_independently_reconstructed": 11,
+  "extra_lacuna_permissions_checked": 0,
+  "extra_lacuna_allowed_by_split": {
+    "1/0": 0,
+    "1/1": 0,
+    "1/2": 0,
+    "1/3": 0,
+    "2/0": 0,
+    "2/1": 0,
+    "2/2": 0,
+    "2/3": 0,
+    "3/0": 0,
+    "3/1": 0,
+    "3/2": 0,
+    "3/3": 0,
+    "4/0": 0,
+    "4/1": 0,
+    "4/2": 0,
+    "4/3": 0
+  },
+  "original_memberships_and_source_permissions": "byte-identical",
+  "step14_control_arms": "22 prediction tables exactly preserved; continuous metrics within 1e-10; Spearman within 5e-6",
+  "spearman_csv_tie_tolerance": 5e-06,
+  "maximum_observed_spearman_error": 4.924116669968726e-13,
+  "selected_fits_independently_replayed": 88,
+  "maximum_prediction_replay_error": 5.011990822367807e-12,
+  "input_hashes": 65,
+  "input_sources": {
+    "working_tree": 65
+  },
+  "output_hashes": 25,
+  "window_anchor": "calendar",
+  "training_rows": "include_primary",
+  "controls_release": "data/runs/zimbabwe_aggregation_v2",
+  "new_arms_identical_to_control": 22,
+  "maximum_identity_difference_t_ha": 0.0,
+  "verifier_sha256": "ffbe4f9627157d5400028d924dcd49860c82fc2f45a1b3c4ae1e6c8c170cbeb4",
+  "manifest_sha256": "5b3cb2d0ce6055647f4152d1819e34f7febec596ffb9764cfb856ba50d605f91"
+}

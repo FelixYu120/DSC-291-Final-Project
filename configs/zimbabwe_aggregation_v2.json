@@ -1,0 +1,33 @@
+{
+  "experiment": "zimbabwe_aggregation_v2",
+  "supersedes": "zimbabwe_aggregation_v1",
+  "team_rule_changes": [
+    "window_anchor=calendar: no survey planting/harvest date is a model input or window anchor; the crop-date V1 variant is not a model candidate",
+    "training_rows=include_primary: every training row has labels_v1.include_primary; the 1,874 Zimbabwe 2024 zeros are excluded"
+  ],
+  "window_anchor": "calendar",
+  "training_rows": "include_primary",
+  "target_folds": [1, 2, 3, 4],
+  "reserved_fold": 0,
+  "calendar_months": [12, 1, 2, 3, 4, 5, 6],
+  "calendar_cutoff_month_day": "04-01",
+  "feature_families": ["bands", "indices"],
+  "variants": ["v0_mean", "v1_calendar_mean", "v2_max", "v3_median", "v3_mode"],
+  "training_sets": ["target", "merged"],
+  "ridge_alphas": [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0],
+  "source_weight_ratios": [0.0, 0.1, 0.3, 1.0],
+  "zero_sensitivity_weight": 0.25,
+  "auxiliary_buffer_km": 2.0,
+  "bootstrap_draws": 2000,
+  "seed": 20261107,
+  "primary_method": "bands_v1_calendar_mean_target",
+  "primary_reference": "bands_v0_mean_target",
+  "mode_estimator": "half_sample_mode_mean_of_tied_recursive_estimates",
+  "evaluation_status": "exploratory_same_development_folds_not_a_new_blind_test",
+  "prediction_setting": "retrospective_yield_estimation",
+  "calendar_sources": [
+    "https://fews.net/sites/default/files/documents/reports/ZW_February_to_September_2023_FSO_Final_jh.pdf",
+    "https://unfccc.int/sites/default/files/resource/NAP-Zimbabwe-2024.pdf"
+  ],
+  "mode_reference": "https://arxiv.org/abs/math/0505419"
+}

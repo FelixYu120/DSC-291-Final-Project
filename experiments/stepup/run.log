@@ -1,0 +1,238 @@
+zimbabwe_lacuna_2022_2023: S2 GCVI peak done
+zimbabwe_lacuna_2022_2023: S3 GCVI season shape (peak, mean, peak month, area before peak) done
+zimbabwe_lacuna_2022_2023: S4 GCVI monthly curve done
+zimbabwe_lacuna_2022_2023: S5 A1: 5 indices, max + mean done
+zimbabwe_lacuna_2022_2023: S6 5 indices, monthly curve done
+zimbabwe_lacuna_2022_2023: S7 10 bands, monthly curve done
+zimbabwe_lacuna_2022_2023: S8 10 bands, monthly, pre-harvest months only done
+zimbabwe_lacuna_2022_2023: S9 10 bands monthly + coordinates done
+zimbabwe_lacuna_2022_2023: S10 Presto frozen embedding (128) done
+zimbabwe_lacuna_2022_2023: S11 10 bands monthly + Presto done
+zimbabwe_lacuna_2022_2023: S12 MOSAIKS field + chip (v1, 2,048) done
+zimbabwe_lacuna_2022_2023: all done
+malawi_2023: S2 GCVI peak done
+malawi_2023: S3 GCVI season shape (peak, mean, peak month, area before peak) done
+malawi_2023: S4 GCVI monthly curve done
+malawi_2023: S5 A1: 5 indices, max + mean done
+malawi_2023: S6 5 indices, monthly curve done
+malawi_2023: S7 10 bands, monthly curve done
+malawi_2023: S8 10 bands, monthly, pre-harvest months only done
+malawi_2023: S9 10 bands monthly + coordinates done
+malawi_2023: S10 Presto frozen embedding (128) done
+malawi_2023: S11 10 bands monthly + Presto done
+malawi_2023: S12 MOSAIKS field + chip (v1, 2,048) done
+malawi_2023: all done
+malawi_2022: S2 GCVI peak done
+malawi_2022: S3 GCVI season shape (peak, mean, peak month, area before peak) done
+malawi_2022: S4 GCVI monthly curve done
+malawi_2022: S5 A1: 5 indices, max + mean done
+malawi_2022: S6 5 indices, monthly curve done
+malawi_2022: S7 10 bands, monthly curve done
+malawi_2022: S8 10 bands, monthly, pre-harvest months only done
+malawi_2022: S9 10 bands monthly + coordinates done
+malawi_2022: S10 Presto frozen embedding (128) done
+malawi_2022: S11 10 bands monthly + Presto done
+malawi_2022: all done
+kenya_oaf_2019_2020: S2 GCVI peak done
+kenya_oaf_2019_2020: S3 GCVI season shape (peak, mean, peak month, area before peak) done
+kenya_oaf_2019_2020: S4 GCVI monthly curve done
+kenya_oaf_2019_2020: S5 A1: 5 indices, max + mean done
+kenya_oaf_2019_2020: S6 5 indices, monthly curve done
+kenya_oaf_2019_2020: S7 10 bands, monthly curve done
+kenya_oaf_2019_2020: S8 10 bands, monthly, pre-harvest months only done
+kenya_oaf_2019_2020: S9 10 bands monthly + coordinates done
+kenya_oaf_2019_2020: S12 MOSAIKS field + chip (v1, 2,048) done
+kenya_oaf_2019_2020: all done
+zimbabwe_2024: S2 GCVI peak done
+zimbabwe_2024: S3 GCVI season shape (peak, mean, peak month, area before peak) done
+zimbabwe_2024: S4 GCVI monthly curve done
+zimbabwe_2024: S5 A1: 5 indices, max + mean done
+zimbabwe_2024: S6 5 indices, monthly curve done
+zimbabwe_2024: S7 10 bands, monthly curve done
+zimbabwe_2024: S8 10 bands, monthly, pre-harvest months only done
+zimbabwe_2024: S9 10 bands monthly + coordinates done
+zimbabwe_2024: S12 MOSAIKS field + chip (v1, 2,048) done
+zimbabwe_2024: all done
+                        cohort                                                             step                    head        r2  rank_inside_clusters
+0    zimbabwe_lacuna_2022_2023                                              S0 R0 training mean                       - -0.007815                   NaN
+1    zimbabwe_lacuna_2022_2023                       S1 R1 coordinates only (10 nearest fields)                     kNN  0.127064             -0.053648
+2    zimbabwe_lacuna_2022_2023                                                     S2 GCVI peak                   Ridge  0.139764              0.298822
+3    zimbabwe_lacuna_2022_2023                                                     S2 GCVI peak          Bayesian ridge  0.140287              0.298647
+4    zimbabwe_lacuna_2022_2023                                                     S2 GCVI peak                     ARD  0.140287              0.298647
+5    zimbabwe_lacuna_2022_2023  S3 GCVI season shape (peak, mean, peak month, area before peak)                   Ridge  0.181693              0.324474
+6    zimbabwe_lacuna_2022_2023  S3 GCVI season shape (peak, mean, peak month, area before peak)          Bayesian ridge  0.181433              0.324226
+7    zimbabwe_lacuna_2022_2023  S3 GCVI season shape (peak, mean, peak month, area before peak)                     ARD  0.181118              0.324585
+8    zimbabwe_lacuna_2022_2023  S3 GCVI season shape (peak, mean, peak month, area before peak)        Gaussian process  0.206039              0.320996
+9    zimbabwe_lacuna_2022_2023  S3 GCVI season shape (peak, mean, peak month, area before peak)  Bayesian pairwise rank       NaN              0.320345
+10   zimbabwe_lacuna_2022_2023                                            S4 GCVI monthly curve                   Ridge  0.202308              0.357618
+11   zimbabwe_lacuna_2022_2023                                            S4 GCVI monthly curve          Bayesian ridge  0.206877              0.356208
+12   zimbabwe_lacuna_2022_2023                                            S4 GCVI monthly curve                     ARD  0.206129              0.354854
+13   zimbabwe_lacuna_2022_2023                                     S5 A1: 5 indices, max + mean                   Ridge  0.190525              0.298975
+14   zimbabwe_lacuna_2022_2023                                     S5 A1: 5 indices, max + mean          Bayesian ridge  0.189234              0.297647
+15   zimbabwe_lacuna_2022_2023                                     S5 A1: 5 indices, max + mean                     ARD  0.187006              0.295978
+16   zimbabwe_lacuna_2022_2023                                     S5 A1: 5 indices, max + mean        Gaussian process  0.195184              0.305386
+17   zimbabwe_lacuna_2022_2023                                     S5 A1: 5 indices, max + mean  Bayesian pairwise rank       NaN              0.317591
+18   zimbabwe_lacuna_2022_2023                                      S6 5 indices, monthly curve                   Ridge  0.237098              0.326994
+19   zimbabwe_lacuna_2022_2023                                      S6 5 indices, monthly curve          Bayesian ridge  0.251967              0.328402
+20   zimbabwe_lacuna_2022_2023                                      S6 5 indices, monthly curve                     ARD  0.244939              0.325139
+21   zimbabwe_lacuna_2022_2023                                       S7 10 bands, monthly curve                   Ridge  0.321999              0.341911
+22   zimbabwe_lacuna_2022_2023                                       S7 10 bands, monthly curve          Bayesian ridge  0.325077              0.346054
+23   zimbabwe_lacuna_2022_2023                                       S7 10 bands, monthly curve                     ARD  0.321862              0.342997
+24   zimbabwe_lacuna_2022_2023                                       S7 10 bands, monthly curve        Gaussian process  0.340965              0.342650
+25   zimbabwe_lacuna_2022_2023                                       S7 10 bands, monthly curve  Bayesian pairwise rank       NaN              0.374544
+26   zimbabwe_lacuna_2022_2023                    S8 10 bands, monthly, pre-harvest months only                   Ridge  0.317468              0.342631
+27   zimbabwe_lacuna_2022_2023                    S8 10 bands, monthly, pre-harvest months only          Bayesian ridge  0.317894              0.343432
+28   zimbabwe_lacuna_2022_2023                    S8 10 bands, monthly, pre-harvest months only                     ARD  0.314498              0.338568
+29   zimbabwe_lacuna_2022_2023                    S8 10 bands, monthly, pre-harvest months only  Bayesian pairwise rank       NaN              0.375638
+30   zimbabwe_lacuna_2022_2023                                S9 10 bands monthly + coordinates                   Ridge  0.257029              0.341689
+31   zimbabwe_lacuna_2022_2023                                S9 10 bands monthly + coordinates          Bayesian ridge  0.325196              0.349874
+32   zimbabwe_lacuna_2022_2023                                S9 10 bands monthly + coordinates                     ARD  0.296788              0.343833
+33   zimbabwe_lacuna_2022_2023                                S10 Presto frozen embedding (128)                   Ridge  0.302425              0.358037
+34   zimbabwe_lacuna_2022_2023                                S10 Presto frozen embedding (128)          Bayesian ridge  0.305004              0.357782
+35   zimbabwe_lacuna_2022_2023                                S10 Presto frozen embedding (128)                     ARD  0.287618              0.356028
+36   zimbabwe_lacuna_2022_2023                                    S11 10 bands monthly + Presto                   Ridge  0.327137              0.365460
+37   zimbabwe_lacuna_2022_2023                                    S11 10 bands monthly + Presto          Bayesian ridge  0.330339              0.363979
+38   zimbabwe_lacuna_2022_2023                             S12 MOSAIKS field + chip (v1, 2,048)                   Ridge  0.287830              0.294256
+39   zimbabwe_lacuna_2022_2023                             S12 MOSAIKS field + chip (v1, 2,048)          Bayesian ridge  0.290987              0.287933
+40                 malawi_2023                                              S0 R0 training mean                       - -0.008473                   NaN
+41                 malawi_2023                       S1 R1 coordinates only (10 nearest fields)                     kNN -0.142050              0.047852
+42                 malawi_2023                                                     S2 GCVI peak                   Ridge  0.052017              0.236095
+43                 malawi_2023                                                     S2 GCVI peak          Bayesian ridge  0.051331              0.238776
+44                 malawi_2023                                                     S2 GCVI peak                     ARD  0.051331              0.238776
+45                 malawi_2023  S3 GCVI season shape (peak, mean, peak month, area before peak)                   Ridge  0.047859              0.166379
+46                 malawi_2023  S3 GCVI season shape (peak, mean, peak month, area before peak)          Bayesian ridge  0.046280              0.169522
+47                 malawi_2023  S3 GCVI season shape (peak, mean, peak month, area before peak)                     ARD  0.031900              0.172184
+48                 malawi_2023  S3 GCVI season shape (peak, mean, peak month, area before peak)        Gaussian process  0.045680              0.159691
+49                 malawi_2023  S3 GCVI season shape (peak, mean, peak month, area before peak)  Bayesian pairwise rank       NaN              0.180641
+50                 malawi_2023                                            S4 GCVI monthly curve                   Ridge  0.084161              0.343783
+51                 malawi_2023                                            S4 GCVI monthly curve          Bayesian ridge  0.085900              0.340827
+52                 malawi_2023                                            S4 GCVI monthly curve                     ARD  0.093751              0.339275
+53                 malawi_2023                                     S5 A1: 5 indices, max + mean                   Ridge  0.154168              0.424554
+54                 malawi_2023                                     S5 A1: 5 indices, max + mean          Bayesian ridge  0.153339              0.423238
+55                 malawi_2023                                     S5 A1: 5 indices, max + mean                     ARD  0.157214              0.420396
+56                 malawi_2023                                     S5 A1: 5 indices, max + mean        Gaussian process  0.185768              0.429264
+57                 malawi_2023                                     S5 A1: 5 indices, max + mean  Bayesian pairwise rank       NaN              0.330211
+58                 malawi_2023                                      S6 5 indices, monthly curve                   Ridge  0.125062              0.386201
+59                 malawi_2023                                      S6 5 indices, monthly curve          Bayesian ridge  0.125109              0.383123
+60                 malawi_2023                                      S6 5 indices, monthly curve                     ARD  0.108454              0.403335
+61                 malawi_2023                                       S7 10 bands, monthly curve                   Ridge  0.084289              0.393318
+62                 malawi_2023                                       S7 10 bands, monthly curve          Bayesian ridge  0.081384              0.396442
+63                 malawi_2023                                       S7 10 bands, monthly curve                     ARD  0.115868              0.464927
+64                 malawi_2023                                       S7 10 bands, monthly curve        Gaussian process  0.086602              0.375921
+65                 malawi_2023                                       S7 10 bands, monthly curve  Bayesian pairwise rank       NaN              0.341775
+66                 malawi_2023                    S8 10 bands, monthly, pre-harvest months only                   Ridge  0.086446              0.399286
+67                 malawi_2023                    S8 10 bands, monthly, pre-harvest months only          Bayesian ridge  0.009391              0.230927
+68                 malawi_2023                    S8 10 bands, monthly, pre-harvest months only                     ARD  0.128121              0.422244
+69                 malawi_2023                    S8 10 bands, monthly, pre-harvest months only  Bayesian pairwise rank       NaN              0.356668
+70                 malawi_2023                                S9 10 bands monthly + coordinates                   Ridge  0.074552              0.401495
+71                 malawi_2023                                S9 10 bands monthly + coordinates          Bayesian ridge  0.080282              0.399314
+72                 malawi_2023                                S9 10 bands monthly + coordinates                     ARD  0.105123              0.492151
+73                 malawi_2023                                S10 Presto frozen embedding (128)                   Ridge  0.089982              0.298790
+74                 malawi_2023                                S10 Presto frozen embedding (128)          Bayesian ridge  0.097592              0.315430
+75                 malawi_2023                                S10 Presto frozen embedding (128)                     ARD -0.040082              0.243153
+76                 malawi_2023                                    S11 10 bands monthly + Presto                   Ridge  0.103328              0.367898
+77                 malawi_2023                                    S11 10 bands monthly + Presto          Bayesian ridge  0.109927              0.369650
+78                 malawi_2023                             S12 MOSAIKS field + chip (v1, 2,048)                   Ridge  0.016231              0.341894
+79                 malawi_2023                             S12 MOSAIKS field + chip (v1, 2,048)          Bayesian ridge  0.047197              0.337784
+80                 malawi_2022                                              S0 R0 training mean                       - -0.081866                   NaN
+81                 malawi_2022                       S1 R1 coordinates only (10 nearest fields)                     kNN  0.334722             -0.072090
+82                 malawi_2022                                                     S2 GCVI peak                   Ridge  0.059683              0.273187
+83                 malawi_2022                                                     S2 GCVI peak          Bayesian ridge  0.059572              0.272951
+84                 malawi_2022                                                     S2 GCVI peak                     ARD  0.059572              0.272951
+85                 malawi_2022  S3 GCVI season shape (peak, mean, peak month, area before peak)                   Ridge  0.102038              0.276754
+86                 malawi_2022  S3 GCVI season shape (peak, mean, peak month, area before peak)          Bayesian ridge  0.102660              0.276428
+87                 malawi_2022  S3 GCVI season shape (peak, mean, peak month, area before peak)                     ARD  0.100514              0.275742
+88                 malawi_2022  S3 GCVI season shape (peak, mean, peak month, area before peak)        Gaussian process  0.106762              0.232198
+89                 malawi_2022  S3 GCVI season shape (peak, mean, peak month, area before peak)  Bayesian pairwise rank       NaN              0.263419
+90                 malawi_2022                                            S4 GCVI monthly curve                   Ridge  0.229740              0.274054
+91                 malawi_2022                                            S4 GCVI monthly curve          Bayesian ridge  0.234822              0.274302
+92                 malawi_2022                                            S4 GCVI monthly curve                     ARD  0.240051              0.276475
+93                 malawi_2022                                     S5 A1: 5 indices, max + mean                   Ridge  0.392895              0.299287
+94                 malawi_2022                                     S5 A1: 5 indices, max + mean          Bayesian ridge  0.399510              0.306652
+95                 malawi_2022                                     S5 A1: 5 indices, max + mean                     ARD  0.397291              0.303685
+96                 malawi_2022                                     S5 A1: 5 indices, max + mean        Gaussian process  0.432846              0.371036
+97                 malawi_2022                                     S5 A1: 5 indices, max + mean  Bayesian pairwise rank       NaN              0.348049
+98                 malawi_2022                                      S6 5 indices, monthly curve                   Ridge  0.443277              0.350275
+99                 malawi_2022                                      S6 5 indices, monthly curve          Bayesian ridge  0.441980              0.352108
+100                malawi_2022                                      S6 5 indices, monthly curve                     ARD  0.439471              0.351588
+101                malawi_2022                                       S7 10 bands, monthly curve                   Ridge  0.509106              0.390165
+102                malawi_2022                                       S7 10 bands, monthly curve          Bayesian ridge  0.509500              0.396123
+103                malawi_2022                                       S7 10 bands, monthly curve                     ARD  0.484877              0.378691
+104                malawi_2022                                       S7 10 bands, monthly curve        Gaussian process  0.532731              0.430151
+105                malawi_2022                                       S7 10 bands, monthly curve  Bayesian pairwise rank       NaN              0.289359
+106                malawi_2022                    S8 10 bands, monthly, pre-harvest months only                   Ridge  0.484005              0.324981
+107                malawi_2022                    S8 10 bands, monthly, pre-harvest months only          Bayesian ridge  0.489271              0.324874
+108                malawi_2022                    S8 10 bands, monthly, pre-harvest months only                     ARD  0.476889              0.341665
+109                malawi_2022                    S8 10 bands, monthly, pre-harvest months only  Bayesian pairwise rank       NaN              0.305456
+110                malawi_2022                                S9 10 bands monthly + coordinates                   Ridge  0.517534              0.401859
+111                malawi_2022                                S9 10 bands monthly + coordinates          Bayesian ridge  0.511506              0.398861
+112                malawi_2022                                S9 10 bands monthly + coordinates                     ARD  0.510031              0.379500
+113                malawi_2022                                S10 Presto frozen embedding (128)                   Ridge  0.461123              0.259693
+114                malawi_2022                                S10 Presto frozen embedding (128)          Bayesian ridge  0.462184              0.263500
+115                malawi_2022                                S10 Presto frozen embedding (128)                     ARD  0.409668              0.208397
+116                malawi_2022                                    S11 10 bands monthly + Presto                   Ridge  0.475955              0.295698
+117                malawi_2022                                    S11 10 bands monthly + Presto          Bayesian ridge  0.479604              0.302542
+118        kenya_oaf_2019_2020                                              S0 R0 training mean                       - -0.002783                   NaN
+119        kenya_oaf_2019_2020                       S1 R1 coordinates only (10 nearest fields)                     kNN  0.210632              0.026043
+120        kenya_oaf_2019_2020                                                     S2 GCVI peak                   Ridge  0.017651              0.097545
+121        kenya_oaf_2019_2020                                                     S2 GCVI peak          Bayesian ridge  0.018055              0.097562
+122        kenya_oaf_2019_2020                                                     S2 GCVI peak                     ARD  0.018055              0.097562
+123        kenya_oaf_2019_2020  S3 GCVI season shape (peak, mean, peak month, area before peak)                   Ridge  0.032638              0.088991
+124        kenya_oaf_2019_2020  S3 GCVI season shape (peak, mean, peak month, area before peak)          Bayesian ridge  0.032488              0.087469
+125        kenya_oaf_2019_2020  S3 GCVI season shape (peak, mean, peak month, area before peak)                     ARD  0.032614              0.084857
+126        kenya_oaf_2019_2020  S3 GCVI season shape (peak, mean, peak month, area before peak)  Bayesian pairwise rank       NaN              0.052990
+127        kenya_oaf_2019_2020                                            S4 GCVI monthly curve                   Ridge  0.041664             -0.010996
+128        kenya_oaf_2019_2020                                            S4 GCVI monthly curve          Bayesian ridge  0.039364             -0.013863
+129        kenya_oaf_2019_2020                                            S4 GCVI monthly curve                     ARD  0.037482             -0.009364
+130        kenya_oaf_2019_2020                                     S5 A1: 5 indices, max + mean                   Ridge  0.053758              0.127137
+131        kenya_oaf_2019_2020                                     S5 A1: 5 indices, max + mean          Bayesian ridge  0.053875              0.127129
+132        kenya_oaf_2019_2020                                     S5 A1: 5 indices, max + mean                     ARD  0.053814              0.126800
+133        kenya_oaf_2019_2020                                     S5 A1: 5 indices, max + mean  Bayesian pairwise rank       NaN              0.101672
+134        kenya_oaf_2019_2020                                      S6 5 indices, monthly curve                   Ridge  0.097315              0.017498
+135        kenya_oaf_2019_2020                                      S6 5 indices, monthly curve          Bayesian ridge  0.096899              0.019267
+136        kenya_oaf_2019_2020                                      S6 5 indices, monthly curve                     ARD  0.096391              0.004972
+137        kenya_oaf_2019_2020                                       S7 10 bands, monthly curve                   Ridge  0.134112             -0.021884
+138        kenya_oaf_2019_2020                                       S7 10 bands, monthly curve          Bayesian ridge  0.133754             -0.026761
+139        kenya_oaf_2019_2020                                       S7 10 bands, monthly curve                     ARD  0.133681             -0.003421
+140        kenya_oaf_2019_2020                                       S7 10 bands, monthly curve  Bayesian pairwise rank       NaN              0.040258
+141        kenya_oaf_2019_2020                    S8 10 bands, monthly, pre-harvest months only                   Ridge  0.127999             -0.014128
+142        kenya_oaf_2019_2020                    S8 10 bands, monthly, pre-harvest months only          Bayesian ridge  0.129692             -0.019019
+143        kenya_oaf_2019_2020                    S8 10 bands, monthly, pre-harvest months only                     ARD  0.131669             -0.008391
+144        kenya_oaf_2019_2020                    S8 10 bands, monthly, pre-harvest months only  Bayesian pairwise rank       NaN              0.064720
+145        kenya_oaf_2019_2020                                S9 10 bands monthly + coordinates                   Ridge  0.164224              0.025284
+146        kenya_oaf_2019_2020                                S9 10 bands monthly + coordinates          Bayesian ridge  0.144592             -0.011202
+147        kenya_oaf_2019_2020                                S9 10 bands monthly + coordinates                     ARD  0.168938              0.030277
+148        kenya_oaf_2019_2020                             S12 MOSAIKS field + chip (v1, 2,048)                   Ridge  0.195469              0.080851
+149        kenya_oaf_2019_2020                             S12 MOSAIKS field + chip (v1, 2,048)          Bayesian ridge  0.195450              0.081188
+150              zimbabwe_2024                                              S0 R0 training mean                       - -0.005555                   NaN
+151              zimbabwe_2024                       S1 R1 coordinates only (10 nearest fields)                     kNN  0.202930             -0.005798
+152              zimbabwe_2024                                                     S2 GCVI peak                   Ridge  0.150995              0.173534
+153              zimbabwe_2024                                                     S2 GCVI peak          Bayesian ridge  0.151303              0.173811
+154              zimbabwe_2024                                                     S2 GCVI peak                     ARD  0.151303              0.173811
+155              zimbabwe_2024  S3 GCVI season shape (peak, mean, peak month, area before peak)                   Ridge  0.150423              0.176933
+156              zimbabwe_2024  S3 GCVI season shape (peak, mean, peak month, area before peak)          Bayesian ridge  0.150379              0.178441
+157              zimbabwe_2024  S3 GCVI season shape (peak, mean, peak month, area before peak)                     ARD  0.150346              0.176025
+158              zimbabwe_2024  S3 GCVI season shape (peak, mean, peak month, area before peak)  Bayesian pairwise rank       NaN              0.171912
+159              zimbabwe_2024                                            S4 GCVI monthly curve                   Ridge  0.150341              0.195699
+160              zimbabwe_2024                                            S4 GCVI monthly curve          Bayesian ridge  0.152290              0.195536
+161              zimbabwe_2024                                            S4 GCVI monthly curve                     ARD  0.148423              0.196062
+162              zimbabwe_2024                                     S5 A1: 5 indices, max + mean                   Ridge  0.206286              0.232594
+163              zimbabwe_2024                                     S5 A1: 5 indices, max + mean          Bayesian ridge  0.206561              0.232699
+164              zimbabwe_2024                                     S5 A1: 5 indices, max + mean                     ARD  0.205264              0.228024
+165              zimbabwe_2024                                     S5 A1: 5 indices, max + mean  Bayesian pairwise rank       NaN              0.232523
+166              zimbabwe_2024                                      S6 5 indices, monthly curve                   Ridge  0.182747              0.221324
+167              zimbabwe_2024                                      S6 5 indices, monthly curve          Bayesian ridge  0.192123              0.232372
+168              zimbabwe_2024                                      S6 5 indices, monthly curve                     ARD  0.191198              0.233479
+169              zimbabwe_2024                                       S7 10 bands, monthly curve                   Ridge  0.217217              0.247562
+170              zimbabwe_2024                                       S7 10 bands, monthly curve          Bayesian ridge  0.218148              0.244030
+171              zimbabwe_2024                                       S7 10 bands, monthly curve                     ARD  0.221800              0.253880
+172              zimbabwe_2024                                       S7 10 bands, monthly curve  Bayesian pairwise rank       NaN              0.209412
+173              zimbabwe_2024                    S8 10 bands, monthly, pre-harvest months only                   Ridge  0.199790              0.227358
+174              zimbabwe_2024                    S8 10 bands, monthly, pre-harvest months only          Bayesian ridge  0.200760              0.227253
+175              zimbabwe_2024                    S8 10 bands, monthly, pre-harvest months only                     ARD  0.199656              0.234363
+176              zimbabwe_2024                    S8 10 bands, monthly, pre-harvest months only  Bayesian pairwise rank       NaN              0.191265
+177              zimbabwe_2024                                S9 10 bands monthly + coordinates                   Ridge  0.214298              0.251935
+178              zimbabwe_2024                                S9 10 bands monthly + coordinates          Bayesian ridge  0.214989              0.248639
+179              zimbabwe_2024                                S9 10 bands monthly + coordinates                     ARD  0.215296              0.256891
+180              zimbabwe_2024                             S12 MOSAIKS field + chip (v1, 2,048)                   Ridge  0.230404              0.241423
+181              zimbabwe_2024                             S12 MOSAIKS field + chip (v1, 2,048)          Bayesian ridge  0.230674              0.241608

@@ -1,0 +1,2464 @@
+{
+  "absolute_tolerance": 1e-09,
+  "bootstrap_draws": 2000,
+  "comparisons": [
+    {
+      "maximum_absolute_error": 3.654715419187937e-14,
+      "method": "bands_v0_mean_target",
+      "recomputed": {
+        "ci_high": 0.06392538024547953,
+        "ci_low": -0.05602656955253655,
+        "delta_r2": -0.0015229020664553339,
+        "delta_rmse_t_ha": 0.001667728573170102,
+        "r2_ci_high": 0.05135135282662338,
+        "r2_ci_low": -0.059446189463593556
+      },
+      "reference": "legacy_indices_mean_max_target",
+      "reported": {
+        "ci_high": 0.0639253802455,
+        "ci_low": -0.0560265695525,
+        "delta_r2": -0.00152290206645,
+        "delta_rmse_t_ha": 0.00166772857317,
+        "r2_ci_high": 0.0513513528266,
+        "r2_ci_low": -0.0594461894636
+      }
+    },
+    {
+      "maximum_absolute_error": 2.878292493669471e-15,
+      "method": "bands_v0_mean_merged",
+      "recomputed": {
+        "ci_high": 0.000975469648838106,
+        "ci_low": -0.0009145066934254543,
+        "delta_r2": -2.8061765975584407e-05,
+        "delta_rmse_t_ha": 3.0715901848221705e-05,
+        "r2_ci_high": 0.0008305405624159125,
+        "r2_ci_low": -0.0008943131279225636
+      },
+      "reference": "bands_v0_mean_target",
+      "reported": {
+        "ci_high": 0.000975469648839,
+        "ci_low": -0.000914506693423,
+        "delta_r2": -2.80617659782e-05,
+        "delta_rmse_t_ha": 3.07159018511e-05,
+        "r2_ci_high": 0.000830540562415,
+        "r2_ci_low": -0.000894313127922
+      }
+    },
+    {
+      "maximum_absolute_error": 2.400857290751901e-14,
+      "method": "bands_v0_mean_merged",
+      "recomputed": {
+        "ci_high": 0.0673594586001803,
+        "ci_low": -0.05243104833892345,
+        "delta_r2": -0.004805542531811757,
+        "delta_rmse_t_ha": 0.005267729709727442,
+        "r2_ci_high": 0.04777491032839985,
+        "r2_ci_low": -0.06285258060722401
+      },
+      "reference": "legacy_indices_mean_max_merged",
+      "reported": {
+        "ci_high": 0.0673594586002,
+        "ci_low": -0.0524310483389,
+        "delta_r2": -0.00480554253181,
+        "delta_rmse_t_ha": 0.00526772970973,
+        "r2_ci_high": 0.0477749103284,
+        "r2_ci_low": -0.0628525806072
+      }
+    },
+    {
+      "maximum_absolute_error": 4.299338662860919e-14,
+      "method": "bands_v1_calendar_mean_target",
+      "recomputed": {
+        "ci_high": -0.008586534434270076,
+        "ci_low": -0.08053995641654299,
+        "delta_r2": 0.04011401876393106,
+        "delta_rmse_t_ha": -0.04445796357580689,
+        "r2_ci_high": 0.07173601715807387,
+        "r2_ci_low": 0.007839969720499397
+      },
+      "reference": "bands_v0_mean_target",
+      "reported": {
+        "ci_high": -0.00858653443427,
+        "ci_low": -0.0805399564165,
+        "delta_r2": 0.0401140187639,
+        "delta_rmse_t_ha": -0.0444579635758,
+        "r2_ci_high": 0.0717360171581,
+        "r2_ci_low": 0.0078399697205
+      }
+    },
+    {
+      "maximum_absolute_error": 5.1431081615760377e-14,
+      "method": "bands_v1_calendar_mean_target",
+      "recomputed": {
+        "ci_high": 0.02123935505964857,
+        "ci_low": -0.09899293898728523,
+        "delta_r2": 0.038591116697475725,
+        "delta_rmse_t_ha": -0.04279023500263679,
+        "r2_ci_high": 0.08893882366488165,
+        "r2_ci_low": -0.020215230123038063
+      },
+      "reference": "legacy_indices_mean_max_target",
+      "reported": {
+        "ci_high": 0.0212393550597,
+        "ci_low": -0.0989929389873,
+        "delta_r2": 0.0385911166975,
+        "delta_rmse_t_ha": -0.0427902350026,
+        "r2_ci_high": 0.0889388236649,
+        "r2_ci_low": -0.020215230123
+      }
+    },
+    {
+      "maximum_absolute_error": 2.29547283958631e-15,
+      "method": "bands_v1_calendar_mean_merged",
+      "recomputed": {
+        "ci_high": 0.0013060173066107175,
+        "ci_low": -0.0027709912184889053,
+        "delta_r2": 0.0007194642832243359,
+        "delta_rmse_t_ha": -0.0008076665014595807,
+        "r2_ci_high": 0.0024946731265577046,
+        "r2_ci_low": -0.0011745698669103077
+      },
+      "reference": "bands_v1_calendar_mean_target",
+      "reported": {
+        "ci_high": 0.00130601730661,
+        "ci_low": -0.00277099121849,
+        "delta_r2": 0.000719464283225,
+        "delta_rmse_t_ha": -0.00080766650146,
+        "r2_ci_high": 0.00249467312656,
+        "r2_ci_low": -0.00117456986691
+      }
+    },
+    {
+      "maximum_absolute_error": 4.1744385725905886e-14,
+      "method": "bands_v1_calendar_mean_merged",
+      "recomputed": {
+        "ci_high": -0.009250342435756455,
+        "ci_low": -0.08141538395104174,
+        "delta_r2": 0.04086154481313098,
+        "delta_rmse_t_ha": -0.045296345979114694,
+        "r2_ci_high": 0.07213902818284097,
+        "r2_ci_low": 0.008690681720603569
+      },
+      "reference": "bands_v0_mean_merged",
+      "reported": {
+        "ci_high": -0.00925034243576,
+        "ci_low": -0.081415383951,
+        "delta_r2": 0.0408615448131,
+        "delta_rmse_t_ha": -0.0452963459791,
+        "r2_ci_high": 0.0721390281828,
+        "r2_ci_low": 0.0086906817206
+      }
+    },
+    {
+      "maximum_absolute_error": 4.8992060408536986e-14,
+      "method": "bands_v1_calendar_mean_merged",
+      "recomputed": {
+        "ci_high": 0.024057308802952374,
+        "ci_low": -0.09665901934580881,
+        "delta_r2": 0.03605600228131922,
+        "delta_rmse_t_ha": -0.04002861626938725,
+        "r2_ci_high": 0.08632315570810274,
+        "r2_ci_low": -0.022328854676748992
+      },
+      "reference": "legacy_indices_mean_max_merged",
+      "reported": {
+        "ci_high": 0.024057308803,
+        "ci_low": -0.0966590193458,
+        "delta_r2": 0.0360560022813,
+        "delta_rmse_t_ha": -0.0400286162694,
+        "r2_ci_high": 0.0863231557081,
+        "r2_ci_low": -0.0223288546767
+      }
+    },
+    {
+      "maximum_absolute_error": 4.251599072802037e-13,
+      "method": "bands_v2_max_target",
+      "recomputed": {
+        "ci_high": 0.14172890204263947,
+        "ci_low": 0.05318747259980683,
+        "delta_r2": -0.0900962979845854,
+        "delta_rmse_t_ha": 0.09605353429396613,
+        "r2_ci_high": -0.050625023701208686,
+        "r2_ci_low": -0.13186004887257485
+      },
+      "reference": "bands_v0_mean_target",
+      "reported": {
+        "ci_high": 0.141728902043,
+        "ci_low": 0.0531874725998,
+        "delta_r2": -0.0900962979846,
+        "delta_rmse_t_ha": 0.096053534294,
+        "r2_ci_high": -0.0506250237012,
+        "r2_ci_low": -0.131860048873
+      }
+    },
+    {
+      "maximum_absolute_error": 3.0464519795714295e-13,
+      "method": "bands_v2_max_target",
+      "recomputed": {
+        "ci_high": 0.15932947456924265,
+        "ci_low": 0.041332324392855294,
+        "delta_r2": -0.09161920005104074,
+        "delta_rmse_t_ha": 0.09772126286713623,
+        "r2_ci_high": -0.0404926296741041,
+        "r2_ci_low": -0.15165944832769535
+      },
+      "reference": "legacy_indices_mean_max_target",
+      "reported": {
+        "ci_high": 0.159329474569,
+        "ci_low": 0.0413323243929,
+        "delta_r2": -0.091619200051,
+        "delta_rmse_t_ha": 0.0977212628671,
+        "r2_ci_high": -0.0404926296741,
+        "r2_ci_low": -0.151659448328
+      }
+    },
+    {
+      "maximum_absolute_error": 6.089746762416581e-15,
+      "method": "bands_v2_max_merged",
+      "recomputed": {
+        "ci_high": 0.004342564341576347,
+        "ci_low": -0.009875306200071871,
+        "delta_r2": 0.002501930105247796,
+        "delta_rmse_t_ha": -0.0026015261792198263,
+        "r2_ci_high": 0.009861212143729226,
+        "r2_ci_low": -0.00416798684733391
+      },
+      "reference": "bands_v2_max_target",
+      "reported": {
+        "ci_high": 0.00434256434158,
+        "ci_low": -0.00987530620007,
+        "delta_r2": 0.00250193010525,
+        "delta_rmse_t_ha": -0.00260152617922,
+        "r2_ci_high": 0.00986121214373,
+        "r2_ci_low": -0.00416798684734
+      }
+    },
+    {
+      "maximum_absolute_error": 4.0667469392019484e-13,
+      "method": "bands_v2_max_merged",
+      "recomputed": {
+        "ci_high": 0.14088542472825422,
+        "ci_low": 0.050518156443178516,
+        "delta_r2": -0.08756630611336202,
+        "delta_rmse_t_ha": 0.09342129221289808,
+        "r2_ci_high": -0.04830366666399725,
+        "r2_ci_low": -0.13081994231340668
+      },
+      "reference": "bands_v0_mean_merged",
+      "reported": {
+        "ci_high": 0.140885424728,
+        "ci_low": 0.0505181564432,
+        "delta_r2": -0.0875663061134,
+        "delta_rmse_t_ha": 0.0934212922129,
+        "r2_ci_high": -0.048303666664,
+        "r2_ci_low": -0.130819942313
+      }
+    },
+    {
+      "maximum_absolute_error": 4.3373638014543303e-13,
+      "method": "bands_v2_max_merged",
+      "recomputed": {
+        "ci_high": 0.16064833259256625,
+        "ci_low": 0.04392340309822633,
+        "delta_r2": -0.09237184864517378,
+        "delta_rmse_t_ha": 0.09868902192262552,
+        "r2_ci_high": -0.04267885205787978,
+        "r2_ci_low": -0.15186056686760027
+      },
+      "reference": "legacy_indices_mean_max_merged",
+      "reported": {
+        "ci_high": 0.160648332593,
+        "ci_low": 0.0439234030982,
+        "delta_r2": -0.0923718486452,
+        "delta_rmse_t_ha": 0.0986890219226,
+        "r2_ci_high": -0.0426788520579,
+        "r2_ci_low": -0.151860566868
+      }
+    },
+    {
+      "maximum_absolute_error": 3.9959702213820947e-13,
+      "method": "bands_v3_median_target",
+      "recomputed": {
+        "ci_high": 0.194792332598204,
+        "ci_low": 0.09128784126293493,
+        "delta_r2": -0.13509207003175616,
+        "delta_rmse_t_ha": 0.1422452336173996,
+        "r2_ci_high": -0.08760475002584729,
+        "r2_ci_low": -0.18553232544960271
+      },
+      "reference": "bands_v0_mean_target",
+      "reported": {
+        "ci_high": 0.194792332598,
+        "ci_low": 0.0912878412629,
+        "delta_r2": -0.135092070032,
+        "delta_rmse_t_ha": 0.142245233617,
+        "r2_ci_high": -0.0876047500258,
+        "r2_ci_low": -0.18553232545
+      }
+    },
+    {
+      "maximum_absolute_error": 4.3029468876909505e-13,
+      "method": "bands_v3_median_target",
+      "recomputed": {
+        "ci_high": 0.21391154870911125,
+        "ci_low": 0.08057355208147567,
+        "delta_r2": -0.1366149720982115,
+        "delta_rmse_t_ha": 0.1439129621905697,
+        "r2_ci_high": -0.07950258723809647,
+        "r2_ci_low": -0.2031325224223667
+      },
+      "reference": "legacy_indices_mean_max_target",
+      "reported": {
+        "ci_high": 0.213911548709,
+        "ci_low": 0.0805735520815,
+        "delta_r2": -0.136614972098,
+        "delta_rmse_t_ha": 0.143912962191,
+        "r2_ci_high": -0.0795025872381,
+        "r2_ci_low": -0.203132522422
+      }
+    },
+    {
+      "maximum_absolute_error": 1.3256539962980263e-15,
+      "method": "bands_v3_median_merged",
+      "recomputed": {
+        "ci_high": -3.7842916090564106e-05,
+        "ci_low": -0.0007368046929037864,
+        "delta_r2": 0.00036724303464796826,
+        "delta_rmse_t_ha": -0.0003725529329354771,
+        "r2_ci_high": 0.0007524379102603257,
+        "r2_ci_low": 3.583691623247066e-05
+      },
+      "reference": "bands_v3_median_target",
+      "reported": {
+        "ci_high": -3.78429160903e-05,
+        "ci_low": -0.000736804692903,
+        "delta_r2": 0.000367243034648,
+        "delta_rmse_t_ha": -0.000372552932935,
+        "r2_ci_high": 0.000752437910259,
+        "r2_ci_low": 3.58369162322e-05
+      }
+    },
+    {
+      "maximum_absolute_error": 3.8410941094468853e-13,
+      "method": "bands_v3_median_merged",
+      "recomputed": {
+        "ci_high": 0.19447799987602513,
+        "ci_low": 0.09031904932729672,
+        "delta_r2": -0.1346967652311326,
+        "delta_rmse_t_ha": 0.1418419647826159,
+        "r2_ci_high": -0.0868358800344694,
+        "r2_ci_low": -0.18546790461125554
+      },
+      "reference": "bands_v0_mean_merged",
+      "reported": {
+        "ci_high": 0.194477999876,
+        "ci_low": 0.0903190493273,
+        "delta_r2": -0.134696765231,
+        "delta_rmse_t_ha": 0.141841964783,
+        "r2_ci_high": -0.0868358800345,
+        "r2_ci_low": -0.185467904611
+      }
+    },
+    {
+      "maximum_absolute_error": 3.4333647036532966e-13,
+      "method": "bands_v3_median_merged",
+      "recomputed": {
+        "ci_high": 0.2180722124632782,
+        "ci_low": 0.08450528112065012,
+        "delta_r2": -0.13950230776294437,
+        "delta_rmse_t_ha": 0.14710969449234335,
+        "r2_ci_high": -0.08169245903111375,
+        "r2_ci_low": -0.20712008832129833
+      },
+      "reference": "legacy_indices_mean_max_merged",
+      "reported": {
+        "ci_high": 0.218072212463,
+        "ci_low": 0.0845052811207,
+        "delta_r2": -0.139502307763,
+        "delta_rmse_t_ha": 0.147109694492,
+        "r2_ci_high": -0.0816924590311,
+        "r2_ci_low": -0.207120088321
+      }
+    },
+    {
+      "maximum_absolute_error": 3.2568392427378967e-13,
+      "method": "bands_v3_mode_target",
+      "recomputed": {
+        "ci_high": 0.2903678346581333,
+        "ci_low": 0.1469190252360257,
+        "delta_r2": -0.209036688050247,
+        "delta_rmse_t_ha": 0.21585576836178588,
+        "r2_ci_high": -0.14855911981599096,
+        "r2_ci_low": -0.2751621146373257
+      },
+      "reference": "bands_v0_mean_target",
+      "reported": {
+        "ci_high": 0.290367834658,
+        "ci_low": 0.146919025236,
+        "delta_r2": -0.20903668805,
+        "delta_rmse_t_ha": 0.215855768362,
+        "r2_ci_high": -0.148559119816,
+        "r2_ci_low": -0.275162114637
+      }
+    },
+    {
+      "maximum_absolute_error": 4.0939474033052647e-13,
+      "method": "bands_v3_mode_target",
+      "recomputed": {
+        "ci_high": 0.28382210338215014,
+        "ci_low": 0.15439727993361915,
+        "delta_r2": -0.21055959011670233,
+        "delta_rmse_t_ha": 0.21752349693495598,
+        "r2_ci_high": -0.1535294483184094,
+        "r2_ci_low": -0.2723319152542184
+      },
+      "reference": "legacy_indices_mean_max_target",
+      "reported": {
+        "ci_high": 0.283822103382,
+        "ci_low": 0.154397279934,
+        "delta_r2": -0.210559590117,
+        "delta_rmse_t_ha": 0.217523496935,
+        "r2_ci_high": -0.153529448318,
+        "r2_ci_low": -0.272331915254
+      }
+    },
+    {
+      "maximum_absolute_error": 1.0220990720455347e-14,
+      "method": "bands_v3_mode_merged",
+      "recomputed": {
+        "ci_high": 0.011372248551389779,
+        "ci_low": -0.00551954103112734,
+        "delta_r2": -0.001925990160048352,
+        "delta_rmse_t_ha": 0.0018813770325563084,
+        "r2_ci_high": 0.005781139768347807,
+        "r2_ci_low": -0.011552908622406183
+      },
+      "reference": "bands_v3_mode_target",
+      "reported": {
+        "ci_high": 0.0113722485514,
+        "ci_low": -0.00551954103113,
+        "delta_r2": -0.00192599016005,
+        "delta_rmse_t_ha": 0.00188137703256,
+        "r2_ci_high": 0.00578113976835,
+        "r2_ci_low": -0.0115529086224
+      }
+    },
+    {
+      "maximum_absolute_error": 4.939659792313478e-13,
+      "method": "bands_v3_mode_merged",
+      "recomputed": {
+        "ci_high": 0.2926264910007693,
+        "ci_low": 0.1478123346070044,
+        "delta_r2": -0.21093461644431977,
+        "delta_rmse_t_ha": 0.21770642949249397,
+        "r2_ci_high": -0.14873162319561595,
+        "r2_ci_low": -0.2770655114776209
+      },
+      "reference": "bands_v0_mean_merged",
+      "reported": {
+        "ci_high": 0.292626491001,
+        "ci_low": 0.147812334607,
+        "delta_r2": -0.210934616444,
+        "delta_rmse_t_ha": 0.217706429492,
+        "r2_ci_high": -0.148731623196,
+        "r2_ci_low": -0.277065511478
+      }
+    },
+    {
+      "maximum_absolute_error": 4.02622379880313e-13,
+      "method": "bands_v3_mode_merged",
+      "recomputed": {
+        "ci_high": 0.2905490605194026,
+        "ci_low": 0.15953787997790464,
+        "delta_r2": -0.21574015897613152,
+        "delta_rmse_t_ha": 0.2229741592022214,
+        "r2_ci_high": -0.15930758371991752,
+        "r2_ci_low": -0.2768420248663033
+      },
+      "reference": "legacy_indices_mean_max_merged",
+      "reported": {
+        "ci_high": 0.290549060519,
+        "ci_low": 0.159537879978,
+        "delta_r2": -0.215740158976,
+        "delta_rmse_t_ha": 0.222974159202,
+        "r2_ci_high": -0.15930758372,
+        "r2_ci_low": -0.276842024866
+      }
+    },
+    {
+      "maximum_absolute_error": 2.1890822488046524e-13,
+      "method": "indices_v0_mean_target",
+      "recomputed": {
+        "ci_high": 0.10454720357178109,
+        "ci_low": 0.03652880729073936,
+        "delta_r2": -0.06588687609037691,
+        "delta_rmse_t_ha": 0.07079156596104319,
+        "r2_ci_high": -0.034931790771539094,
+        "r2_ci_low": -0.0947035308090909
+      },
+      "reference": "legacy_indices_mean_max_target",
+      "reported": {
+        "ci_high": 0.104547203572,
+        "ci_low": 0.0365288072907,
+        "delta_r2": -0.0658868760904,
+        "delta_rmse_t_ha": 0.070791565961,
+        "r2_ci_high": -0.0349317907715,
+        "r2_ci_low": -0.0947035308091
+      }
+    },
+    {
+      "maximum_absolute_error": 5.097918615026842e-15,
+      "method": "indices_v0_mean_merged",
+      "recomputed": {
+        "ci_high": 0.0009604215304853644,
+        "ci_low": -0.0017571194611649022,
+        "delta_r2": 0.0004039605112102773,
+        "delta_rmse_t_ha": -0.0004258541254862358,
+        "r2_ci_high": 0.0017163314137754902,
+        "r2_ci_low": -0.0009041959028386087
+      },
+      "reference": "indices_v0_mean_target",
+      "reported": {
+        "ci_high": 0.000960421530484,
+        "ci_low": -0.00175711946117,
+        "delta_r2": 0.000403960511211,
+        "delta_rmse_t_ha": -0.000425854125487,
+        "r2_ci_high": 0.00171633141378,
+        "r2_ci_low": -0.000904195902837
+      }
+    },
+    {
+      "maximum_absolute_error": 1.0312584119986923e-13,
+      "method": "indices_v0_mean_merged",
+      "recomputed": {
+        "ci_high": 0.10797693849910313,
+        "ci_low": 0.03910213687325577,
+        "delta_r2": -0.06873749427854747,
+        "delta_rmse_t_ha": 0.07393499707026607,
+        "r2_ci_high": -0.03817441757778012,
+        "r2_ci_low": -0.09820899582511362
+      },
+      "reference": "legacy_indices_mean_max_merged",
+      "reported": {
+        "ci_high": 0.107976938499,
+        "ci_low": 0.0391021368733,
+        "delta_r2": -0.0687374942785,
+        "delta_rmse_t_ha": 0.0739349970703,
+        "r2_ci_high": -0.0381744175778,
+        "r2_ci_low": -0.0982089958251
+      }
+    },
+    {
+      "maximum_absolute_error": 4.682365606356598e-14,
+      "method": "indices_v1_calendar_mean_target",
+      "recomputed": {
+        "ci_high": -0.03179499113908768,
+        "ci_low": -0.0969840102684866,
+        "delta_r2": 0.05953420104757323,
+        "delta_rmse_t_ha": -0.06384495748987229,
+        "r2_ci_high": 0.08828478563115318,
+        "r2_ci_low": 0.03097948023273283
+      },
+      "reference": "indices_v0_mean_target",
+      "reported": {
+        "ci_high": -0.0317949911391,
+        "ci_low": -0.0969840102685,
+        "delta_r2": 0.0595342010476,
+        "delta_rmse_t_ha": -0.0638449574899,
+        "r2_ci_high": 0.0882847856312,
+        "r2_ci_low": 0.0309794802327
+      }
+    },
+    {
+      "maximum_absolute_error": 3.815697757758585e-14,
+      "method": "indices_v1_calendar_mean_target",
+      "recomputed": {
+        "ci_high": 0.04213934738637283,
+        "ci_low": -0.03215476854876184,
+        "delta_r2": -0.006352675042803679,
+        "delta_rmse_t_ha": 0.006946608471170901,
+        "r2_ci_high": 0.02933828842543533,
+        "r2_ci_low": -0.03894228049278054
+      },
+      "reference": "legacy_indices_mean_max_target",
+      "reported": {
+        "ci_high": 0.0421393473864,
+        "ci_low": -0.0321547685488,
+        "delta_r2": -0.0063526750428,
+        "delta_rmse_t_ha": 0.00694660847117,
+        "r2_ci_high": 0.0293382884254,
+        "r2_ci_low": -0.0389422804928
+      }
+    },
+    {
+      "maximum_absolute_error": 3.715257268499528e-14,
+      "method": "indices_v1_calendar_mean_merged",
+      "recomputed": {
+        "ci_high": 0.013615656736334247,
+        "ci_low": -0.0022569994843602724,
+        "delta_r2": -0.0047090915804598454,
+        "delta_rmse_t_ha": 0.00513214362064196,
+        "r2_ci_high": 0.002174318010518946,
+        "r2_ci_low": -0.012531835733062848
+      },
+      "reference": "indices_v1_calendar_mean_target",
+      "reported": {
+        "ci_high": 0.0136156567363,
+        "ci_low": -0.00225699948436,
+        "delta_r2": -0.00470909158046,
+        "delta_rmse_t_ha": 0.00513214362064,
+        "r2_ci_high": 0.00217431801052,
+        "r2_ci_low": -0.0125318357331
+      }
+    },
+    {
+      "maximum_absolute_error": 4.4096670759330436e-14,
+      "method": "indices_v1_calendar_mean_merged",
+      "recomputed": {
+        "ci_high": -0.02792594452538086,
+        "ci_low": -0.08928605485108904,
+        "delta_r2": 0.05442114895590311,
+        "delta_rmse_t_ha": -0.05828695974374409,
+        "r2_ci_high": 0.08125464673087203,
+        "r2_ci_low": 0.02711915560190994
+      },
+      "reference": "indices_v0_mean_merged",
+      "reported": {
+        "ci_high": -0.0279259445254,
+        "ci_low": -0.0892860548511,
+        "delta_r2": 0.0544211489559,
+        "delta_rmse_t_ha": -0.0582869597437,
+        "r2_ci_high": 0.0812546467309,
+        "r2_ci_low": 0.0271191556019
+      }
+    },
+    {
+      "maximum_absolute_error": 4.4363818174630865e-14,
+      "method": "indices_v1_calendar_mean_merged",
+      "recomputed": {
+        "ci_high": 0.04910245312976539,
+        "ci_low": -0.02017861538578312,
+        "delta_r2": -0.014316345322644364,
+        "delta_rmse_t_ha": 0.01564803732652198,
+        "r2_ci_high": 0.018563562698238903,
+        "r2_ci_low": -0.04526587745916395
+      },
+      "reference": "legacy_indices_mean_max_merged",
+      "reported": {
+        "ci_high": 0.0491024531298,
+        "ci_low": -0.0201786153858,
+        "delta_r2": -0.0143163453226,
+        "delta_rmse_t_ha": 0.0156480373265,
+        "r2_ci_high": 0.0185635626982,
+        "r2_ci_low": -0.0452658774592
+      }
+    },
+    {
+      "maximum_absolute_error": 4.408140519274184e-13,
+      "method": "indices_v2_max_target",
+      "recomputed": {
+        "ci_high": -0.029821866671202922,
+        "ci_low": -0.10702536209144081,
+        "delta_r2": 0.06421736683598966,
+        "delta_rmse_t_ha": -0.0689633695983396,
+        "r2_ci_high": 0.09701828368787388,
+        "r2_ci_low": 0.02917790178601588
+      },
+      "reference": "indices_v0_mean_target",
+      "reported": {
+        "ci_high": -0.0298218666712,
+        "ci_low": -0.107025362091,
+        "delta_r2": 0.064217366836,
+        "delta_rmse_t_ha": -0.0689633695983,
+        "r2_ci_high": 0.0970182836879,
+        "r2_ci_low": 0.029177901786
+      }
+    },
+    {
+      "maximum_absolute_error": 4.389891228306908e-14,
+      "method": "indices_v2_max_target",
+      "recomputed": {
+        "ci_high": 0.02228075511968006,
+        "ci_low": -0.018079552753883444,
+        "delta_r2": -0.001669509254387247,
+        "delta_rmse_t_ha": 0.0018281963627035935,
+        "r2_ci_high": 0.016640901533356102,
+        "r2_ci_low": -0.020511389289421565
+      },
+      "reference": "legacy_indices_mean_max_target",
+      "reported": {
+        "ci_high": 0.0222807551197,
+        "ci_low": -0.0180795527539,
+        "delta_r2": -0.00166950925439,
+        "delta_rmse_t_ha": 0.0018281963627,
+        "r2_ci_high": 0.0166409015334,
+        "r2_ci_low": -0.0205113892894
+      }
+    },
+    {
+      "maximum_absolute_error": 3.251739155718525e-15,
+      "method": "indices_v2_max_merged",
+      "recomputed": {
+        "ci_high": 6.002680235816479e-05,
+        "ci_low": -0.0016753998743032517,
+        "delta_r2": 0.0007040076385529392,
+        "delta_rmse_t_ha": -0.0007706969873737535,
+        "r2_ci_high": 0.0014731351511592984,
+        "r2_ci_low": -5.9101228168462194e-05
+      },
+      "reference": "indices_v2_max_target",
+      "reported": {
+        "ci_high": 6.00268023589e-05,
+        "ci_low": -0.0016753998743,
+        "delta_r2": 0.000704007638552,
+        "delta_rmse_t_ha": -0.000770696987372,
+        "r2_ci_high": 0.00147313515116,
+        "r2_ci_low": -5.9101228169e-05
+      }
+    },
+    {
+      "maximum_absolute_error": 5.809241976351132e-14,
+      "method": "indices_v2_max_merged",
+      "recomputed": {
+        "ci_high": -0.029509126913421942,
+        "ci_low": -0.10768530491205809,
+        "delta_r2": 0.06451741396333233,
+        "delta_rmse_t_ha": -0.06930821246022711,
+        "r2_ci_high": 0.09779025598788706,
+        "r2_ci_low": 0.02894877945860476
+      },
+      "reference": "indices_v0_mean_merged",
+      "reported": {
+        "ci_high": -0.0295091269134,
+        "ci_low": -0.107685304912,
+        "delta_r2": 0.0645174139633,
+        "delta_rmse_t_ha": -0.0693082124602,
+        "r2_ci_high": 0.0977902559879,
+        "r2_ci_low": 0.0289487794586
+      }
+    },
+    {
+      "maximum_absolute_error": 4.752795379481256e-14,
+      "method": "indices_v2_max_merged",
+      "recomputed": {
+        "ci_high": 0.023582112930616534,
+        "ci_low": -0.013671303966075438,
+        "delta_r2": -0.004220080315215147,
+        "delta_rmse_t_ha": 0.004626784610038959,
+        "r2_ci_high": 0.012602541303232837,
+        "r2_ci_low": -0.02183189583404753
+      },
+      "reference": "legacy_indices_mean_max_merged",
+      "reported": {
+        "ci_high": 0.0235821129306,
+        "ci_low": -0.0136713039661,
+        "delta_r2": -0.00422008031521,
+        "delta_rmse_t_ha": 0.00462678461004,
+        "r2_ci_high": 0.0126025413032,
+        "r2_ci_low": -0.021831895834
+      }
+    },
+    {
+      "maximum_absolute_error": 3.2460145682478014e-14,
+      "method": "indices_v3_median_target",
+      "recomputed": {
+        "ci_high": 0.09960705332893247,
+        "ci_low": 0.03173630922148145,
+        "delta_r2": -0.0634127844522685,
+        "delta_rmse_t_ha": 0.0656867855243124,
+        "r2_ci_high": -0.03148451471748573,
+        "r2_ci_low": -0.09558727489049082
+      },
+      "reference": "indices_v0_mean_target",
+      "reported": {
+        "ci_high": 0.0996070533289,
+        "ci_low": 0.0317363092215,
+        "delta_r2": -0.0634127844523,
+        "delta_rmse_t_ha": 0.0656867855243,
+        "r2_ci_high": -0.0314845147175,
+        "r2_ci_low": -0.0955872748905
+      }
+    },
+    {
+      "maximum_absolute_error": 3.55576679211822e-13,
+      "method": "indices_v3_median_target",
+      "recomputed": {
+        "ci_high": 0.18810020960203053,
+        "ci_low": 0.08369673058781113,
+        "delta_r2": -0.1292996605426454,
+        "delta_rmse_t_ha": 0.1364783514853556,
+        "r2_ci_high": -0.08512673870962993,
+        "r2_ci_low": -0.17270033060072917
+      },
+      "reference": "legacy_indices_mean_max_target",
+      "reported": {
+        "ci_high": 0.188100209602,
+        "ci_low": 0.0836967305878,
+        "delta_r2": -0.129299660543,
+        "delta_rmse_t_ha": 0.136478351485,
+        "r2_ci_high": -0.0851267387096,
+        "r2_ci_low": -0.172700330601
+      }
+    },
+    {
+      "maximum_absolute_error": 4.591162519607117e-15,
+      "method": "indices_v3_median_merged",
+      "recomputed": {
+        "ci_high": 0.0010601701229245911,
+        "ci_low": -0.001511840570423778,
+        "delta_r2": 0.00011501345523179385,
+        "delta_rmse_t_ha": -0.00011711741681863508,
+        "r2_ci_high": 0.001496479488608393,
+        "r2_ci_low": -0.0010605796510272548
+      },
+      "reference": "indices_v3_median_target",
+      "reported": {
+        "ci_high": 0.00106017012292,
+        "ci_low": -0.00151184057042,
+        "delta_r2": 0.000115013455229,
+        "delta_rmse_t_ha": -0.000117117416816,
+        "r2_ci_high": 0.00149647948861,
+        "r2_ci_low": -0.00106057965103
+      }
+    },
+    {
+      "maximum_absolute_error": 1.6535384173010925e-13,
+      "method": "indices_v3_median_merged",
+      "recomputed": {
+        "ci_high": 0.10036709726983464,
+        "ci_low": 0.031995015390555256,
+        "delta_r2": -0.06370173150824698,
+        "delta_rmse_t_ha": 0.06599552223298,
+        "r2_ci_high": -0.031798078307247235,
+        "r2_ci_low": -0.09643856643907404
+      },
+      "reference": "indices_v0_mean_merged",
+      "reported": {
+        "ci_high": 0.10036709727,
+        "ci_low": 0.0319950153906,
+        "delta_r2": -0.0637017315082,
+        "delta_rmse_t_ha": 0.065995522233,
+        "r2_ci_high": -0.0317980783072,
+        "r2_ci_low": -0.0964385664391
+      }
+    },
+    {
+      "maximum_absolute_error": 4.5036196993919475e-13,
+      "method": "indices_v3_median_merged",
+      "recomputed": {
+        "ci_high": 0.19192784891513,
+        "ci_low": 0.08660719406210118,
+        "delta_r2": -0.13243922578679446,
+        "delta_rmse_t_ha": 0.13993051930324607,
+        "r2_ci_high": -0.08893265598862368,
+        "r2_ci_low": -0.17682705650754965
+      },
+      "reference": "legacy_indices_mean_max_merged",
+      "reported": {
+        "ci_high": 0.191927848915,
+        "ci_low": 0.0866071940621,
+        "delta_r2": -0.132439225787,
+        "delta_rmse_t_ha": 0.139930519303,
+        "r2_ci_high": -0.0889326559886,
+        "r2_ci_low": -0.176827056508
+      }
+    },
+    {
+      "maximum_absolute_error": 3.4849900742983664e-13,
+      "method": "indices_v3_mode_target",
+      "recomputed": {
+        "ci_high": 0.15790220494273258,
+        "ci_low": 0.04754227535244114,
+        "delta_r2": -0.09964319127947041,
+        "delta_rmse_t_ha": 0.10223340028031225,
+        "r2_ci_high": -0.04733127101606374,
+        "r2_ci_low": -0.1523950732166515
+      },
+      "reference": "indices_v0_mean_target",
+      "reported": {
+        "ci_high": 0.157902204943,
+        "ci_low": 0.0475422753524,
+        "delta_r2": -0.0996431912795,
+        "delta_rmse_t_ha": 0.10223340028,
+        "r2_ci_high": -0.0473312710161,
+        "r2_ci_low": -0.152395073217
+      }
+    },
+    {
+      "maximum_absolute_error": 3.5543790133374387e-13,
+      "method": "indices_v3_mode_target",
+      "recomputed": {
+        "ci_high": 0.23691864577603244,
+        "ci_low": 0.10756564244599802,
+        "delta_r2": -0.16553006736984732,
+        "delta_rmse_t_ha": 0.17302496624135544,
+        "r2_ci_high": -0.10695422797929137,
+        "r2_ci_low": -0.22127638279581988
+      },
+      "reference": "legacy_indices_mean_max_target",
+      "reported": {
+        "ci_high": 0.236918645776,
+        "ci_low": 0.107565642446,
+        "delta_r2": -0.16553006737,
+        "delta_rmse_t_ha": 0.173024966241,
+        "r2_ci_high": -0.106954227979,
+        "r2_ci_low": -0.221276382796
+      }
+    },
+    {
+      "maximum_absolute_error": 3.599551212651875e-15,
+      "method": "indices_v3_mode_merged",
+      "recomputed": {
+        "ci_high": -4.300730034202216e-06,
+        "ci_low": -0.001217428922306979,
+        "delta_r2": 0.0005927142642664363,
+        "delta_rmse_t_ha": -0.0005924299179385084,
+        "r2_ci_high": 0.0012432050042164005,
+        "r2_ci_low": 4.209122376222516e-06
+      },
+      "reference": "indices_v3_mode_target",
+      "reported": {
+        "ci_high": -4.30073003503e-06,
+        "ci_low": -0.00121742892231,
+        "delta_r2": 0.000592714264266,
+        "delta_rmse_t_ha": -0.000592429917938,
+        "r2_ci_high": 0.00124320500422,
+        "r2_ci_low": 4.20912237707e-06
+      }
+    },
+    {
+      "maximum_absolute_error": 1.9617640845126516e-13,
+      "method": "indices_v3_mode_merged",
+      "recomputed": {
+        "ci_high": 0.15850165426692706,
+        "ci_low": 0.047593595687838844,
+        "delta_r2": -0.09945443752641425,
+        "delta_rmse_t_ha": 0.10206682448785998,
+        "r2_ci_high": -0.047411826171629506,
+        "r2_ci_low": -0.15231095413980383
+      },
+      "reference": "indices_v0_mean_merged",
+      "reported": {
+        "ci_high": 0.158501654267,
+        "ci_low": 0.0475935956878,
+        "delta_r2": -0.0994544375264,
+        "delta_rmse_t_ha": 0.102066824488,
+        "r2_ci_high": -0.0474118261716,
+        "r2_ci_low": -0.15231095414
+      }
+    },
+    {
+      "maximum_absolute_error": 2.8821389719269064e-13,
+      "method": "indices_v3_mode_merged",
+      "recomputed": {
+        "ci_high": 0.23994043735171178,
+        "ci_low": 0.10987833918718806,
+        "delta_r2": -0.16819193180496173,
+        "delta_rmse_t_ha": 0.17600182155812605,
+        "r2_ci_high": -0.10958897017976141,
+        "r2_ci_low": -0.22488020671084336
+      },
+      "reference": "legacy_indices_mean_max_merged",
+      "reported": {
+        "ci_high": 0.239940437352,
+        "ci_low": 0.109878339187,
+        "delta_r2": -0.168191931805,
+        "delta_rmse_t_ha": 0.176001821558,
+        "r2_ci_high": -0.10958897018,
+        "r2_ci_low": -0.224880206711
+      }
+    },
+    {
+      "maximum_absolute_error": 1.919471526168337e-15,
+      "method": "legacy_indices_mean_max_merged",
+      "recomputed": {
+        "ci_high": 0.000716437481482023,
+        "ci_low": -0.008390168190451425,
+        "delta_r2": 0.003254578699380839,
+        "delta_rmse_t_ha": -0.0035692852347091186,
+        "r2_ci_high": 0.007580968645478833,
+        "r2_ci_low": -0.0006609949597080805
+      },
+      "reference": "legacy_indices_mean_max_target",
+      "reported": {
+        "ci_high": 0.000716437481482,
+        "ci_low": -0.00839016819045,
+        "delta_r2": 0.00325457869938,
+        "delta_rmse_t_ha": -0.00356928523471,
+        "r2_ci_high": 0.00758096864548,
+        "r2_ci_low": -0.00066099495971
+      }
+    },
+    {
+      "maximum_absolute_error": 1.6344148257000002e-13,
+      "method": "bands_v0_mean_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "bands_v0_mean_target",
+      "reported": {
+        "ci_high": 1.6344148257000002e-13,
+        "ci_low": -1.51001433579e-13,
+        "delta_r2": -8.770761894539999e-15,
+        "delta_rmse_t_ha": 9.54791801178e-15,
+        "r2_ci_high": 1.40115696823e-13,
+        "r2_ci_low": -1.5022705302e-13
+      }
+    },
+    {
+      "maximum_absolute_error": 1.9355350655558823e-13,
+      "method": "bands_v0_mean_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.06392538024547953,
+        "ci_low": -0.05602656955253655,
+        "delta_r2": -0.0015229020664553339,
+        "delta_rmse_t_ha": 0.001667728573170102,
+        "r2_ci_high": 0.05135135282662338,
+        "r2_ci_low": -0.059446189463593556
+      },
+      "reference": "legacy_indices_mean_max_all_lacuna",
+      "reported": {
+        "ci_high": 0.0639253802454,
+        "ci_low": -0.0560265695524,
+        "delta_r2": -0.00152290206638,
+        "delta_rmse_t_ha": 0.00166772857309,
+        "r2_ci_high": 0.0513513528267,
+        "r2_ci_low": -0.0594461894634
+      }
+    },
+    {
+      "maximum_absolute_error": 2.15844009332e-13,
+      "method": "bands_v0_mean_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "bands_v0_mean_merged",
+      "reported": {
+        "ci_high": 8.216760605249999e-14,
+        "ci_low": -2.15844009332e-13,
+        "delta_r2": 6.42819131258e-14,
+        "delta_rmse_t_ha": -7.038813976119999e-14,
+        "r2_ci_high": 1.96181959566e-13,
+        "r2_ci_low": -7.652489752989999e-14
+      }
+    },
+    {
+      "maximum_absolute_error": 8.754574756103528e-14,
+      "method": "bands_v0_mean_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.000975469648838106,
+        "ci_low": -0.0009145066934254543,
+        "delta_r2": -2.8061765975584407e-05,
+        "delta_rmse_t_ha": 3.0715901848221705e-05,
+        "r2_ci_high": 0.0008305405624159125,
+        "r2_ci_low": -0.0008943131279225636
+      },
+      "reference": "bands_v0_mean_all_lacuna",
+      "reported": {
+        "ci_high": 0.000975469648901,
+        "ci_low": -0.000914506693513,
+        "delta_r2": -2.80617659052e-05,
+        "delta_rmse_t_ha": 3.07159017712e-05,
+        "r2_ci_high": 0.000830540562335,
+        "r2_ci_low": -0.000894313127866
+      }
+    },
+    {
+      "maximum_absolute_error": 9.985068327722502e-14,
+      "method": "bands_v0_mean_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.0673594586001803,
+        "ci_low": -0.05243104833892345,
+        "delta_r2": -0.004805542531811757,
+        "delta_rmse_t_ha": 0.005267729709727442,
+        "r2_ci_high": 0.04777491032839985,
+        "r2_ci_low": -0.06285258060722401
+      },
+      "reference": "legacy_indices_mean_max_all_zimbabwe",
+      "reported": {
+        "ci_high": 0.0673594586002,
+        "ci_low": -0.0524310483389,
+        "delta_r2": -0.00480554253185,
+        "delta_rmse_t_ha": 0.00526772970977,
+        "r2_ci_high": 0.0477749103283,
+        "r2_ci_low": -0.0628525806073
+      }
+    },
+    {
+      "maximum_absolute_error": 2.34495756146e-13,
+      "method": "bands_v1_calendar_mean_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "bands_v1_calendar_mean_target",
+      "reported": {
+        "ci_high": 8.68416449862e-14,
+        "ci_low": -2.34495756146e-13,
+        "delta_r2": 6.772360450209999e-14,
+        "delta_rmse_t_ha": -7.616129948929999e-14,
+        "r2_ci_high": 2.14278594868e-13,
+        "r2_ci_low": -7.838174553849999e-14
+      }
+    },
+    {
+      "maximum_absolute_error": 1.2612133559741778e-13,
+      "method": "bands_v1_calendar_mean_all_lacuna",
+      "recomputed": {
+        "ci_high": -0.008586534434270076,
+        "ci_low": -0.08053995641654299,
+        "delta_r2": 0.04011401876393106,
+        "delta_rmse_t_ha": -0.04445796357580689,
+        "r2_ci_high": 0.07173601715807387,
+        "r2_ci_low": 0.007839969720499397
+      },
+      "reference": "bands_v0_mean_all_lacuna",
+      "reported": {
+        "ci_high": -0.00858653443432,
+        "ci_low": -0.0805399564166,
+        "delta_r2": 0.040114018764,
+        "delta_rmse_t_ha": -0.0444579635759,
+        "r2_ci_high": 0.0717360171582,
+        "r2_ci_low": 0.00783996972054
+      }
+    },
+    {
+      "maximum_absolute_error": 2.3806304150220114e-13,
+      "method": "bands_v1_calendar_mean_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.02123935505964857,
+        "ci_low": -0.09899293898728523,
+        "delta_r2": 0.038591116697475725,
+        "delta_rmse_t_ha": -0.04279023500263679,
+        "r2_ci_high": 0.08893882366488165,
+        "r2_ci_low": -0.020215230123038063
+      },
+      "reference": "legacy_indices_mean_max_all_lacuna",
+      "reported": {
+        "ci_high": 0.0212393550596,
+        "ci_low": -0.0989929389873,
+        "delta_r2": 0.0385911166976,
+        "delta_rmse_t_ha": -0.0427902350028,
+        "r2_ci_high": 0.088938823665,
+        "r2_ci_low": -0.0202152301228
+      }
+    },
+    {
+      "maximum_absolute_error": 1.55891966003e-13,
+      "method": "bands_v1_calendar_mean_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "bands_v1_calendar_mean_merged",
+      "reported": {
+        "ci_high": 9.217626661949999e-14,
+        "ci_low": -1.55891966003e-13,
+        "delta_r2": 2.8532731732899996e-14,
+        "delta_rmse_t_ha": -3.21964677141e-14,
+        "r2_ci_high": 1.37248545862e-13,
+        "r2_ci_low": -8.561207298639999e-14
+      }
+    },
+    {
+      "maximum_absolute_error": 2.389052497497879e-13,
+      "method": "bands_v1_calendar_mean_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.0013060173066107175,
+        "ci_low": -0.0027709912184889053,
+        "delta_r2": 0.0007194642832243359,
+        "delta_rmse_t_ha": -0.0008076665014595807,
+        "r2_ci_high": 0.0024946731265577046,
+        "r2_ci_low": -0.0011745698669103077
+      },
+      "reference": "bands_v1_calendar_mean_all_lacuna",
+      "reported": {
+        "ci_high": 0.0013060173068,
+        "ci_low": -0.00277099121825,
+        "delta_r2": 0.000719464283186,
+        "delta_rmse_t_ha": -0.000807666501417,
+        "r2_ci_high": 0.00249467312661,
+        "r2_ci_low": -0.00117456986708
+      }
+    },
+    {
+      "maximum_absolute_error": 5.825895321720509e-14,
+      "method": "bands_v1_calendar_mean_all_zimbabwe",
+      "recomputed": {
+        "ci_high": -0.009250342435756455,
+        "ci_low": -0.08141538395104174,
+        "delta_r2": 0.04086154481313098,
+        "delta_rmse_t_ha": -0.045296345979114694,
+        "r2_ci_high": 0.07213902818284097,
+        "r2_ci_low": 0.008690681720603569
+      },
+      "reference": "bands_v0_mean_all_zimbabwe",
+      "reported": {
+        "ci_high": -0.00925034243574,
+        "ci_low": -0.0814153839511,
+        "delta_r2": 0.0408615448131,
+        "delta_rmse_t_ha": -0.0452963459791,
+        "r2_ci_high": 0.0721390281828,
+        "r2_ci_low": 0.00869068172061
+      }
+    },
+    {
+      "maximum_absolute_error": 2.476248373017853e-13,
+      "method": "bands_v1_calendar_mean_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.024057308802952374,
+        "ci_low": -0.09665901934580881,
+        "delta_r2": 0.03605600228131922,
+        "delta_rmse_t_ha": -0.04002861626938725,
+        "r2_ci_high": 0.08632315570810274,
+        "r2_ci_low": -0.022328854676748992
+      },
+      "reference": "legacy_indices_mean_max_all_zimbabwe",
+      "reported": {
+        "ci_high": 0.0240573088032,
+        "ci_low": -0.0966590193457,
+        "delta_r2": 0.0360560022812,
+        "delta_rmse_t_ha": -0.0400286162693,
+        "r2_ci_high": 0.0863231557081,
+        "r2_ci_low": -0.0223288546768
+      }
+    },
+    {
+      "maximum_absolute_error": 1.96526128704e-13,
+      "method": "bands_v2_max_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "bands_v2_max_target",
+      "reported": {
+        "ci_high": 7.376321775609999e-14,
+        "ci_low": -1.96526128704e-13,
+        "delta_r2": 5.6510351953399995e-14,
+        "delta_rmse_t_ha": -5.88418203051e-14,
+        "r2_ci_high": 1.87183601952e-13,
+        "r2_ci_low": -7.565614801309999e-14
+      }
+    },
+    {
+      "maximum_absolute_error": 6.394607066084745e-13,
+      "method": "bands_v2_max_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.14172890204263947,
+        "ci_low": 0.05318747259980683,
+        "delta_r2": -0.0900962979845854,
+        "delta_rmse_t_ha": 0.09605353429396613,
+        "r2_ci_high": -0.050625023701208686,
+        "r2_ci_low": -0.13186004887257485
+      },
+      "reference": "bands_v0_mean_all_lacuna",
+      "reported": {
+        "ci_high": 0.141728902042,
+        "ci_low": 0.0531874725999,
+        "delta_r2": -0.0900962979845,
+        "delta_rmse_t_ha": 0.0960535342939,
+        "r2_ci_high": -0.050625023701,
+        "r2_ci_low": -0.131860048873
+      }
+    },
+    {
+      "maximum_absolute_error": 3.0464519795714295e-13,
+      "method": "bands_v2_max_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.15932947456924265,
+        "ci_low": 0.041332324392855294,
+        "delta_r2": -0.09161920005104074,
+        "delta_rmse_t_ha": 0.09772126286713623,
+        "r2_ci_high": -0.0404926296741041,
+        "r2_ci_low": -0.15165944832769535
+      },
+      "reference": "legacy_indices_mean_max_all_lacuna",
+      "reported": {
+        "ci_high": 0.159329474569,
+        "ci_low": 0.0413323243928,
+        "delta_r2": -0.0916192000509,
+        "delta_rmse_t_ha": 0.097721262867,
+        "r2_ci_high": -0.040492629674,
+        "r2_ci_low": -0.151659448328
+      }
+    },
+    {
+      "maximum_absolute_error": 2.94470003936e-13,
+      "method": "bands_v2_max_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "bands_v2_max_merged",
+      "reported": {
+        "ci_high": 2.94470003936e-13,
+        "ci_low": -2.5129898162399998e-14,
+        "delta_r2": -1.30784272301e-13,
+        "delta_rmse_t_ha": 1.35891298214e-13,
+        "r2_ci_high": 2.60985677514e-14,
+        "r2_ci_low": -2.8765878568e-13
+      }
+    },
+    {
+      "maximum_absolute_error": 2.6187038648650685e-13,
+      "method": "bands_v2_max_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.004342564341576347,
+        "ci_low": -0.009875306200071871,
+        "delta_r2": 0.002501930105247796,
+        "delta_rmse_t_ha": -0.0026015261792198263,
+        "r2_ci_high": 0.009861212143729226,
+        "r2_ci_low": -0.00416798684733391
+      },
+      "reference": "bands_v2_max_all_lacuna",
+      "reported": {
+        "ci_high": 0.0043425643418,
+        "ci_low": -0.00987530619981,
+        "delta_r2": 0.00250193010506,
+        "delta_rmse_t_ha": -0.00260152617902,
+        "r2_ci_high": 0.00986121214347,
+        "r2_ci_low": -0.00416798684739
+      }
+    },
+    {
+      "maximum_absolute_error": 4.0667469392019484e-13,
+      "method": "bands_v2_max_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.14088542472825422,
+        "ci_low": 0.050518156443178516,
+        "delta_r2": -0.08756630611336202,
+        "delta_rmse_t_ha": 0.09342129221289808,
+        "r2_ci_high": -0.04830366666399725,
+        "r2_ci_low": -0.13081994231340668
+      },
+      "reference": "bands_v0_mean_all_zimbabwe",
+      "reported": {
+        "ci_high": 0.140885424728,
+        "ci_low": 0.0505181564434,
+        "delta_r2": -0.0875663061136,
+        "delta_rmse_t_ha": 0.0934212922131,
+        "r2_ci_high": -0.0483036666642,
+        "r2_ci_low": -0.130819942313
+      }
+    },
+    {
+      "maximum_absolute_error": 4.3373638014543303e-13,
+      "method": "bands_v2_max_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.16064833259256625,
+        "ci_low": 0.04392340309822633,
+        "delta_r2": -0.09237184864517378,
+        "delta_rmse_t_ha": 0.09868902192262552,
+        "r2_ci_high": -0.04267885205787978,
+        "r2_ci_low": -0.15186056686760027
+      },
+      "reference": "legacy_indices_mean_max_all_zimbabwe",
+      "reported": {
+        "ci_high": 0.160648332593,
+        "ci_low": 0.0439234030984,
+        "delta_r2": -0.0923718486454,
+        "delta_rmse_t_ha": 0.0986890219229,
+        "r2_ci_high": -0.0426788520583,
+        "r2_ci_low": -0.151860566868
+      }
+    },
+    {
+      "maximum_absolute_error": 1.75642833611e-13,
+      "method": "bands_v3_median_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "bands_v3_median_target",
+      "reported": {
+        "ci_high": 1.75642833611e-13,
+        "ci_low": -1.44784184641e-13,
+        "delta_r2": -1.1435297153599999e-14,
+        "delta_rmse_t_ha": 1.1546319456099998e-14,
+        "r2_ci_high": 1.39019351586e-13,
+        "r2_ci_low": -1.7542078900600001e-13
+      }
+    },
+    {
+      "maximum_absolute_error": 3.9959702213820947e-13,
+      "method": "bands_v3_median_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.194792332598204,
+        "ci_low": 0.09128784126293493,
+        "delta_r2": -0.13509207003175616,
+        "delta_rmse_t_ha": 0.1422452336173996,
+        "r2_ci_high": -0.08760475002584729,
+        "r2_ci_low": -0.18553232544960271
+      },
+      "reference": "bands_v0_mean_all_lacuna",
+      "reported": {
+        "ci_high": 0.194792332598,
+        "ci_low": 0.0912878412629,
+        "delta_r2": -0.135092070032,
+        "delta_rmse_t_ha": 0.142245233617,
+        "r2_ci_high": -0.0876047500258,
+        "r2_ci_low": -0.18553232545
+      }
+    },
+    {
+      "maximum_absolute_error": 5.697109450863991e-13,
+      "method": "bands_v3_median_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.21391154870911125,
+        "ci_low": 0.08057355208147567,
+        "delta_r2": -0.1366149720982115,
+        "delta_rmse_t_ha": 0.1439129621905697,
+        "r2_ci_high": -0.07950258723809647,
+        "r2_ci_low": -0.2031325224223667
+      },
+      "reference": "legacy_indices_mean_max_all_lacuna",
+      "reported": {
+        "ci_high": 0.213911548709,
+        "ci_low": 0.0805735520814,
+        "delta_r2": -0.136614972098,
+        "delta_rmse_t_ha": 0.14391296219,
+        "r2_ci_high": -0.0795025872382,
+        "r2_ci_low": -0.203132522422
+      }
+    },
+    {
+      "maximum_absolute_error": 1.938449401e-13,
+      "method": "bands_v3_median_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "bands_v3_median_merged",
+      "reported": {
+        "ci_high": 1.89431803577e-13,
+        "ci_low": -1.15030207581e-13,
+        "delta_r2": -3.20854454117e-14,
+        "delta_rmse_t_ha": 3.2640556924e-14,
+        "r2_ci_high": 1.17131304656e-13,
+        "r2_ci_low": -1.938449401e-13
+      }
+    },
+    {
+      "maximum_absolute_error": 3.02135703608708e-14,
+      "method": "bands_v3_median_all_zimbabwe",
+      "recomputed": {
+        "ci_high": -3.7842916090564106e-05,
+        "ci_low": -0.0007368046929037864,
+        "delta_r2": 0.00036724303464796826,
+        "delta_rmse_t_ha": -0.0003725529329354771,
+        "r2_ci_high": 0.0007524379102603257,
+        "r2_ci_low": 3.583691623247066e-05
+      },
+      "reference": "bands_v3_median_all_lacuna",
+      "reported": {
+        "ci_high": -3.78429160851e-05,
+        "ci_low": -0.000736804692934,
+        "delta_r2": 0.000367243034627,
+        "delta_rmse_t_ha": -0.000372552932914,
+        "r2_ci_high": 0.000752437910282,
+        "r2_ci_low": 3.58369162274e-05
+      }
+    },
+    {
+      "maximum_absolute_error": 3.8410941094468853e-13,
+      "method": "bands_v3_median_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.19447799987602513,
+        "ci_low": 0.09031904932729672,
+        "delta_r2": -0.1346967652311326,
+        "delta_rmse_t_ha": 0.1418419647826159,
+        "r2_ci_high": -0.0868358800344694,
+        "r2_ci_low": -0.18546790461125554
+      },
+      "reference": "bands_v0_mean_all_zimbabwe",
+      "reported": {
+        "ci_high": 0.194477999876,
+        "ci_low": 0.0903190493273,
+        "delta_r2": -0.134696765231,
+        "delta_rmse_t_ha": 0.141841964783,
+        "r2_ci_high": -0.0868358800345,
+        "r2_ci_low": -0.185467904611
+      }
+    },
+    {
+      "maximum_absolute_error": 3.4333647036532966e-13,
+      "method": "bands_v3_median_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.2180722124632782,
+        "ci_low": 0.08450528112065012,
+        "delta_r2": -0.13950230776294437,
+        "delta_rmse_t_ha": 0.14710969449234335,
+        "r2_ci_high": -0.08169245903111375,
+        "r2_ci_low": -0.20712008832129833
+      },
+      "reference": "legacy_indices_mean_max_all_zimbabwe",
+      "reported": {
+        "ci_high": 0.218072212463,
+        "ci_low": 0.0845052811208,
+        "delta_r2": -0.139502307763,
+        "delta_rmse_t_ha": 0.147109694492,
+        "r2_ci_high": -0.0816924590312,
+        "r2_ci_low": -0.207120088321
+      }
+    },
+    {
+      "maximum_absolute_error": 1.62103663826e-13,
+      "method": "bands_v3_mode_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "bands_v3_mode_target",
+      "reported": {
+        "ci_high": 1.53882462328e-13,
+        "ci_low": -1.43918210682e-13,
+        "delta_r2": -1.3544720900399999e-14,
+        "delta_rmse_t_ha": 1.28785870857e-14,
+        "r2_ci_high": 1.50995882464e-13,
+        "r2_ci_low": -1.62103663826e-13
+      }
+    },
+    {
+      "maximum_absolute_error": 3.2568392427378967e-13,
+      "method": "bands_v3_mode_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.2903678346581333,
+        "ci_low": 0.1469190252360257,
+        "delta_r2": -0.209036688050247,
+        "delta_rmse_t_ha": 0.21585576836178588,
+        "r2_ci_high": -0.14855911981599096,
+        "r2_ci_low": -0.2751621146373257
+      },
+      "reference": "bands_v0_mean_all_lacuna",
+      "reported": {
+        "ci_high": 0.290367834658,
+        "ci_low": 0.146919025236,
+        "delta_r2": -0.20903668805,
+        "delta_rmse_t_ha": 0.215855768362,
+        "r2_ci_high": -0.148559119816,
+        "r2_ci_low": -0.275162114637
+      }
+    },
+    {
+      "maximum_absolute_error": 4.0939474033052647e-13,
+      "method": "bands_v3_mode_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.28382210338215014,
+        "ci_low": 0.15439727993361915,
+        "delta_r2": -0.21055959011670233,
+        "delta_rmse_t_ha": 0.21752349693495598,
+        "r2_ci_high": -0.1535294483184094,
+        "r2_ci_low": -0.2723319152542184
+      },
+      "reference": "legacy_indices_mean_max_all_lacuna",
+      "reported": {
+        "ci_high": 0.283822103382,
+        "ci_low": 0.154397279934,
+        "delta_r2": -0.210559590117,
+        "delta_rmse_t_ha": 0.217523496935,
+        "r2_ci_high": -0.153529448318,
+        "r2_ci_low": -0.272331915254
+      }
+    },
+    {
+      "maximum_absolute_error": 1.76758607751e-13,
+      "method": "bands_v3_mode_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "bands_v3_mode_merged",
+      "reported": {
+        "ci_high": 1.11488596133e-13,
+        "ci_low": -1.70985448023e-13,
+        "delta_r2": 3.35287353437e-14,
+        "delta_rmse_t_ha": -3.2862601528899995e-14,
+        "r2_ci_high": 1.76758607751e-13,
+        "r2_ci_low": -1.15479847906e-13
+      }
+    },
+    {
+      "maximum_absolute_error": 1.3780643293159756e-13,
+      "method": "bands_v3_mode_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.011372248551389779,
+        "ci_low": -0.00551954103112734,
+        "delta_r2": -0.001925990160048352,
+        "delta_rmse_t_ha": 0.0018813770325563084,
+        "r2_ci_high": 0.005781139768347807,
+        "r2_ci_low": -0.011552908622406183
+      },
+      "reference": "bands_v3_mode_all_lacuna",
+      "reported": {
+        "ci_high": 0.0113722485514,
+        "ci_low": -0.00551954103112,
+        "delta_r2": -0.00192599016,
+        "delta_rmse_t_ha": 0.00188137703251,
+        "r2_ci_high": 0.00578113976821,
+        "r2_ci_low": -0.0115529086223
+      }
+    },
+    {
+      "maximum_absolute_error": 5.060396546241464e-13,
+      "method": "bands_v3_mode_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.2926264910007693,
+        "ci_low": 0.1478123346070044,
+        "delta_r2": -0.21093461644431977,
+        "delta_rmse_t_ha": 0.21770642949249397,
+        "r2_ci_high": -0.14873162319561595,
+        "r2_ci_low": -0.2770655114776209
+      },
+      "reference": "bands_v0_mean_all_zimbabwe",
+      "reported": {
+        "ci_high": 0.292626491001,
+        "ci_low": 0.147812334607,
+        "delta_r2": -0.210934616444,
+        "delta_rmse_t_ha": 0.217706429493,
+        "r2_ci_high": -0.148731623196,
+        "r2_ci_low": -0.277065511478
+      }
+    },
+    {
+      "maximum_absolute_error": 5.974110095507967e-13,
+      "method": "bands_v3_mode_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.2905490605194026,
+        "ci_low": 0.15953787997790464,
+        "delta_r2": -0.21574015897613152,
+        "delta_rmse_t_ha": 0.2229741592022214,
+        "r2_ci_high": -0.15930758371991752,
+        "r2_ci_low": -0.2768420248663033
+      },
+      "reference": "legacy_indices_mean_max_all_zimbabwe",
+      "reported": {
+        "ci_high": 0.29054906052,
+        "ci_low": 0.159537879978,
+        "delta_r2": -0.215740158976,
+        "delta_rmse_t_ha": 0.222974159202,
+        "r2_ci_high": -0.15930758372,
+        "r2_ci_low": -0.276842024866
+      }
+    },
+    {
+      "maximum_absolute_error": 2.4814317267600003e-13,
+      "method": "indices_v0_mean_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "indices_v0_mean_target",
+      "reported": {
+        "ci_high": 2.48029374816e-13,
+        "ci_low": -6.619149672819999e-14,
+        "delta_r2": -7.77156117238e-14,
+        "delta_rmse_t_ha": 8.193445921729999e-14,
+        "r2_ci_high": 6.074307723479999e-14,
+        "r2_ci_low": -2.4814317267600003e-13
+      }
+    },
+    {
+      "maximum_absolute_error": 2.3935714521527984e-13,
+      "method": "indices_v0_mean_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.10454720357178109,
+        "ci_low": 0.03652880729073936,
+        "delta_r2": -0.06588687609037691,
+        "delta_rmse_t_ha": 0.07079156596104319,
+        "r2_ci_high": -0.034931790771539094,
+        "r2_ci_low": -0.0947035308090909
+      },
+      "reference": "legacy_indices_mean_max_all_lacuna",
+      "reported": {
+        "ci_high": 0.104547203572,
+        "ci_low": 0.0365288072905,
+        "delta_r2": -0.0658868760904,
+        "delta_rmse_t_ha": 0.070791565961,
+        "r2_ci_high": -0.0349317907716,
+        "r2_ci_low": -0.0947035308091
+      }
+    },
+    {
+      "maximum_absolute_error": 1.63880020665e-13,
+      "method": "indices_v0_mean_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "indices_v0_mean_merged",
+      "reported": {
+        "ci_high": 1.63880020665e-13,
+        "ci_low": -1.14602771717e-13,
+        "delta_r2": -2.2870594307299997e-14,
+        "delta_rmse_t_ha": 2.4202861936799998e-14,
+        "r2_ci_high": 1.10692011113e-13,
+        "r2_ci_low": -1.59661173171e-13
+      }
+    },
+    {
+      "maximum_absolute_error": 1.1509781842888867e-13,
+      "method": "indices_v0_mean_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.0009604215304853644,
+        "ci_low": -0.0017571194611649022,
+        "delta_r2": 0.0004039605112102773,
+        "delta_rmse_t_ha": -0.0004258541254862358,
+        "r2_ci_high": 0.0017163314137754902,
+        "r2_ci_low": -0.0009041959028386087
+      },
+      "reference": "indices_v0_mean_all_lacuna",
+      "reported": {
+        "ci_high": 0.000960421530545,
+        "ci_low": -0.00175711946128,
+        "delta_r2": 0.000403960511266,
+        "delta_rmse_t_ha": -0.000425854125544,
+        "r2_ci_high": 0.00171633141389,
+        "r2_ci_low": -0.000904195902857
+      }
+    },
+    {
+      "maximum_absolute_error": 1.525307657956887e-13,
+      "method": "indices_v0_mean_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.10797693849910313,
+        "ci_low": 0.03910213687325577,
+        "delta_r2": -0.06873749427854747,
+        "delta_rmse_t_ha": 0.07393499707026607,
+        "r2_ci_high": -0.03817441757778012,
+        "r2_ci_low": -0.09820899582511362
+      },
+      "reference": "legacy_indices_mean_max_all_zimbabwe",
+      "reported": {
+        "ci_high": 0.107976938499,
+        "ci_low": 0.0391021368734,
+        "delta_r2": -0.0687374942787,
+        "delta_rmse_t_ha": 0.0739349970704,
+        "r2_ci_high": -0.0381744175778,
+        "r2_ci_low": -0.098208995825
+      }
+    },
+    {
+      "maximum_absolute_error": 1.44334544316e-13,
+      "method": "indices_v1_calendar_mean_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "indices_v1_calendar_mean_target",
+      "reported": {
+        "ci_high": 1.3503087537e-13,
+        "ci_low": -1.44334544316e-13,
+        "delta_r2": 1.4432899320099999e-15,
+        "delta_rmse_t_ha": -1.7763568393999998e-15,
+        "r2_ci_high": 1.3430923040400001e-13,
+        "r2_ci_low": -1.24583676708e-13
+      }
+    },
+    {
+      "maximum_absolute_error": 2.4683033394978793e-13,
+      "method": "indices_v1_calendar_mean_all_lacuna",
+      "recomputed": {
+        "ci_high": -0.03179499113908768,
+        "ci_low": -0.0969840102684866,
+        "delta_r2": 0.05953420104757323,
+        "delta_rmse_t_ha": -0.06384495748987229,
+        "r2_ci_high": 0.08828478563115318,
+        "r2_ci_low": 0.03097948023273283
+      },
+      "reference": "indices_v0_mean_all_lacuna",
+      "reported": {
+        "ci_high": -0.0317949911392,
+        "ci_low": -0.0969840102685,
+        "delta_r2": 0.0595342010477,
+        "delta_rmse_t_ha": -0.06384495749,
+        "r2_ci_high": 0.0882847856314,
+        "r2_ci_low": 0.0309794802329
+      }
+    },
+    {
+      "maximum_absolute_error": 1.7282703046461734e-13,
+      "method": "indices_v1_calendar_mean_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.04213934738637283,
+        "ci_low": -0.03215476854876184,
+        "delta_r2": -0.006352675042803679,
+        "delta_rmse_t_ha": 0.006946608471170901,
+        "r2_ci_high": 0.02933828842543533,
+        "r2_ci_low": -0.03894228049278054
+      },
+      "reference": "legacy_indices_mean_max_all_lacuna",
+      "reported": {
+        "ci_high": 0.0421393473862,
+        "ci_low": -0.0321547685489,
+        "delta_r2": -0.00635267504272,
+        "delta_rmse_t_ha": 0.00694660847108,
+        "r2_ci_high": 0.0293382884256,
+        "r2_ci_low": -0.0389422804928
+      }
+    },
+    {
+      "maximum_absolute_error": 1.8564039194800002e-13,
+      "method": "indices_v1_calendar_mean_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "indices_v1_calendar_mean_merged",
+      "reported": {
+        "ci_high": 1.8564039194800002e-13,
+        "ci_low": -6.35103081237e-14,
+        "delta_r2": -5.295763827459999e-14,
+        "delta_rmse_t_ha": 5.75095526756e-14,
+        "r2_ci_high": 5.873912467539999e-14,
+        "r2_ci_low": -1.71099245883e-13
+      }
+    },
+    {
+      "maximum_absolute_error": 1.371524421811543e-13,
+      "method": "indices_v1_calendar_mean_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.013615656736334247,
+        "ci_low": -0.0022569994843602724,
+        "delta_r2": -0.0047090915804598454,
+        "delta_rmse_t_ha": 0.00513214362064196,
+        "r2_ci_high": 0.002174318010518946,
+        "r2_ci_low": -0.012531835733062848
+      },
+      "reference": "indices_v1_calendar_mean_all_lacuna",
+      "reported": {
+        "ci_high": 0.0136156567364,
+        "ci_low": -0.00225699948437,
+        "delta_r2": -0.00470909158052,
+        "delta_rmse_t_ha": 0.0051321436207,
+        "r2_ci_high": 0.00217431801052,
+        "r2_ci_low": -0.0125318357332
+      }
+    },
+    {
+      "maximum_absolute_error": 8.903988657493755e-14,
+      "method": "indices_v1_calendar_mean_all_zimbabwe",
+      "recomputed": {
+        "ci_high": -0.02792594452538086,
+        "ci_low": -0.08928605485108904,
+        "delta_r2": 0.05442114895590311,
+        "delta_rmse_t_ha": -0.05828695974374409,
+        "r2_ci_high": 0.08125464673087203,
+        "r2_ci_low": 0.02711915560190994
+      },
+      "reference": "indices_v0_mean_all_zimbabwe",
+      "reported": {
+        "ci_high": -0.0279259445253,
+        "ci_low": -0.089286054851,
+        "delta_r2": 0.0544211489559,
+        "delta_rmse_t_ha": -0.0582869597437,
+        "r2_ci_high": 0.0812546467308,
+        "r2_ci_low": 0.0271191556019
+      }
+    },
+    {
+      "maximum_absolute_error": 2.346109417850073e-13,
+      "method": "indices_v1_calendar_mean_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.04910245312976539,
+        "ci_low": -0.02017861538578312,
+        "delta_r2": -0.014316345322644364,
+        "delta_rmse_t_ha": 0.01564803732652198,
+        "r2_ci_high": 0.018563562698238903,
+        "r2_ci_low": -0.04526587745916395
+      },
+      "reference": "legacy_indices_mean_max_all_zimbabwe",
+      "reported": {
+        "ci_high": 0.04910245313,
+        "ci_low": -0.0201786153856,
+        "delta_r2": -0.0143163453228,
+        "delta_rmse_t_ha": 0.0156480373267,
+        "r2_ci_high": 0.0185635626982,
+        "r2_ci_low": -0.0452658774593
+      }
+    },
+    {
+      "maximum_absolute_error": 1.38344891099e-13,
+      "method": "indices_v2_max_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "indices_v2_max_target",
+      "reported": {
+        "ci_high": 9.86100090472e-14,
+        "ci_low": -1.38344891099e-13,
+        "delta_r2": 1.9984014443299998e-14,
+        "delta_rmse_t_ha": -2.17603712827e-14,
+        "r2_ci_high": 1.29121713321e-13,
+        "r2_ci_low": -9.082179452949999e-14
+      }
+    },
+    {
+      "maximum_absolute_error": 4.408140519274184e-13,
+      "method": "indices_v2_max_all_lacuna",
+      "recomputed": {
+        "ci_high": -0.029821866671202922,
+        "ci_low": -0.10702536209144081,
+        "delta_r2": 0.06421736683598966,
+        "delta_rmse_t_ha": -0.0689633695983396,
+        "r2_ci_high": 0.09701828368787388,
+        "r2_ci_low": 0.02917790178601588
+      },
+      "reference": "indices_v0_mean_all_lacuna",
+      "reported": {
+        "ci_high": -0.0298218666713,
+        "ci_low": -0.107025362091,
+        "delta_r2": 0.0642173668361,
+        "delta_rmse_t_ha": -0.0689633695984,
+        "r2_ci_high": 0.097018283688,
+        "r2_ci_low": 0.0291779017862
+      }
+    },
+    {
+      "maximum_absolute_error": 2.215658212456617e-13,
+      "method": "indices_v2_max_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.02228075511968006,
+        "ci_low": -0.018079552753883444,
+        "delta_r2": -0.001669509254387247,
+        "delta_rmse_t_ha": 0.0018281963627035935,
+        "r2_ci_high": 0.016640901533356102,
+        "r2_ci_low": -0.020511389289421565
+      },
+      "reference": "legacy_indices_mean_max_all_lacuna",
+      "reported": {
+        "ci_high": 0.0222807551196,
+        "ci_low": -0.018079552754,
+        "delta_r2": -0.00166950925429,
+        "delta_rmse_t_ha": 0.00182819636259,
+        "r2_ci_high": 0.0166409015335,
+        "r2_ci_low": -0.0205113892892
+      }
+    },
+    {
+      "maximum_absolute_error": 2.2271073874000002e-13,
+      "method": "indices_v2_max_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "indices_v2_max_merged",
+      "reported": {
+        "ci_high": 1.18610676836e-13,
+        "ci_low": -2.2271073874000002e-13,
+        "delta_r2": 4.0190073491399996e-14,
+        "delta_rmse_t_ha": -4.41868763801e-14,
+        "r2_ci_high": 2.04838923601e-13,
+        "r2_ci_low": -1.11471942787e-13
+      }
+    },
+    {
+      "maximum_absolute_error": 2.1206478820158178e-13,
+      "method": "indices_v2_max_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 6.002680235816479e-05,
+        "ci_low": -0.0016753998743032517,
+        "delta_r2": 0.0007040076385529392,
+        "delta_rmse_t_ha": -0.0007706969873737535,
+        "r2_ci_high": 0.0014731351511592984,
+        "r2_ci_low": -5.9101228168462194e-05
+      },
+      "reference": "indices_v2_max_all_lacuna",
+      "reported": {
+        "ci_high": 6.00268021461e-05,
+        "ci_low": -0.00167539987426,
+        "delta_r2": 0.000704007638572,
+        "delta_rmse_t_ha": -0.000770696987394,
+        "r2_ci_high": 0.00147313515112,
+        "r2_ci_low": -5.91012279597e-05
+      }
+    },
+    {
+      "maximum_absolute_error": 8.705536291842009e-14,
+      "method": "indices_v2_max_all_zimbabwe",
+      "recomputed": {
+        "ci_high": -0.029509126913421942,
+        "ci_low": -0.10768530491205809,
+        "delta_r2": 0.06451741396333233,
+        "delta_rmse_t_ha": -0.06930821246022711,
+        "r2_ci_high": 0.09779025598788706,
+        "r2_ci_low": 0.02894877945860476
+      },
+      "reference": "indices_v0_mean_all_zimbabwe",
+      "reported": {
+        "ci_high": -0.0295091269135,
+        "ci_low": -0.107685304912,
+        "delta_r2": 0.0645174139634,
+        "delta_rmse_t_ha": -0.0693082124603,
+        "r2_ci_high": 0.0977902559878,
+        "r2_ci_low": 0.0289487794586
+      }
+    },
+    {
+      "maximum_absolute_error": 1.7543778929596243e-13,
+      "method": "indices_v2_max_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.023582112930616534,
+        "ci_low": -0.013671303966075438,
+        "delta_r2": -0.004220080315215147,
+        "delta_rmse_t_ha": 0.004626784610038959,
+        "r2_ci_high": 0.012602541303232837,
+        "r2_ci_low": -0.02183189583404753
+      },
+      "reference": "legacy_indices_mean_max_all_zimbabwe",
+      "reported": {
+        "ci_high": 0.0235821129306,
+        "ci_low": -0.0136713039659,
+        "delta_r2": -0.00422008031528,
+        "delta_rmse_t_ha": 0.00462678461011,
+        "r2_ci_high": 0.0126025413032,
+        "r2_ci_low": -0.0218318958341
+      }
+    },
+    {
+      "maximum_absolute_error": 2.40490960479e-13,
+      "method": "indices_v3_median_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "indices_v3_median_target",
+      "reported": {
+        "ci_high": 2.40490960479e-13,
+        "ci_low": -2.0211610163299998e-14,
+        "delta_r2": -1.01363362148e-13,
+        "delta_rmse_t_ha": 1.0325074129000001e-13,
+        "r2_ci_high": 1.9770296511e-14,
+        "r2_ci_low": -2.37934671965e-13
+      }
+    },
+    {
+      "maximum_absolute_error": 1.8144513669327011e-13,
+      "method": "indices_v3_median_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.09960705332893247,
+        "ci_low": 0.03173630922148145,
+        "delta_r2": -0.0634127844522685,
+        "delta_rmse_t_ha": 0.0656867855243124,
+        "r2_ci_high": -0.03148451471748573,
+        "r2_ci_low": -0.09558727489049082
+      },
+      "reference": "indices_v0_mean_all_lacuna",
+      "reported": {
+        "ci_high": 0.0996070533291,
+        "ci_low": 0.0317363092213,
+        "delta_r2": -0.0634127844523,
+        "delta_rmse_t_ha": 0.0656867855243,
+        "r2_ci_high": -0.0314845147175,
+        "r2_ci_low": -0.0955872748906
+      }
+    },
+    {
+      "maximum_absolute_error": 3.55576679211822e-13,
+      "method": "indices_v3_median_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.18810020960203053,
+        "ci_low": 0.08369673058781113,
+        "delta_r2": -0.1292996605426454,
+        "delta_rmse_t_ha": 0.1364783514853556,
+        "r2_ci_high": -0.08512673870962993,
+        "r2_ci_low": -0.17270033060072917
+      },
+      "reference": "legacy_indices_mean_max_all_lacuna",
+      "reported": {
+        "ci_high": 0.188100209602,
+        "ci_low": 0.0836967305878,
+        "delta_r2": -0.129299660543,
+        "delta_rmse_t_ha": 0.136478351485,
+        "r2_ci_high": -0.0851267387097,
+        "r2_ci_low": -0.172700330601
+      }
+    },
+    {
+      "maximum_absolute_error": 1.59222635077e-13,
+      "method": "indices_v3_median_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "indices_v3_median_merged",
+      "reported": {
+        "ci_high": 1.59222635077e-13,
+        "ci_low": -1.39471767469e-13,
+        "delta_r2": -1.8762769116199997e-14,
+        "delta_rmse_t_ha": 1.90958360236e-14,
+        "r2_ci_high": 1.37703737302e-13,
+        "r2_ci_low": -1.55353507836e-13
+      }
+    },
+    {
+      "maximum_absolute_error": 3.116068601066724e-13,
+      "method": "indices_v3_median_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.0010601701229245911,
+        "ci_low": -0.001511840570423778,
+        "delta_r2": 0.00011501345523179385,
+        "delta_rmse_t_ha": -0.00011711741681863508,
+        "r2_ci_high": 0.001496479488608393,
+        "r2_ci_low": -0.0010605796510272548
+      },
+      "reference": "indices_v3_median_all_lacuna",
+      "reported": {
+        "ci_high": 0.00106017012302,
+        "ci_low": -0.00151184057053,
+        "delta_r2": 0.000115013455312,
+        "delta_rmse_t_ha": -0.0001171174169,
+        "r2_ci_high": 0.00149647948892,
+        "r2_ci_low": -0.00106057965121
+      }
+    },
+    {
+      "maximum_absolute_error": 1.6535384173010925e-13,
+      "method": "indices_v3_median_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.10036709726983464,
+        "ci_low": 0.031995015390555256,
+        "delta_r2": -0.06370173150824698,
+        "delta_rmse_t_ha": 0.06599552223298,
+        "r2_ci_high": -0.031798078307247235,
+        "r2_ci_low": -0.09643856643907404
+      },
+      "reference": "indices_v0_mean_all_zimbabwe",
+      "reported": {
+        "ci_high": 0.10036709727,
+        "ci_low": 0.0319950153905,
+        "delta_r2": -0.0637017315082,
+        "delta_rmse_t_ha": 0.065995522233,
+        "r2_ci_high": -0.0317980783073,
+        "r2_ci_low": -0.096438566439
+      }
+    },
+    {
+      "maximum_absolute_error": 4.5036196993919475e-13,
+      "method": "indices_v3_median_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.19192784891513,
+        "ci_low": 0.08660719406210118,
+        "delta_r2": -0.13243922578679446,
+        "delta_rmse_t_ha": 0.13993051930324607,
+        "r2_ci_high": -0.08893265598862368,
+        "r2_ci_low": -0.17682705650754965
+      },
+      "reference": "legacy_indices_mean_max_all_zimbabwe",
+      "reported": {
+        "ci_high": 0.191927848915,
+        "ci_low": 0.0866071940623,
+        "delta_r2": -0.132439225787,
+        "delta_rmse_t_ha": 0.139930519303,
+        "r2_ci_high": -0.0889326559888,
+        "r2_ci_low": -0.176827056508
+      }
+    },
+    {
+      "maximum_absolute_error": 1.58542623474e-13,
+      "method": "indices_v3_mode_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "indices_v3_mode_target",
+      "reported": {
+        "ci_high": 1.57218682517e-13,
+        "ci_low": -1.5210610548900002e-13,
+        "delta_r2": 4.4408920985e-16,
+        "delta_rmse_t_ha": -4.4408920985e-16,
+        "r2_ci_high": 1.54321000423e-13,
+        "r2_ci_low": -1.58542623474e-13
+      }
+    },
+    {
+      "maximum_absolute_error": 6.515066264256575e-13,
+      "method": "indices_v3_mode_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.15790220494273258,
+        "ci_low": 0.04754227535244114,
+        "delta_r2": -0.09964319127947041,
+        "delta_rmse_t_ha": 0.10223340028031225,
+        "r2_ci_high": -0.04733127101606374,
+        "r2_ci_low": -0.1523950732166515
+      },
+      "reference": "indices_v0_mean_all_lacuna",
+      "reported": {
+        "ci_high": 0.157902204943,
+        "ci_low": 0.0475422753524,
+        "delta_r2": -0.0996431912794,
+        "delta_rmse_t_ha": 0.10223340028,
+        "r2_ci_high": -0.047331271016,
+        "r2_ci_low": -0.152395073216
+      }
+    },
+    {
+      "maximum_absolute_error": 3.5543790133374387e-13,
+      "method": "indices_v3_mode_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.23691864577603244,
+        "ci_low": 0.10756564244599802,
+        "delta_r2": -0.16553006736984732,
+        "delta_rmse_t_ha": 0.17302496624135544,
+        "r2_ci_high": -0.10695422797929137,
+        "r2_ci_low": -0.22127638279581988
+      },
+      "reference": "legacy_indices_mean_max_all_lacuna",
+      "reported": {
+        "ci_high": 0.236918645776,
+        "ci_low": 0.107565642446,
+        "delta_r2": -0.16553006737,
+        "delta_rmse_t_ha": 0.173024966241,
+        "r2_ci_high": -0.106954227979,
+        "r2_ci_low": -0.221276382796
+      }
+    },
+    {
+      "maximum_absolute_error": 2.41379138899e-13,
+      "method": "indices_v3_mode_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "indices_v3_mode_merged",
+      "reported": {
+        "ci_high": 2.3804291871e-13,
+        "ci_low": -3.95516952523e-14,
+        "delta_r2": -9.39248678833e-14,
+        "delta_rmse_t_ha": 9.39248678833e-14,
+        "r2_ci_high": 4.0986658511599994e-14,
+        "r2_ci_low": -2.41379138899e-13
+      }
+    },
+    {
+      "maximum_absolute_error": 9.450838549251994e-14,
+      "method": "indices_v3_mode_all_zimbabwe",
+      "recomputed": {
+        "ci_high": -4.300730034202216e-06,
+        "ci_low": -0.001217428922306979,
+        "delta_r2": 0.0005927142642664363,
+        "delta_rmse_t_ha": -0.0005924299179385084,
+        "r2_ci_high": 0.0012432050042164005,
+        "r2_ci_low": 4.209122376222516e-06
+      },
+      "reference": "indices_v3_mode_all_lacuna",
+      "reported": {
+        "ci_high": -4.30072995035e-06,
+        "ci_low": -0.00121742892223,
+        "delta_r2": 0.000592714264172,
+        "delta_rmse_t_ha": -0.000592429917844,
+        "r2_ci_high": 0.00124320500413,
+        "r2_ci_low": 4.20912229422e-06
+      }
+    },
+    {
+      "maximum_absolute_error": 1.9617640845126516e-13,
+      "method": "indices_v3_mode_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.15850165426692706,
+        "ci_low": 0.047593595687838844,
+        "delta_r2": -0.09945443752641425,
+        "delta_rmse_t_ha": 0.10206682448785998,
+        "r2_ci_high": -0.047411826171629506,
+        "r2_ci_low": -0.15231095413980383
+      },
+      "reference": "indices_v0_mean_all_zimbabwe",
+      "reported": {
+        "ci_high": 0.158501654267,
+        "ci_low": 0.0475935956879,
+        "delta_r2": -0.0994544375265,
+        "delta_rmse_t_ha": 0.102066824488,
+        "r2_ci_high": -0.0474118261717,
+        "r2_ci_low": -0.15231095414
+      }
+    },
+    {
+      "maximum_absolute_error": 2.8821389719269064e-13,
+      "method": "indices_v3_mode_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.23994043735171178,
+        "ci_low": 0.10987833918718806,
+        "delta_r2": -0.16819193180496173,
+        "delta_rmse_t_ha": 0.17600182155812605,
+        "r2_ci_high": -0.10958897017976141,
+        "r2_ci_low": -0.22488020671084336
+      },
+      "reference": "legacy_indices_mean_max_all_zimbabwe",
+      "reported": {
+        "ci_high": 0.239940437352,
+        "ci_low": 0.109878339187,
+        "delta_r2": -0.168191931805,
+        "delta_rmse_t_ha": 0.176001821558,
+        "r2_ci_high": -0.10958897018,
+        "r2_ci_low": -0.224880206711
+      }
+    },
+    {
+      "maximum_absolute_error": 2.35605979171e-13,
+      "method": "legacy_indices_mean_max_all_lacuna",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "legacy_indices_mean_max_target",
+      "reported": {
+        "ci_high": 2.35605979171e-13,
+        "ci_low": -5.929146063009999e-14,
+        "delta_r2": -7.938094626069999e-14,
+        "delta_rmse_t_ha": 8.704148513059999e-14,
+        "r2_ci_high": 5.5513926788799994e-14,
+        "r2_ci_low": -2.16499040917e-13
+      }
+    },
+    {
+      "maximum_absolute_error": 2.76240141872e-13,
+      "method": "legacy_indices_mean_max_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.0,
+        "ci_low": 0.0,
+        "delta_r2": 0.0,
+        "delta_rmse_t_ha": 0.0,
+        "r2_ci_high": 0.0,
+        "r2_ci_low": 0.0
+      },
+      "reference": "legacy_indices_mean_max_merged",
+      "reported": {
+        "ci_high": 4.28601598657e-14,
+        "ci_low": -2.76240141872e-13,
+        "delta_r2": 1.0236256287e-13,
+        "delta_rmse_t_ha": -1.1235457009200001e-13,
+        "r2_ci_high": 2.42919573346e-13,
+        "r2_ci_low": -4.14307477214e-14
+      }
+    },
+    {
+      "maximum_absolute_error": 3.3808047507355443e-13,
+      "method": "legacy_indices_mean_max_all_zimbabwe",
+      "recomputed": {
+        "ci_high": 0.000716437481482023,
+        "ci_low": -0.008390168190451425,
+        "delta_r2": 0.003254578699380839,
+        "delta_rmse_t_ha": -0.0035692852347091186,
+        "r2_ci_high": 0.007580968645478833,
+        "r2_ci_low": -0.0006609949597080805
+      },
+      "reference": "legacy_indices_mean_max_all_lacuna",
+      "reported": {
+        "ci_high": 0.000716437481144,
+        "ci_low": -0.00839016819074,
+        "delta_r2": 0.00325457869956,
+        "delta_rmse_t_ha": -0.00356928523491,
+        "r2_ci_high": 0.00758096864559,
+        "r2_ci_low": -0.00066099495937
+      }
+    }
+  ],
+  "contrasts_verified": 116,
+  "input_sha256": {
+    "config.json": "4bd54cb0db4d8c3ac256b3b75c4621aa7f27f513927e8040f2696a8fd65104b5",
+    "paired_differences.csv": "10cd293d03f7d7acf85e81c38918c96029909a6a2e54f8dabb89196e6b35b61e",
+    "predictions.csv": "1425cbda2daf09c9a755dac984be7e7985ec5f05563468e59709b6a4780c91ca"
+  },
+  "maximum_absolute_error": 6.515066264256575e-13,
+  "method": "Explicit spatial-group row concatenation; fresh outcome mean, SSE and SST in every replicate; paired percentile differences",
+  "methods": 44,
+  "observations_per_method": 1504,
+  "release": "data\\runs\\zimbabwe_multiyear_v2",
+  "resampled_observation_count_maximum": 2109,
+  "resampled_observation_count_minimum": 1041,
+  "scalar_checks": 696,
+  "seed": 20261107,
+  "spatial_groups": 232,
+  "status": "passed",
+  "verification_script_sha256": "ff921d865e21b48d5b0a26ed2d18a57675524a8a0e39df659029b57d37efca5b",
+  "versions": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6"
+  }
+}

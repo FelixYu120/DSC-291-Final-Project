@@ -1,0 +1,11 @@
+protocol,outer_fold,train_fields,test_fields,test_groups
+New village,0,1504,376,57
+New village,1,1504,376,58
+New village,2,1504,376,58
+New village,3,1504,376,58
+New village,4,1504,376,58
+New region,0,1502,378,2
+New region,1,1505,375,3
+New region,2,1503,377,5
+New region,3,1508,372,5
+New region,4,1502,378,5

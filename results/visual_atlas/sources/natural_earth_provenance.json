@@ -1,0 +1,27 @@
+{
+  "publisher": "Natural Earth",
+  "scale": "1:50,000,000",
+  "license": "Public domain",
+  "terms": "https://www.naturalearthdata.com/about/terms-of-use/",
+  "retrieved_local_date": "2026-11-11",
+  "crs": "WGS84 longitude, latitude",
+  "sources": [
+    {
+      "layer": "Admin 0 Countries",
+      "version": "5.1.1",
+      "url": "https://naturalearth.s3.amazonaws.com/5.1.1/50m_cultural/ne_50m_admin_0_countries.zip",
+      "archive_sha256": "5fed433373581fa648920435f937d95f2d3c0200e067409c6478dcdf1b853139",
+      "selection": "ADM0_A3 == ZWE"
+    },
+    {
+      "layer": "Populated Places (simple)",
+      "version": "5.1.2",
+      "url": "https://naturalearth.s3.amazonaws.com/5.1.2/50m_cultural/ne_50m_populated_places_simple.zip",
+      "archive_sha256": "a6ebb4be4672de4cd2b94b04cdc9a1bd5a5cb684d28c0e75f535152e5f07a296",
+      "selection": "adm0_a3 == ZWE and name in [Harare, Bulawayo]"
+    }
+  ],
+  "extract": "zimbabwe_natural_earth.geojson",
+  "extract_sha256": "1efb17b42bd03a33d6f3d0038280069ce0fba62698f9da7d37034d68895c9eab",
+  "extraction": "Retained the selected geometries and three display properties. Oriented the country exterior counterclockwise for GeoJSON. No boundary simplification or rounding was applied."
+}

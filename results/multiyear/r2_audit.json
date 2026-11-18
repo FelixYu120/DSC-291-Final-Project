@@ -1,0 +1,19 @@
+{
+  "all_checks_passed": true,
+  "method_count": 52,
+  "evaluation_fields": 1504,
+  "metric": "1 - pooled SSE / pooled SST; unweighted, original yield scale",
+  "yield_mean_t_ha": 3.233588430851064,
+  "yield_population_variance": 3.93710085760136,
+  "inputs": {
+    "predictions.csv": "649093ab093c0d9caf9d0dbaaf63742c740a716c9d4c0819242b6fb1008ac97b",
+    "metrics.csv": "55dd6e5a4f58d7e34fc43234466402f60eb3024626dc893193a8840a1793eb40",
+    "target_memberships.csv": "90f1dc5e484b0fe507a232f101a45c434e9f8364942575ae708403b932373870",
+    "manifest.json": "270721466cb10d2ad236f440706b808f1c43f5e2891882eab7657fb63ce1d36a"
+  },
+  "audit_script_sha256": "8139e4d58d52848af039ae00cf8b85ebde795e629c3ac6d95bb1bedaf871e495",
+  "outputs": {
+    "r2_audit.csv": "149997388861ee345c1960859c6d323a3583c5eccaba4060122feb47b120b4c6",
+    "r2_audit_folds.csv": "1bd48acd6f79a3988f016bdd287cf166e2e75dd18724b174c8b6bdfaf5bcd498"
+  }
+}

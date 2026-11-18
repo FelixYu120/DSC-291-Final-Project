@@ -1,0 +1,35 @@
+{
+  "test_suite": {
+    "passed": 157,
+    "skipped": 2,
+    "reason": "Windows-only path checks"
+  },
+  "repeat_exact": true,
+  "matched_files": [
+    "predictions.parquet",
+    "summary.csv",
+    "metrics.csv excluding run_id",
+    "fold_fits.csv"
+  ],
+  "repeat_run_id": "spatial_baselines_v1-20261103T225831908433Z",
+  "prediction_rows": 18324,
+  "metric_rows": 201,
+  "fold_fit_rows": 45,
+  "historical_comparison": "historical_comparison.csv",
+  "database_labels_and_splits_unchanged": true,
+  "historical_comparison_details": {
+    "r0_a1_match_to_float_precision": true,
+    "r1_rmse_difference_t_ha": {
+      "kenya": 3.30644e-05,
+      "lacuna": -5.2339e-06,
+      "malawi": 0.0
+    },
+    "same_observation_order_and_coordinates": true,
+    "unequal_yield_neighbor_boundary_ties": {
+      "kenya": 82,
+      "lacuna": 8,
+      "malawi": 0
+    },
+    "historical_cause": "Tie sensitivity is supported by diagnostics; exact historical cause unproven without original predictions/runtime"
+  }
+}

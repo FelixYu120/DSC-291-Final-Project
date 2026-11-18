@@ -1,0 +1,14 @@
+{
+  "api_versions": [
+    "v2.10.0"
+  ],
+  "climatology": "1991\u20132020",
+  "field_months": 59382,
+  "grid_distance_km_max": 42.917139169890554,
+  "grid_distance_km_median": 22.97566359428071,
+  "historical_cell_months": 39576,
+  "labels": 6598,
+  "missing_weather_rows": 0,
+  "weather_cells": 97,
+  "weather_features": 46
+}

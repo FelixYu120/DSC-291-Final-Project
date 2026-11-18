@@ -117,6 +117,23 @@ def random_diagnostic(rows: pd.DataFrame) -> pd.DataFrame:
     return _table(rows, np.arange(len(rows)), fold, "random_diag")
 
 
+def temporal_rank(first: pd.DataFrame, second: pd.DataFrame, km: float = 20.0) -> pd.DataFrame:
+    """temporal_rank (data v2): one region in two seasons measured by different crop cuts, e.g. Malawi 2022 and 2023.
+
+    Rows: the `first` fields within `km` of a `second` field, and every `second` field. Repeat 0 trains on the
+    first season and tests on the second, repeat 1 the reverse. group_id is a 2 km cluster over both seasons.
+    The cuts differ, so this split is scored by rank only, never in t/ha.
+    """
+    both = pd.concat([first, second], ignore_index=True)
+    lat, lon = both["lat"].to_numpy(), both["lon"].to_numpy()
+    gap = nearest_km(lat, lon, np.arange(len(first)), np.arange(len(first), len(both)))
+    rows = pd.concat([first[gap < km], second], ignore_index=True)
+    groups = connected_clusters(rows["lat"].to_numpy(), rows["lon"].to_numpy(), 2.0)
+    train_cohorts = (first["cohort"].iloc[0], second["cohort"].iloc[0])
+    return pd.concat([_table(rows, groups, np.where(rows["cohort"] == train, "train", "test"), "temporal_rank", repeat)
+                      for repeat, train in enumerate(train_cohorts)], ignore_index=True)
+
+
 def check_split(split: pd.DataFrame, rows: pd.DataFrame) -> list[str]:
     """Problems of one split table; empty when it is sound. The tests of docs/EVALUATION.md, section 4."""
     problems = []
@@ -124,7 +141,7 @@ def check_split(split: pd.DataFrame, rows: pd.DataFrame) -> list[str]:
     for repeat, table in split.groupby("repeat"):
         if set(table["obs_id"]) != set(rows["obs_id"]) or table["obs_id"].duplicated().any():
             problems.append(f"{family} repeat {repeat}: rows are not exactly the eligible observations, once each")
-        if family != "temporal" and (table.groupby("group_id")["fold"].nunique() > 1).any():
+        if not family.startswith("temporal") and (table.groupby("group_id")["fold"].nunique() > 1).any():
             problems.append(f"{family} repeat {repeat}: a group is in two folds")
     if family == "s1_cc2km":
         where = rows.set_index("obs_id").loc[split["obs_id"]]

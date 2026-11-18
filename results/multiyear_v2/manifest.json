@@ -1,0 +1,257 @@
+{
+  "base_git_commit": "912de10741c50b3b4ae9eb835093cbd702d25a8b",
+  "config": {
+    "auxiliary_buffer_km": 2.0,
+    "bootstrap_draws": 2000,
+    "calendar_cutoff_month_day": "04-01",
+    "calendar_months": [
+      12,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "calendar_sources": [
+      "https://fews.net/sites/default/files/documents/reports/ZW_February_to_September_2023_FSO_Final_jh.pdf",
+      "https://unfccc.int/sites/default/files/resource/NAP-Zimbabwe-2024.pdf"
+    ],
+    "controls_config": "configs/zimbabwe_aggregation_v2.json",
+    "controls_release": "data/runs/zimbabwe_aggregation_v2",
+    "evaluation_status": "exploratory_same_1504_lacuna_2023_development_fields_not_a_new_blind_test",
+    "experiment": "zimbabwe_multiyear_v2",
+    "feature_families": [
+      "bands",
+      "indices"
+    ],
+    "identity_tolerance_t_ha": 1e-09,
+    "minimum_clear_months": 4,
+    "missing_imagery_policy": "exclude_if_fewer_than_four_common_season_months_or_any_nonfinite_aggregate_predictor_no_imputation",
+    "mode_estimator": "half_sample_mode_mean_of_tied_recursive_estimates",
+    "mode_reference": "https://arxiv.org/abs/math/0505419",
+    "prediction_setting": "retrospective_yield_estimation",
+    "primary_method": "bands_v1_calendar_mean_all_zimbabwe",
+    "primary_reference": "bands_v1_calendar_mean_all_lacuna",
+    "reserved_fold": 0,
+    "ridge_alphas": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0,
+      1000.0
+    ],
+    "seed": 20261107,
+    "source_weight_ratios": [
+      0.0,
+      0.1,
+      0.3,
+      1.0
+    ],
+    "supersedes": "zimbabwe_multiyear_v1",
+    "target_folds": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "team_rule_changes": [
+      "window_anchor=calendar: no survey planting/harvest date is a model input, window anchor or eligibility condition; the prespecified comparison uses the December-March calendar mean",
+      "training_rows=include_primary: every training pool uses labels_v1.include_primary rows only; arms that become identical to a step 14 v2 control are marked identical"
+    ],
+    "training_rows": "include_primary",
+    "training_sets": [
+      "all_lacuna",
+      "all_zimbabwe"
+    ],
+    "variants": [
+      "v0_mean",
+      "v1_calendar_mean",
+      "v2_max",
+      "v3_median",
+      "v3_mode"
+    ],
+    "window_anchor": "calendar",
+    "zero_sensitivity_weight": 0.25
+  },
+  "inputs": {
+    "configs/team_database_v1.json": "c57a284f6334cc824284c85c327a79a5123b305ae4de818eb099de1ffd257b95",
+    "configs/zimbabwe_aggregation_v1.json": "d1ddbdc46fefd697a528f7d1d007886ad8118fef9c0eaaf09215809cc1ab08d4",
+    "configs/zimbabwe_aggregation_v2.json": "9629bb6fd195b92f0496e3783436dff9a9d4598b99f7ac4c3064b09167991616",
+    "configs/zimbabwe_merge_v1.json": "1602a7caf7e18fbe66b2b69bde7a206d81191247bbb1bf85dceb04ef73ec91e1",
+    "configs\\zimbabwe_multiyear_v2.json": "f89b2228a4ea212c803b5ed6758e4d5ce3f93eb7f1287c090d0974b0ebf1dd71",
+    "data/cropyield.duckdb": "e192b9d6021fdae020f9b08123b98648dc4b5274989635927c709a5607cdcd60",
+    "data/metadata/zimbabwe.json": "dac1072632c8818a4c831d45f77a3a3ed34dc7d4564e49197b94ce062f34f175",
+    "data/processed/labels_v1.parquet": "49aae383c4489aa98e9e7fe8c31cda6bf1cd752adc8e9540cffdc147a5e0ef92",
+    "data/raw/vision_guided_yield_estimation/metadata.csv": "bbd1451564a24f0e2a7f7c6966cb13b5f9ae7948bd0608068310ef7c4867e003",
+    "data/raw/zimbabwe/Lacuna_Yield_data_geojson-2023.geojson": "0dc4301509072c4306c951d88cf7cc6e0832c46aab921d237341c17bc6bb78cd",
+    "data/splits/manifest.json": "b8abf5e47c59d7e6c93620742de65ca5ba6a332d3a701eedc61a67d2533af53f",
+    "data/splits/zimbabwe_lacuna_2022_2023__s1_cc2km.csv": "253f437d30a3742779e164c6b30fda5d613d5fe38decccf2b45ce21d95288dff",
+    "data/splits/zimbabwe_lacuna_2022_2023__s2_region.csv": "da357af13e1fa78d55c812211fc9948d425673dff0426be4d20a396aed827252",
+    "data\\runs\\zimbabwe_aggregation_v2\\PROTOCOL.md": "7c28e17089391826612b188a0e1192edfef239ecc0c4ace8dcf8dedba31c253a",
+    "data\\runs\\zimbabwe_aggregation_v2\\RESULTS.md": "bd82f3dc955bcc05f523a6b677c388355378ba17239afd16bf90be3022768adb",
+    "data\\runs\\zimbabwe_aggregation_v2\\comparison.png": "d16ba18345ad19af5c2d1dc29000ad42940e414d7ac4d70f6412ad87ac895c0b",
+    "data\\runs\\zimbabwe_aggregation_v2\\data_summary.json": "af8bc6940473cfce86bfd3bd95bb1c8bfcd3c62510f5430d156e4185252bf0de",
+    "data\\runs\\zimbabwe_aggregation_v2\\feature_dictionary.json": "cb96d549e8953803a19bec799cce5bb657c8f63a584c9d0437b12e1bd0df85a6",
+    "data\\runs\\zimbabwe_aggregation_v2\\features.parquet": "441368c00bcc3a011c9caa9aa263583d036b4962f0f76e646b6447263e834842",
+    "data\\runs\\zimbabwe_aggregation_v2\\fold_metrics.csv": "85ab26e800778281a25a0f9a8f0165c6ca9b5cb088fdcdc45725a91433e1b5eb",
+    "data\\runs\\zimbabwe_aggregation_v2\\manifest.json": "93ad4ed5b67505baeb4f5fbc07e71c2215726b18d0483c0f0f244d39aa112661",
+    "data\\runs\\zimbabwe_aggregation_v2\\metrics.csv": "969d52b8eb560c01362603000637e74ab9664c38a734d8aa87ed4ab7c3ec33ff",
+    "data\\runs\\zimbabwe_aggregation_v2\\monthly_observations.parquet": "d92fcc525588a018b1ad7eedd76bf1c8d894ecb5bed4ae869bb6c64d6fd41416",
+    "data\\runs\\zimbabwe_aggregation_v2\\observations.csv": "54e6f92366fbb3d7c5ffe9eccb70e9f7538dc188b65cec6a7fa8bfda695f0401",
+    "data\\runs\\zimbabwe_aggregation_v2\\paired_differences.csv": "004b05b56f61b6268be181d0a8e8d2ee049922ba71bc3a034e827c3d3d67df99",
+    "data\\runs\\zimbabwe_aggregation_v2\\predictions.csv": "56b9e111955f1b8aff8190e76d95a57218fcecc5b142974e0f29688f245361a0",
+    "data\\runs\\zimbabwe_aggregation_v2\\selected_parameters.csv": "de219c240076f246d9ea2b25358fe8b18fa0177c10b917da3989c7a8696fe139",
+    "data\\runs\\zimbabwe_aggregation_v2\\source_spatial_permissions.csv": "bffb221c04276cdc115d281ea109e5e054a54d8786749d18b6f4cf522d42ec08",
+    "data\\runs\\zimbabwe_aggregation_v2\\target_memberships.csv": "90f1dc5e484b0fe507a232f101a45c434e9f8364942575ae708403b932373870",
+    "data\\runs\\zimbabwe_aggregation_v2\\training_outer_diagnostics.csv": "dcd3afc66780de0fa20fa097a2b7e223e881a283cd8546ee0945d6ad3eacd528",
+    "data\\runs\\zimbabwe_aggregation_v2\\training_rows_audit.csv": "14ab391794cb0590470151269c1031a1884a663d44448d1fbb76f0404ecc9a0a",
+    "data\\runs\\zimbabwe_aggregation_v2\\tuning.csv": "4e4d1d5465cdc8eeca92fcfdcc3a86df2eed24c5550b2524b1de74fa42199f06",
+    "data\\runs\\zimbabwe_aggregation_v2\\window_audit.csv": "a2a1620f1b58a45a78af81a216c4fd703189894fe088f61231be68c7ed7811c9",
+    "data\\runs\\zimbabwe_merge_v1\\PROTOCOL.md": "e28596f3be52f498a9db3b883a5090a74adbfc73173f2e239466c74e5d005dc0",
+    "data\\runs\\zimbabwe_merge_v1\\RESULTS.md": "ff7a5dc6e8abe4cdfebb182f9613f148cfd6ce93e03ad0e0ef6c0253e111e724",
+    "data\\runs\\zimbabwe_merge_v1\\combined_data.csv": "d9451f21f6662c56dfbf768563a7263d4f81beebaa0c4c26ef5be00c4e38fcbe",
+    "data\\runs\\zimbabwe_merge_v1\\combined_data.parquet": "f5f0c1ced6f9b85991274a29feb6d2bc88f5d1652de4decdbcdafed572b181c5",
+    "data\\runs\\zimbabwe_merge_v1\\comparison.png": "a3bb745a1b7fe32f8f0913ab58d4647145c6ad0ac0234c988c77a3859b907149",
+    "data\\runs\\zimbabwe_merge_v1\\data_summary.json": "83be1c1bf9c06523c8501eb9ccf322270cd1151879c5cd4a8a095f3a625698a1",
+    "data\\runs\\zimbabwe_merge_v1\\fold_metrics.csv": "db04359017299a3ad6435f18c2c784bb5bb6084739c1f30ca02858b7fa620c60",
+    "data\\runs\\zimbabwe_merge_v1\\harmonized_labels.parquet": "5b7ed30ac62a05101d7eb770bbce647fc33764052ad18d7bd7ad3bd32ef01319",
+    "data\\runs\\zimbabwe_merge_v1\\manifest.json": "805aaad4f932048323168f638d6727128328720e546378f70b39875817c9e0b4",
+    "data\\runs\\zimbabwe_merge_v1\\metrics.csv": "44cd735901793805e0cf089006525071fa85b71d7b569fc4f9fa253c421f0fde",
+    "data\\runs\\zimbabwe_merge_v1\\paired_differences.csv": "3646a155e148abed7b1c33248888ffad77ad1a9d43241eb5d7fc1ab0ba12996e",
+    "data\\runs\\zimbabwe_merge_v1\\predictions.csv": "890b9655e9c97fd9d01a5e992749a0d3281c3684517803e6b77edf66c10e06fa",
+    "data\\runs\\zimbabwe_merge_v1\\selected_parameters.csv": "a9e656951506d3ec1d5da3c5054cb224e92c639568eb7f4c7e8d008baee3b266",
+    "data\\runs\\zimbabwe_merge_v1\\source_2024_audit.csv": "9bbbd13f55c12754c1b0b8a1e6c3822365a3d8e48ec51a78078745a535c1b5ef",
+    "data\\runs\\zimbabwe_merge_v1\\source_spatial_permissions.csv": "bffb221c04276cdc115d281ea109e5e054a54d8786749d18b6f4cf522d42ec08",
+    "data\\runs\\zimbabwe_merge_v1\\target_memberships.csv": "90f1dc5e484b0fe507a232f101a45c434e9f8364942575ae708403b932373870",
+    "data\\runs\\zimbabwe_merge_v1\\tuning.csv": "ad71ca212fbfa52d24db0ce108977578b8e4112ca2ff2bf475341c41bc616148",
+    "docs/zimbabwe/AGGREGATION_PROTOCOL.md": "7c28e17089391826612b188a0e1192edfef239ecc0c4ace8dcf8dedba31c253a",
+    "docs/zimbabwe/MULTIYEAR_PROTOCOL.md": "dd25dccb0ed49c4bc09ac4b277539b94416ba54f9705766b41076a38fa396df8",
+    "pyproject.toml": "78f0c7a739c60341ebb5f4cd40c0246089c982c238e70f306c4b221b53eb4925",
+    "requirements.txt": "758d3b0fe92e4efa02aa1f9e5d67f18aacb868c8df2a13d09b1880cc1ee5a061",
+    "scripts/step15_compare_zimbabwe_multiyear.py": "a98fc764cc57704ac491058e363caa74f3f190ef91a0f4eebf48b7a688e4a2f7",
+    "src/cropyield/__init__.py": "b8f57482f76b78dc36f9553fbe9dd0cac7d9adc374064d97215dcee8718b77f7",
+    "src/cropyield/data/cohorts.py": "8dcfbdb9cb641c6f4260974d560257532cfbd0d42118279c37d7a2b8ff6c8c5c",
+    "src/cropyield/data/handoff.py": "070fcfb23db4167374ad40f88bf76ef2b400aff546f4190422e6836cd8231b77",
+    "src/cropyield/data/labels.py": "1e993aa24beb74c348b64268642b1774ecd8dbe3bbba10757940ffa3bee6b21d",
+    "src/cropyield/data/xy.py": "41743292fd48c3df77d08a616aa5d20ef6c8bb4a618c5e6f28dc6cd083f69048",
+    "src/cropyield/eval/splits.py": "138dd5cd18abb26da00f6cb6fb1c2615a46e0ee0f8cb7ad91b3f98abde789a85",
+    "src/cropyield/experiments/zimbabwe_aggregation.py": "7e2a1ea0c4d11fc396476f29794a13836900d249a8edae12dec2a65e73c493c9",
+    "src/cropyield/experiments/zimbabwe_diagnosis.py": "c07df37387575c063ef9c2beb2d009285b58cbd2a8d57aa36603c298bd400ce6",
+    "src/cropyield/experiments/zimbabwe_merge.py": "ebff7a50dfb6dca15550908906c47045ff44f331368f53f586e47b7e3e694fd6",
+    "src/cropyield/experiments/zimbabwe_multiyear.py": "c78cb2ac776bb47634a37c2a575b64c4d234d6536c5ae9c07433273ca09b8b13"
+  },
+  "outputs": {
+    "PROTOCOL.md": {
+      "bytes": 11436,
+      "sha256": "dd25dccb0ed49c4bc09ac4b277539b94416ba54f9705766b41076a38fa396df8"
+    },
+    "RESULTS.md": {
+      "bytes": 3687,
+      "sha256": "d322e542ee2ea1ac285645372ab9e1e87f242004ede36e42904a76740bc63128"
+    },
+    "arm_identity.csv": {
+      "bytes": 2319,
+      "sha256": "e23cd5ec3ce9c95f3b9ba06a9aed569be543268bb5fe7e22bff5f6239a98e008"
+    },
+    "config.json": {
+      "bytes": 2234,
+      "sha256": "4bd54cb0db4d8c3ac256b3b75c4621aa7f27f513927e8040f2696a8fd65104b5"
+    },
+    "coverage_summary.csv": {
+      "bytes": 347,
+      "sha256": "4cec491da6e9ce6617b0bb94286389a0e0dd4a2dcd4f0ec210d64c08dd870033"
+    },
+    "data_summary.json": {
+      "bytes": 2110,
+      "sha256": "e5ac0c0ad993b4c58570bc7258a8472d4169a1c627ef7b302f97a73a1d682c55"
+    },
+    "eligibility_audit.csv": {
+      "bytes": 6680145,
+      "sha256": "96ec07515dec09e13fc20a64ff1ff8b4fa6824abb6ede982b18101dfd52f0f68"
+    },
+    "extra_lacuna_spatial_permissions.csv": {
+      "bytes": 86,
+      "sha256": "7ab077901213586508514429493d4c5b4d544ce0cf90883d8bca82391bf09538"
+    },
+    "feature_dictionary.json": {
+      "bytes": 3129,
+      "sha256": "cb96d549e8953803a19bec799cce5bb657c8f63a584c9d0437b12e1bd0df85a6"
+    },
+    "features.parquet": {
+      "bytes": 4728097,
+      "sha256": "5a0d2b0729b0eeabb1a3e03fa4a5fa296e8b6ab017a5fe1b07e39f52dea8d54d"
+    },
+    "fit_memberships.csv": {
+      "bytes": 4638347,
+      "sha256": "081a3f9e89e1157f45eb0046e93d138e13684d0e92a476c7e092f513bd4907bf"
+    },
+    "fold_metrics.csv": {
+      "bytes": 19014,
+      "sha256": "5192a3698114ccc9a981e0ef4bc6f2a2535371e8a88adee0c46691c8fba69e63"
+    },
+    "historical_control_predictions.csv": {
+      "bytes": 3212475,
+      "sha256": "56b9e111955f1b8aff8190e76d95a57218fcecc5b142974e0f29688f245361a0"
+    },
+    "method_metadata.csv": {
+      "bytes": 5685,
+      "sha256": "080d1252d7177d3595cd477b6d8edf63ae6ba2dccae9cf181101a0f360058865"
+    },
+    "metrics.csv": {
+      "bytes": 6055,
+      "sha256": "290c6affd170fadd354eaaf996d067a600bcc2135dbc221ee088bbd065a1bb4e"
+    },
+    "monthly_observations.parquet": {
+      "bytes": 4642130,
+      "sha256": "3988eac05370ff56fbd59ef2ccb2ebff6ebbc45e5d0e9bc3a69ecccbf8b7d1a4"
+    },
+    "observations.csv": {
+      "bytes": 3534989,
+      "sha256": "4711fea75a1122ebba1b2c82ceba1e50b97578529c8effc73b218dfa49560e8a"
+    },
+    "paired_differences.csv": {
+      "bytes": 19423,
+      "sha256": "10cd293d03f7d7acf85e81c38918c96029909a6a2e54f8dabb89196e6b35b61e"
+    },
+    "predictions.csv": {
+      "bytes": 6590329,
+      "sha256": "1425cbda2daf09c9a755dac984be7e7985ec5f05563468e59709b6a4780c91ca"
+    },
+    "selected_parameters.csv": {
+      "bytes": 17293,
+      "sha256": "c51577886c083215112160e6af55c45830571f465f0642ef323f96ed39aba33a"
+    },
+    "source_spatial_permissions.csv": {
+      "bytes": 6301514,
+      "sha256": "bffb221c04276cdc115d281ea109e5e054a54d8786749d18b6f4cf522d42ec08"
+    },
+    "target_memberships.csv": {
+      "bytes": 1253975,
+      "sha256": "90f1dc5e484b0fe507a232f101a45c434e9f8364942575ae708403b932373870"
+    },
+    "training_outer_diagnostics.csv": {
+      "bytes": 6103,
+      "sha256": "bd70b8d77f340d24f11ea059fa0624c98c1eca43df5f75ddf3f5ccf069e2d03c"
+    },
+    "tuning.csv": {
+      "bytes": 190024,
+      "sha256": "7fb553e3b93af4bdd1283a393f47499f9ec5f2a39879fe449079776384d23973"
+    },
+    "window_audit.csv": {
+      "bytes": 743430,
+      "sha256": "9716ed89ab7204c2b120e483c6d9dc66b6aa735fce244a472ee92981cba1754a"
+    }
+  },
+  "python": "3.12.10",
+  "source_hashes_record_actual_working_tree": true,
+  "versions": {
+    "duckdb": "1.5.5",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1"
+  }
+}

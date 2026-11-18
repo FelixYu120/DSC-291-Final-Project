@@ -1,0 +1,54 @@
+{
+  "datum_operation": "EPSG:1113",
+  "datasets": [
+    {
+      "dataset": "malawi_2022",
+      "all_source_rows": 529,
+      "source_crs": "EPSG:20936",
+      "derived_crs": "EPSG:4326",
+      "coordinate_operations_used": [
+        {
+          "description": "Inverse of UTM zone 36S + Arc 1950 to WGS 84 (1) (with axis order normalized for visualization)",
+          "reported_accuracy_m": 44.0,
+          "feature_count": 529
+        }
+      ],
+      "maize_records": 529,
+      "nonnegative_numeric_yield": 529,
+      "valid_coordinates_and_geometry": 529,
+      "within_country_envelope": 529,
+      "passes_basic_checks": 529,
+      "passes_basic_checks_since_2019": 529,
+      "passes_basic_checks_positive_yield": 526,
+      "zero_yield_in_basic_candidates": 3,
+      "passes_additional_yield_consistency_checks": 529,
+      "screened_candidates": 529,
+      "screened_candidates_since_2019": 529,
+      "zero_yield_in_screened_candidates": 3,
+      "distinct_locations_in_basic_candidates": 529,
+      "exact_duplicate_rows_after_first": 0,
+      "repeated_source_ids": 0,
+      "flag_counts": {
+        "zero_yield_review": 3
+      },
+      "by_year": {
+        "2022": 529
+      },
+      "by_country": {
+        "malawi": 529
+      },
+      "candidate_yield_kg_ha_min_median_max": [
+        0.0,
+        2418.0,
+        10927.0
+      ],
+      "notes": [
+        "The maize identity is established by the campaign metadata; this public shapefile has no per-row crop column.",
+        "The actual .prj is EPSG:20936, not EPSG:4326 as stated in the generic metadata CSV. The derived locations/GeoJSON are transformed using the actual .prj to EPSG:4326. The datum operation used is Inverse of UTM zone 36S + Arc 1950 to WGS 84 (1) (with axis order normalized for visualization) (44 m accuracy); this is operation accuracy, not measured GPS error. Verify boundary alignment before extracting 10 m satellite pixels.",
+        "AVG_YLD is used as the field-average crop-cut yield, interpreted in tonnes/ha based on the campaign dictionary/methodology. The public subset does not expose the individual cuts for recalculation.",
+        "The public file has 529 rows, whereas the project narrative reports 523 sampled fields. No extra rows are arbitrarily removed to match the narrative.",
+        "The downloaded metadata explicitly states Creative Commons By Attribution (CC BY), despite the catalogue page lacking a licence."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+family,outer_fold,model,n_test,rmse
+s1_cc2km,0,Training mean,376,2.061404710123539
+s1_cc2km,0,Monthly availability,376,2.044762636472392
+s1_cc2km,0,NDVI monthly,376,1.7823772618961427
+s1_cc2km,0,GCVI monthly,376,1.7959587823749639
+s1_cc2km,0,MTCI monthly,376,1.9260527986793319
+s1_cc2km,0,NDVI705 monthly,376,1.7844833585533284
+s1_cc2km,0,NDVI740 monthly,376,1.9625179612101429
+s1_cc2km,0,All indices monthly,376,1.7561163146173568
+s1_cc2km,0,Monthly bands,376,1.5980217544939217
+s1_cc2km,0,MOSAIKS field monthly,376,1.9418011378559672
+s1_cc2km,0,MOSAIKS chip monthly,376,1.7306526796105433
+s1_cc2km,0,CV-selected satellite,376,1.5980217544939217
+s1_cc2km,1,Training mean,376,1.9457623780970659
+s1_cc2km,1,Monthly availability,376,1.9235926645024106
+s1_cc2km,1,NDVI monthly,376,1.6994320521425348
+s1_cc2km,1,GCVI monthly,376,1.6971322060755327
+s1_cc2km,1,MTCI monthly,376,1.8013054285168073
+s1_cc2km,1,NDVI705 monthly,376,1.6874010560072574
+s1_cc2km,1,NDVI740 monthly,376,1.7898998047661698
+s1_cc2km,1,All indices monthly,376,1.7288895860556872
+s1_cc2km,1,Monthly bands,376,1.6015426272664048
+s1_cc2km,1,MOSAIKS field monthly,376,1.670400067850755
+s1_cc2km,1,MOSAIKS chip monthly,376,1.6696610766980378
+s1_cc2km,1,CV-selected satellite,376,1.6015426272664048
+s1_cc2km,2,Training mean,376,1.8410694191397463
+s1_cc2km,2,Monthly availability,376,1.816588830064495
+s1_cc2km,2,NDVI monthly,376,1.698364310829334
+s1_cc2km,2,GCVI monthly,376,1.7667759534574734
+s1_cc2km,2,MTCI monthly,376,1.8592297701879932
+s1_cc2km,2,NDVI705 monthly,376,1.7520835526817973
+s1_cc2km,2,NDVI740 monthly,376,1.7098513184671116
+s1_cc2km,2,All indices monthly,376,1.7048194303663875
+s1_cc2km,2,Monthly bands,376,1.549910500282
+s1_cc2km,2,MOSAIKS field monthly,376,1.60469789669551
+s1_cc2km,2,MOSAIKS chip monthly,376,1.6180626469564465
+s1_cc2km,2,CV-selected satellite,376,1.549910500282
+s1_cc2km,3,Training mean,376,2.1770750478996828
+s1_cc2km,3,Monthly availability,376,2.1851866915573703
+s1_cc2km,3,NDVI monthly,376,1.8509285205563226
+s1_cc2km,3,GCVI monthly,376,1.8887166601921086
+s1_cc2km,3,MTCI monthly,376,2.025018146546183
+s1_cc2km,3,NDVI705 monthly,376,1.882240345129015
+s1_cc2km,3,NDVI740 monthly,376,2.005503692055829
+s1_cc2km,3,All indices monthly,376,1.8061973277947037
+s1_cc2km,3,Monthly bands,376,1.7251096519221882
+s1_cc2km,3,MOSAIKS field monthly,376,1.7563575304822756
+s1_cc2km,3,MOSAIKS chip monthly,376,1.8766788111014177
+s1_cc2km,3,CV-selected satellite,376,1.7251096519221882
+s1_cc2km,4,Training mean,376,1.9890423754701247
+s1_cc2km,4,Monthly availability,376,1.9683398689726426
+s1_cc2km,4,NDVI monthly,376,1.7092553008437616
+s1_cc2km,4,GCVI monthly,376,1.7283576323676657
+s1_cc2km,4,MTCI monthly,376,1.8750248107744683
+s1_cc2km,4,NDVI705 monthly,376,1.6816096869111676
+s1_cc2km,4,NDVI740 monthly,376,1.8040422844571815
+s1_cc2km,4,All indices monthly,376,1.6816187411832775
+s1_cc2km,4,Monthly bands,376,1.7118239292816375
+s1_cc2km,4,MOSAIKS field monthly,376,1.7230696963409127
+s1_cc2km,4,MOSAIKS chip monthly,376,1.7945375482562016
+s1_cc2km,4,CV-selected satellite,376,1.7118239292816375
+s2_region,0,Training mean,378,2.1825650743228326
+s2_region,0,Monthly availability,378,2.182564996695539
+s2_region,0,NDVI monthly,378,1.653444831772099
+s2_region,0,GCVI monthly,378,1.755341927093621
+s2_region,0,MTCI monthly,378,1.9549170073100384
+s2_region,0,NDVI705 monthly,378,1.669793732320625
+s2_region,0,NDVI740 monthly,378,1.9414328366702462
+s2_region,0,All indices monthly,378,1.6395896337336706
+s2_region,0,Monthly bands,378,1.4358309159116738
+s2_region,0,MOSAIKS field monthly,378,1.9033616330049183
+s2_region,0,MOSAIKS chip monthly,378,2.181408276593945
+s2_region,0,CV-selected satellite,378,1.669793732320625
+s2_region,1,Training mean,375,2.3659758792582486
+s2_region,1,Monthly availability,375,2.476652999230816
+s2_region,1,NDVI monthly,375,2.0164235483556756
+s2_region,1,GCVI monthly,375,2.1500689654023635
+s2_region,1,MTCI monthly,375,2.364979432413827
+s2_region,1,NDVI705 monthly,375,2.0878249919578242
+s2_region,1,NDVI740 monthly,375,2.1903294528657593
+s2_region,1,All indices monthly,375,2.0693517646642823
+s2_region,1,Monthly bands,375,2.0223550357318674
+s2_region,1,MOSAIKS field monthly,375,2.1135550441930238
+s2_region,1,MOSAIKS chip monthly,375,2.3522859564846508
+s2_region,1,CV-selected satellite,375,2.0223550357318674
+s2_region,2,Training mean,377,2.028356336433051
+s2_region,2,Monthly availability,377,2.049818786741079
+s2_region,2,NDVI monthly,377,1.9986580924049104
+s2_region,2,GCVI monthly,377,2.035770846478951
+s2_region,2,MTCI monthly,377,1.9890914546261953
+s2_region,2,NDVI705 monthly,377,2.0044572687293902
+s2_region,2,NDVI740 monthly,377,2.026020594237575
+s2_region,2,All indices monthly,377,1.9655229268747914
+s2_region,2,Monthly bands,377,1.8909610771497312
+s2_region,2,MOSAIKS field monthly,377,1.8724949929592534
+s2_region,2,MOSAIKS chip monthly,377,2.716729063552167
+s2_region,2,CV-selected satellite,377,1.8909610771497312
+s2_region,3,Training mean,372,1.971864200846562
+s2_region,3,Monthly availability,372,1.971864159588703
+s2_region,3,NDVI monthly,372,1.670024213093092
+s2_region,3,GCVI monthly,372,1.7237527504399959
+s2_region,3,MTCI monthly,372,1.8891666441900612
+s2_region,3,NDVI705 monthly,372,1.6746761718872767
+s2_region,3,NDVI740 monthly,372,1.8521558786220709
+s2_region,3,All indices monthly,372,1.7139774756206263
+s2_region,3,Monthly bands,372,1.6277368422599026
+s2_region,3,MOSAIKS field monthly,372,1.8645521091654778
+s2_region,3,MOSAIKS chip monthly,372,1.7117810531944293
+s2_region,3,CV-selected satellite,372,1.6277368422599026
+s2_region,4,Training mean,378,1.9558716131428757
+s2_region,4,Monthly availability,378,1.955871512552978
+s2_region,4,NDVI monthly,378,1.9331870153334927
+s2_region,4,GCVI monthly,378,1.9189010691743051
+s2_region,4,MTCI monthly,378,1.9410697207596996
+s2_region,4,NDVI705 monthly,378,1.8762084631852023
+s2_region,4,NDVI740 monthly,378,1.8845867254495055
+s2_region,4,All indices monthly,378,1.9740556105623082
+s2_region,4,Monthly bands,378,1.8861553957341919
+s2_region,4,MOSAIKS field monthly,378,1.9101198446248784
+s2_region,4,MOSAIKS chip monthly,378,2.0838647313903995
+s2_region,4,CV-selected satellite,378,1.8861553957341919

@@ -1,0 +1,9 @@
+{
+  "initial_train_mse": 4.3497582367924235,
+  "final_train_mse": 1.5756775751928953,
+  "final_val_mse": 2.9634898820164337,
+  "epochs_run": 50,
+  "threshold_met": null,
+  "encoder_changed": true,
+  "head_changed": true
+}

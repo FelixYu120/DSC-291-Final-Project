@@ -1,0 +1,100 @@
+{
+  "all_numeric_checks_passed": true,
+  "analysis_snapshot": "a8f31fb",
+  "target_arm_rows": 149,
+  "source_diagnostic_rows": 6,
+  "recomputed_metric_checks": 465,
+  "summary_rows_verified": 10,
+  "target_evaluation_fields_per_arm": 1504,
+  "references_in_first_citation_order": 6,
+  "frozen_release_outputs_unchanged": 158,
+  "scientific_models_refitted": false,
+  "model_pipeline_changed": false,
+  "source_files": {
+    "docs/paper/DATA_SOURCES_AND_PREPARATION.md": "8666016f0da99b3774231e579b826e8ebf7b81e6ee8c61cdec69eb596c825f6d",
+    "docs/paper/README.md": "cf849f1e93d5e651d824449c92f4273326fef2472e69c07f0fecf3c5f67a8ab8",
+    "docs/paper/REFERENCES.bib": "c35ecbb40552a459dbd0ecb32bd229a2160ab3531096494d11b9bcc7fa89172d",
+    "docs/paper/RESULTS_APPENDIX.md": "f5a7ae2f465b3713da160aa30957ed609163ad42ee63d3605b588dda180a5158",
+    "docs/paper/RESULTS_LEDGER.csv": "c6b4c44f16feef93950e4f9e81f6328ec854308db28d405bf359fc2df373dd8c",
+    "docs/paper/RESULTS_SUMMARY.md": "65d4c203b2dfbebd1a4b2af20355f22c8374aa4e1b86479d5422ec30ee4ef2a7",
+    "docs/paper/SUPPLEMENTARY_METHODS.md": "b6b68b71bff3e5a498d564bf8d1a3379b95bc2a8f6269924d1850100bc791a56",
+    "docs/paper/data_sources_and_preparation.docx": "014dc8f52fbca38c85d084e2904c995c11e52b7a86b5c23cfc1f0a3266ce940b",
+    "docs/paper/results_summary_one_page.docx": "df2a195798ae613b4af5a138dd6d220c78c1ea7d63c0675d46a4edda0d4d3964"
+  },
+  "document_builder_sha256": "f2915833d42e63b903f285f9a89292e1a7dd320228d1079e12084d80d820746b",
+  "documents": {
+    "docs/paper/data_sources_and_preparation.docx": {
+      "sha256": "014dc8f52fbca38c85d084e2904c995c11e52b7a86b5c23cfc1f0a3266ce940b",
+      "rendered_pages": 2,
+      "editable_fraction_count": 0,
+      "all_rendered_pages_visually_inspected": true,
+      "layout_findings": "Both pages inspected. NASA weather begins on page 2, and all six references fit. No clipped text, overlapping content, orphan headings or stray pages.",
+      "qa_pdf_sha256": "d6a9eb41c9c183201747a879d58f0649c36920a613ec0978b7e404d9095ae405",
+      "qa_page_image_sha256": {
+        "page-1.png": "bfb141f5892506209503446651b218c3f032cffde3afe68b410ab7159646fc14",
+        "page-2.png": "7d9d8cc9b6958769c8de25db7f3d883681d22ad33e3336388a56f0c516b93747"
+      }
+    },
+    "docs/paper/results_summary_one_page.docx": {
+      "sha256": "df2a195798ae613b4af5a138dd6d220c78c1ea7d63c0675d46a4edda0d4d3964",
+      "rendered_pages": 1,
+      "editable_fraction_count": 0,
+      "all_rendered_pages_visually_inspected": true,
+      "layout_findings": "No clipped text, overlapping content, split table rows or stray pages. Equations and tables are readable.",
+      "qa_pdf_sha256": "f760818050a534251890386c60147887c5e63f3ac3301bf0118293ceef0652a7",
+      "qa_page_image_sha256": {
+        "page-1.png": "23b219ac7f14ad47fb2b567e71748de9a29d3c74948d3b21f886597143a73c8e"
+      }
+    }
+  },
+  "bibliography_entries": 13,
+  "review": {
+    "processing_code_and_source_data_reviewed": true,
+    "primary_sources_and_citations_reviewed": true,
+    "results_independently_recomputed_from_saved_predictions": true,
+    "duplicate_controls_identified_in_ledger": true,
+    "review_type": "Repository and primary-source audit with independent agent review; not journal peer review.",
+    "corrected_method_descriptions": [
+      "provider-specific yield thresholds and tolerances",
+      "2024 physical crop-cut area remains unverified despite consistent normalization",
+      "point geometry and single-grid-cell satellite support",
+      "actual B08-based archived mtci formula",
+      "shared versus adaptive Ridge preprocessing",
+      "Presto representation comparison input differences"
+    ]
+  },
+  "renderer": {
+    "name": "documents skill render_docx.py",
+    "sha256": "876d5993324e2faaaa96a68a4f7504642e9a07e6df265b385b2baa03b231369e"
+  },
+  "supplementary_references_in_first_citation_order": 13,
+  "numeric_verification_reused_from_commit": "55b7db1",
+  "numeric_input_and_output_file_hashes_rechecked": true,
+  "shortening_revision": {
+    "local_date": "2026-11-08",
+    "requested_page_range": [
+      1,
+      2
+    ],
+    "rendered_pages_including_references": 2,
+    "extracted_words_including_footer": 872,
+    "full_prior_manuscript_body_preserved_as": "docs/paper/SUPPLEMENTARY_METHODS.md",
+    "shortened_text_independently_reviewed_against_full_methods": true,
+    "results_summary_and_all_numeric_result_tables_unchanged": true,
+    "model_metrics_and_predictions_recomputed_this_revision": false,
+    "version_scope": "Original v1 methods, explicitly labeled; newer v2 methodology and results preserved separately.",
+    "integrated_upstream_commit": "96916e1"
+  },
+  "document_builder_path": "scripts/paper/build_paper_documents.py",
+  "weather_and_processing_revision": {
+    "local_date": "2026-11-09",
+    "version_scope": "Original v1 analysis retained",
+    "rendered_pages_including_references": 2,
+    "extracted_words_including_footer": 1031,
+    "weather_source_and_recipe_checked_against_supplement_and_code": true,
+    "independent_factual_review_passed": true,
+    "more_conversational_wording": true,
+    "results_and_supplement_unchanged": true,
+    "model_metrics_and_predictions_recomputed_this_revision": false
+  }
+}

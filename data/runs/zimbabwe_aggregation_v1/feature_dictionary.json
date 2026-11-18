@@ -1,0 +1,128 @@
+{
+  "bands_v0_mean": [
+    "bands_v0_mean__b02",
+    "bands_v0_mean__b03",
+    "bands_v0_mean__b04",
+    "bands_v0_mean__b05",
+    "bands_v0_mean__b06",
+    "bands_v0_mean__b07",
+    "bands_v0_mean__b08",
+    "bands_v0_mean__b8a",
+    "bands_v0_mean__b11",
+    "bands_v0_mean__b12"
+  ],
+  "bands_v1_calendar_mean": [
+    "bands_v1_calendar_mean__b02",
+    "bands_v1_calendar_mean__b03",
+    "bands_v1_calendar_mean__b04",
+    "bands_v1_calendar_mean__b05",
+    "bands_v1_calendar_mean__b06",
+    "bands_v1_calendar_mean__b07",
+    "bands_v1_calendar_mean__b08",
+    "bands_v1_calendar_mean__b8a",
+    "bands_v1_calendar_mean__b11",
+    "bands_v1_calendar_mean__b12"
+  ],
+  "bands_v1_preharvest_mean": [
+    "bands_v1_preharvest_mean__b02",
+    "bands_v1_preharvest_mean__b03",
+    "bands_v1_preharvest_mean__b04",
+    "bands_v1_preharvest_mean__b05",
+    "bands_v1_preharvest_mean__b06",
+    "bands_v1_preharvest_mean__b07",
+    "bands_v1_preharvest_mean__b08",
+    "bands_v1_preharvest_mean__b8a",
+    "bands_v1_preharvest_mean__b11",
+    "bands_v1_preharvest_mean__b12"
+  ],
+  "bands_v2_max": [
+    "bands_v2_max__b02",
+    "bands_v2_max__b03",
+    "bands_v2_max__b04",
+    "bands_v2_max__b05",
+    "bands_v2_max__b06",
+    "bands_v2_max__b07",
+    "bands_v2_max__b08",
+    "bands_v2_max__b8a",
+    "bands_v2_max__b11",
+    "bands_v2_max__b12"
+  ],
+  "bands_v3_median": [
+    "bands_v3_median__b02",
+    "bands_v3_median__b03",
+    "bands_v3_median__b04",
+    "bands_v3_median__b05",
+    "bands_v3_median__b06",
+    "bands_v3_median__b07",
+    "bands_v3_median__b08",
+    "bands_v3_median__b8a",
+    "bands_v3_median__b11",
+    "bands_v3_median__b12"
+  ],
+  "bands_v3_mode": [
+    "bands_v3_mode__b02",
+    "bands_v3_mode__b03",
+    "bands_v3_mode__b04",
+    "bands_v3_mode__b05",
+    "bands_v3_mode__b06",
+    "bands_v3_mode__b07",
+    "bands_v3_mode__b08",
+    "bands_v3_mode__b8a",
+    "bands_v3_mode__b11",
+    "bands_v3_mode__b12"
+  ],
+  "indices_v0_mean": [
+    "indices_v0_mean__ndvi",
+    "indices_v0_mean__gcvi",
+    "indices_v0_mean__mtci",
+    "indices_v0_mean__ndvi705",
+    "indices_v0_mean__ndvi740"
+  ],
+  "indices_v1_calendar_mean": [
+    "indices_v1_calendar_mean__ndvi",
+    "indices_v1_calendar_mean__gcvi",
+    "indices_v1_calendar_mean__mtci",
+    "indices_v1_calendar_mean__ndvi705",
+    "indices_v1_calendar_mean__ndvi740"
+  ],
+  "indices_v1_preharvest_mean": [
+    "indices_v1_preharvest_mean__ndvi",
+    "indices_v1_preharvest_mean__gcvi",
+    "indices_v1_preharvest_mean__mtci",
+    "indices_v1_preharvest_mean__ndvi705",
+    "indices_v1_preharvest_mean__ndvi740"
+  ],
+  "indices_v2_max": [
+    "indices_v2_max__ndvi",
+    "indices_v2_max__gcvi",
+    "indices_v2_max__mtci",
+    "indices_v2_max__ndvi705",
+    "indices_v2_max__ndvi740"
+  ],
+  "indices_v3_median": [
+    "indices_v3_median__ndvi",
+    "indices_v3_median__gcvi",
+    "indices_v3_median__mtci",
+    "indices_v3_median__ndvi705",
+    "indices_v3_median__ndvi740"
+  ],
+  "indices_v3_mode": [
+    "indices_v3_mode__ndvi",
+    "indices_v3_mode__gcvi",
+    "indices_v3_mode__mtci",
+    "indices_v3_mode__ndvi705",
+    "indices_v3_mode__ndvi740"
+  ],
+  "legacy_indices_mean_max": [
+    "legacy_indices_mean_max__ndvi_season_max",
+    "legacy_indices_mean_max__ndvi_season_mean",
+    "legacy_indices_mean_max__gcvi_season_max",
+    "legacy_indices_mean_max__gcvi_season_mean",
+    "legacy_indices_mean_max__mtci_season_max",
+    "legacy_indices_mean_max__mtci_season_mean",
+    "legacy_indices_mean_max__ndvi705_season_max",
+    "legacy_indices_mean_max__ndvi705_season_mean",
+    "legacy_indices_mean_max__ndvi740_season_max",
+    "legacy_indices_mean_max__ndvi740_season_mean"
+  ]
+}

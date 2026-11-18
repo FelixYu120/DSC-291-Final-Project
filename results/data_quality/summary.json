@@ -1,0 +1,1131 @@
+{
+  "created_at": "2026-11-04T06:34:11.759732+00:00",
+  "branch": "felix-branch",
+  "git_commit": "434cd3e998f5c1903edbd3f00a83c02699dc65da",
+  "working_tree_dirty": false,
+  "integrity_passed": true,
+  "scientific_review_status": "open",
+  "models_trained_or_scored": false,
+  "observations_modified_or_removed": 0,
+  "tables": {
+    "labels": 11364,
+    "downloads": 11364,
+    "scenes": 84967,
+    "coverage": 98299,
+    "monthly_bands": 98299,
+    "vegetation_indices": 98299,
+    "presto_embeddings": 11364,
+    "mosaiks_monthly": 84967,
+    "mosaiks_season": 11364
+  },
+  "cohorts": [
+    {
+      "cohort": "kenya_oaf_2019_2020",
+      "eligible_fields": 3977,
+      "usable_fields": 3977,
+      "flags": {
+        "insufficient_clear_months": {
+          "flagged": 0,
+          "assessed": 3977,
+          "unknown_or_not_applicable": 0
+        },
+        "zero_yield": {
+          "flagged": 74,
+          "assessed": 3977,
+          "unknown_or_not_applicable": 0
+        },
+        "exact_coordinates_repeated": {
+          "flagged": 203,
+          "assessed": 3977,
+          "unknown_or_not_applicable": 0
+        },
+        "near_coordinates_10m": {
+          "flagged": 560,
+          "assessed": 3977,
+          "unknown_or_not_applicable": 0
+        },
+        "polygon_overlap": {
+          "flagged": 0,
+          "assessed": 3977,
+          "unknown_or_not_applicable": 0
+        },
+        "impossible_date": {
+          "flagged": 13,
+          "assessed": 3977,
+          "unknown_or_not_applicable": 0
+        },
+        "missing_observation_date": {
+          "flagged": 89,
+          "assessed": 3977,
+          "unknown_or_not_applicable": 0
+        },
+        "observation_outside_window": {
+          "flagged": 850,
+          "assessed": 3888,
+          "unknown_or_not_applicable": 89
+        },
+        "harvest_after_window": {
+          "flagged": 850,
+          "assessed": 3888,
+          "unknown_or_not_applicable": 89
+        },
+        "post_observation_scene": {
+          "flagged": 2897,
+          "assessed": 3888,
+          "unknown_or_not_applicable": 89
+        },
+        "low_peak_ndvi": {
+          "flagged": 285,
+          "assessed": 3977,
+          "unknown_or_not_applicable": 0
+        },
+        "high_blue_reflectance": {
+          "flagged": 191,
+          "assessed": 3977,
+          "unknown_or_not_applicable": 0
+        },
+        "extreme_mtci": {
+          "flagged": 50,
+          "assessed": 3977,
+          "unknown_or_not_applicable": 0
+        },
+        "reflectance_outside_0_1": {
+          "flagged": 0,
+          "assessed": 3977,
+          "unknown_or_not_applicable": 0
+        },
+        "missing_march": {
+          "flagged": 0,
+          "assessed": 0,
+          "unknown_or_not_applicable": 3977
+        },
+        "provisional_yield_units": {
+          "flagged": 0,
+          "assessed": 3977,
+          "unknown_or_not_applicable": 0
+        },
+        "malawi_cut_area_unresolved": {
+          "flagged": 0,
+          "assessed": 3977,
+          "unknown_or_not_applicable": 0
+        },
+        "kenya_2020_protocol_inferred": {
+          "flagged": 2209,
+          "assessed": 3977,
+          "unknown_or_not_applicable": 0
+        }
+      }
+    },
+    {
+      "cohort": "malawi_2023",
+      "eligible_fields": 260,
+      "usable_fields": 251,
+      "flags": {
+        "insufficient_clear_months": {
+          "flagged": 9,
+          "assessed": 260,
+          "unknown_or_not_applicable": 0
+        },
+        "zero_yield": {
+          "flagged": 0,
+          "assessed": 260,
+          "unknown_or_not_applicable": 0
+        },
+        "exact_coordinates_repeated": {
+          "flagged": 0,
+          "assessed": 260,
+          "unknown_or_not_applicable": 0
+        },
+        "near_coordinates_10m": {
+          "flagged": 4,
+          "assessed": 260,
+          "unknown_or_not_applicable": 0
+        },
+        "polygon_overlap": {
+          "flagged": 14,
+          "assessed": 260,
+          "unknown_or_not_applicable": 0
+        },
+        "impossible_date": {
+          "flagged": 0,
+          "assessed": 0,
+          "unknown_or_not_applicable": 260
+        },
+        "missing_observation_date": {
+          "flagged": 0,
+          "assessed": 260,
+          "unknown_or_not_applicable": 0
+        },
+        "observation_outside_window": {
+          "flagged": 0,
+          "assessed": 260,
+          "unknown_or_not_applicable": 0
+        },
+        "harvest_after_window": {
+          "flagged": 0,
+          "assessed": 0,
+          "unknown_or_not_applicable": 260
+        },
+        "post_observation_scene": {
+          "flagged": 260,
+          "assessed": 260,
+          "unknown_or_not_applicable": 0
+        },
+        "low_peak_ndvi": {
+          "flagged": 11,
+          "assessed": 260,
+          "unknown_or_not_applicable": 0
+        },
+        "high_blue_reflectance": {
+          "flagged": 29,
+          "assessed": 260,
+          "unknown_or_not_applicable": 0
+        },
+        "extreme_mtci": {
+          "flagged": 0,
+          "assessed": 260,
+          "unknown_or_not_applicable": 0
+        },
+        "reflectance_outside_0_1": {
+          "flagged": 0,
+          "assessed": 260,
+          "unknown_or_not_applicable": 0
+        },
+        "missing_march": {
+          "flagged": 128,
+          "assessed": 260,
+          "unknown_or_not_applicable": 0
+        },
+        "provisional_yield_units": {
+          "flagged": 0,
+          "assessed": 260,
+          "unknown_or_not_applicable": 0
+        },
+        "malawi_cut_area_unresolved": {
+          "flagged": 260,
+          "assessed": 260,
+          "unknown_or_not_applicable": 0
+        },
+        "kenya_2020_protocol_inferred": {
+          "flagged": 0,
+          "assessed": 260,
+          "unknown_or_not_applicable": 0
+        }
+      }
+    },
+    {
+      "cohort": "zimbabwe_lacuna_2022_2023",
+      "eligible_fields": 1880,
+      "usable_fields": 1880,
+      "flags": {
+        "insufficient_clear_months": {
+          "flagged": 0,
+          "assessed": 1880,
+          "unknown_or_not_applicable": 0
+        },
+        "zero_yield": {
+          "flagged": 28,
+          "assessed": 1880,
+          "unknown_or_not_applicable": 0
+        },
+        "exact_coordinates_repeated": {
+          "flagged": 14,
+          "assessed": 1880,
+          "unknown_or_not_applicable": 0
+        },
+        "near_coordinates_10m": {
+          "flagged": 22,
+          "assessed": 1880,
+          "unknown_or_not_applicable": 0
+        },
+        "polygon_overlap": {
+          "flagged": 0,
+          "assessed": 1880,
+          "unknown_or_not_applicable": 0
+        },
+        "impossible_date": {
+          "flagged": 0,
+          "assessed": 1880,
+          "unknown_or_not_applicable": 0
+        },
+        "missing_observation_date": {
+          "flagged": 0,
+          "assessed": 1880,
+          "unknown_or_not_applicable": 0
+        },
+        "observation_outside_window": {
+          "flagged": 2,
+          "assessed": 1880,
+          "unknown_or_not_applicable": 0
+        },
+        "harvest_after_window": {
+          "flagged": 2,
+          "assessed": 1880,
+          "unknown_or_not_applicable": 0
+        },
+        "post_observation_scene": {
+          "flagged": 1810,
+          "assessed": 1880,
+          "unknown_or_not_applicable": 0
+        },
+        "low_peak_ndvi": {
+          "flagged": 182,
+          "assessed": 1880,
+          "unknown_or_not_applicable": 0
+        },
+        "high_blue_reflectance": {
+          "flagged": 174,
+          "assessed": 1880,
+          "unknown_or_not_applicable": 0
+        },
+        "extreme_mtci": {
+          "flagged": 26,
+          "assessed": 1880,
+          "unknown_or_not_applicable": 0
+        },
+        "reflectance_outside_0_1": {
+          "flagged": 0,
+          "assessed": 1880,
+          "unknown_or_not_applicable": 0
+        },
+        "missing_march": {
+          "flagged": 0,
+          "assessed": 0,
+          "unknown_or_not_applicable": 1880
+        },
+        "provisional_yield_units": {
+          "flagged": 1880,
+          "assessed": 1880,
+          "unknown_or_not_applicable": 0
+        },
+        "malawi_cut_area_unresolved": {
+          "flagged": 0,
+          "assessed": 1880,
+          "unknown_or_not_applicable": 0
+        },
+        "kenya_2020_protocol_inferred": {
+          "flagged": 0,
+          "assessed": 1880,
+          "unknown_or_not_applicable": 0
+        }
+      }
+    }
+  ],
+  "checks": [
+    {
+      "rule": "team_database_fingerprint",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "frozen_labels_fingerprint",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "frozen_split_malawi_2023__s1_cc2km.csv",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "frozen_split_malawi_2023__s2_region.csv",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "frozen_split_malawi_2023__random_diag.csv",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "frozen_split_kenya_oaf_2019_2020__s1_cc2km.csv",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "frozen_split_kenya_oaf_2019_2020__s2_region.csv",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "frozen_split_kenya_oaf_2019_2020__random_diag.csv",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "frozen_split_kenya_oaf_2019_2020__temporal.csv",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "frozen_split_zimbabwe_lacuna_2022_2023__s1_cc2km.csv",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "frozen_split_zimbabwe_lacuna_2022_2023__s2_region.csv",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "frozen_split_zimbabwe_lacuna_2022_2023__random_diag.csv",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "frozen_split_zimbabwe_2024__s1_cc2km.csv",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "frozen_split_zimbabwe_2024__s2_region.csv",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "frozen_split_zimbabwe_2024__random_diag.csv",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "source_audit_malawi_2022_screened_candidates",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "source_audit_malawi_2023_screened_candidates",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "source_audit_one_acre_fund_full_screened_candidates",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "source_audit_vision_guided_yield_estimation_screened_candidates",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "source_audit_zimbabwe_screened_candidates",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "label_contract",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "field_geometry_valid",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "representative_point_in_polygon",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "source_measurement_and_location_checks",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "labels_unique_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "labels_nonnull_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "labels_label_links",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "downloads_unique_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "downloads_nonnull_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "downloads_label_links",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "scenes_unique_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "scenes_nonnull_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "scenes_label_links",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "coverage_unique_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "coverage_nonnull_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "coverage_label_links",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "monthly_bands_unique_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "monthly_bands_nonnull_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "monthly_bands_label_links",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "vegetation_indices_unique_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "vegetation_indices_nonnull_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "vegetation_indices_label_links",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "presto_embeddings_unique_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "presto_embeddings_nonnull_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "presto_embeddings_label_links",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "mosaiks_monthly_unique_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "mosaiks_monthly_nonnull_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "mosaiks_monthly_label_links",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "mosaiks_season_unique_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "mosaiks_season_nonnull_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "mosaiks_season_label_links",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "database_labels_same_ids",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "database_matches_yield_kg_ha",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "database_matches_lat",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "database_matches_lon",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "database_matches_cohort",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "database_matches_season_year",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "database_matches_source_id",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "database_matches_source_row",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "database_matches_include_primary",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "database_matches_exclusion_reason",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "database_matches_season_start",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "database_matches_season_end",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "valid_yield_and_coordinates",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "source_yield_unit_conversion",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "valid_season_windows",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "coverage_expected_calendar",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": "Each downloaded field has exactly its declared season's months."
+    },
+    {
+      "rule": "coverage_states",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "coverage_matches_monthly_missingness",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "coverage_matches_accepted_scenes",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "monthly_band_null_and_finite_contract",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": "Missing months contain NULL bands, not zeros; present months contain finite bands."
+    },
+    {
+      "rule": "accepted_scene_quality_contract",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "scene_dates_match_month_and_window",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "download_window_and_pixel_contract",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "download_accepted_month_count",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "monthly_field_pixel_count",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "index_month_keys",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "index_formula_ndvi",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": "Recomputed from stored reflectance; zero denominator must become NULL."
+    },
+    {
+      "rule": "index_formula_gcvi",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": "Recomputed from stored reflectance; zero denominator must become NULL."
+    },
+    {
+      "rule": "index_formula_mtci",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": "Recomputed from stored reflectance; zero denominator must become NULL."
+    },
+    {
+      "rule": "index_formula_ndvi705",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": "Recomputed from stored reflectance; zero denominator must become NULL."
+    },
+    {
+      "rule": "index_formula_ndvi740",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": "Recomputed from stored reflectance; zero denominator must become NULL."
+    },
+    {
+      "rule": "presto_embeddings_embedding_finite_dimensions",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "mosaiks_season_chip_finite_dimensions",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "mosaiks_season_field_finite_dimensions",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "mosaiks_monthly_chip_finite_dimensions",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": "Monthly MOSAIKS NULL vectors are allowed and counted separately as unavailable features."
+    },
+    {
+      "rule": "mosaiks_monthly_field_finite_dimensions",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": "Monthly MOSAIKS NULL vectors are allowed and counted separately as unavailable features."
+    },
+    {
+      "rule": "team_copy_complete_downloads",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": "Completeness requirement for this shared team database, not a partial download."
+    },
+    {
+      "rule": "team_copy_complete_presto_embeddings",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": "Completeness requirement for this shared team database, not a partial download."
+    },
+    {
+      "rule": "team_copy_complete_mosaiks_season",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": "Completeness requirement for this shared team database, not a partial download."
+    },
+    {
+      "rule": "mosaiks_months_match_scenes",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "mosaiks_season_month_count",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "season_summary_ids",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "season_ndvi_max",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "season_ndvi_mean",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "season_gcvi_max",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "season_gcvi_mean",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "season_mtci_max",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "season_mtci_mean",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "season_ndvi705_max",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "season_ndvi705_mean",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "season_ndvi740_max",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "season_ndvi740_mean",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "master_clear_month_count",
+      "status": "pass",
+      "failed_rows": 0,
+      "detail": ""
+    },
+    {
+      "rule": "master_row_count",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "frozen_scene_selection",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "all_core_cohorts_present",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    },
+    {
+      "rule": "all_protected_inputs_unchanged",
+      "status": "pass",
+      "failed_rows": null,
+      "detail": ""
+    }
+  ],
+  "monthly_feature_availability": [
+    {
+      "cohort": "kenya_oaf_2019_2020",
+      "scene_months": 29482,
+      "missing_chip_vectors": 1,
+      "missing_field_vectors": 205
+    },
+    {
+      "cohort": "malawi_2022",
+      "scene_months": 1591,
+      "missing_chip_vectors": 0,
+      "missing_field_vectors": 0
+    },
+    {
+      "cohort": "malawi_2023",
+      "scene_months": 1387,
+      "missing_chip_vectors": 0,
+      "missing_field_vectors": 0
+    },
+    {
+      "cohort": "zimbabwe_2024",
+      "scene_months": 38518,
+      "missing_chip_vectors": 0,
+      "missing_field_vectors": 186
+    },
+    {
+      "cohort": "zimbabwe_lacuna_2022_2023",
+      "scene_months": 13989,
+      "missing_chip_vectors": 0,
+      "missing_field_vectors": 128
+    }
+  ],
+  "review_rule_definitions": {
+    "insufficient_clear_months": "Fewer than four nonmissing field-months; availability flag, not a bad yield.",
+    "zero_yield": "Measured zero retained under the core cohort policy; do not drop automatically.",
+    "exact_coordinates_repeated": "Coordinates repeat within the cohort, possibly across years; check field identity.",
+    "near_coordinates_10m": "Frozen near_dup_10m flag, computed on the whole original cohort (including excluded rows).",
+    "polygon_overlap": "Frozen overlap flag: more than 50% of the smaller polygon overlaps another polygon.",
+    "impossible_date": "Known planting/harvest dates violate ordering or year rules; comparisons requiring missing dates remain unverified.",
+    "missing_observation_date": "No usable harvest or crop-cut observation date; timing comparisons are unknown.",
+    "observation_outside_window": "Recorded harvest/cut date lies outside the fixed imagery season.",
+    "harvest_after_window": "Harvest date is later than the end of the imagery season.",
+    "post_observation_scene": "At least one scene follows harvest/crop-cut; restrict claims to retrospective estimation.",
+    "low_peak_ndvi": "Seasonal NDVI max < 0.5: possible location, timing or vegetation issue; not a crop-validity test.",
+    "high_blue_reflectance": "At least one nonmissing month has B02 > 0.15; possible haze or bright ground.",
+    "extreme_mtci": "At least one month has absolute MTCI > 100; inspect its denominator.",
+    "reflectance_outside_0_1": "At least one finite reflectance is outside [0,1]; possible atmospheric/processing effect, not automatic corruption.",
+    "missing_march": "Malawi only: March is not clear. Other cohorts are not assessed by this rule.",
+    "provisional_yield_units": "Lacuna product/moisture conventions require provider confirmation.",
+    "malawi_cut_area_unresolved": "Provider must clarify whether the main harvested area was 75 or 100 square metres.",
+    "kenya_2020_protocol_inferred": "The 2020 cut-size interpretation is inferred; explicit provider confirmation remains useful."
+  },
+  "open_questions": [
+    {
+      "cohort": "malawi_2023",
+      "status": "provider_confirmation_needed",
+      "question": "Did the main crop-cut weight cover 100 m\u00b2, or 75 m\u00b2 after removing the nested 5\u00d75 m cut?",
+      "action": "Keep provider yield unchanged until harvest-area documentation resolves this."
+    },
+    {
+      "cohort": "kenya_oaf_2019_2020",
+      "status": "provider_confirmation_needed",
+      "question": "Which GPS points mark fields versus homes; which repeats are the same field; can invalid/missing dates be corrected?",
+      "action": "Review flagged IDs with original survey records. Ask for explicit 2020 crop-cut protocol confirmation."
+    },
+    {
+      "cohort": "zimbabwe_lacuna_2022_2023",
+      "status": "provider_confirmation_needed",
+      "question": "What are the grain/cob basis, drying or moisture convention, and yield unit definition?",
+      "action": "Retain provisional-unit flag; do not infer cross-country measurement equivalence."
+    }
+  ],
+  "limitations": [
+    "This audit checks stored data, conversions and internal consistency; it cannot establish ground truth.",
+    "No pixel-level image, cloud-mask or GPS-on-field visual inspection is performed. Stored metadata passing is not a visual pass.",
+    "The numerical validity of embeddings is checked; their semantic correctness is not established by finite values.",
+    "Review thresholds are fixed descriptive heuristics from the data guide, not learned cutoffs or automatic exclusions.",
+    "Country membership is not independently checked against an administrative-boundary dataset.",
+    "Uncertain crop-cut methods, moisture conventions and missing dates need provider evidence, not guessed corrections.",
+    "Fields may have multiple review flags; counts must not be added to obtain a number of bad fields.",
+    "Only Kenya, Malawi 2023 and Lacuna primary rows receive detailed review tables; integrity checks cover all retained cohorts."
+  ],
+  "country_folders": {
+    "kenya_oaf_2019_2020": "KEN",
+    "malawi_2023": "MWI",
+    "zimbabwe_lacuna_2022_2023": "ZWE"
+  },
+  "input_sha256_before": {
+    "configs/sentinel2_scenes_v1.parquet": "d48bff1dc4a455af5f614fbc0dc43b08456833c1b6f2050d2bfac5b2022e60fa",
+    "configs/team_database_v1.json": "c57a284f6334cc824284c85c327a79a5123b305ae4de818eb099de1ffd257b95",
+    "data/audit/malawi_2022_screened_candidates.csv": "5eda1742f125e5f22847c5e8baa03c02a00adfbb770f1b5be19c06c8f3ae9e8e",
+    "data/audit/malawi_2023_screened_candidates.csv": "a4b3f3915396a656137d5b06b4649ff3ec0578efbb4308d4d063488fbe952731",
+    "data/audit/one_acre_fund_full_screened_candidates.csv": "c78e15a95f36ad4048ad09a055d75e64d145b4d0abb675a7d69f164682932090",
+    "data/audit/vision_guided_yield_estimation_screened_candidates.csv": "2c5a730c18a4afbb583228a9ec26fb4729ec17085471536f0fbe3ad079e4dd8a",
+    "data/audit/zimbabwe_screened_candidates.csv": "b5760d3ea75d3019d06c97f8f77ad4d32b5a796185537fc940fc6aab3bd4d14c",
+    "data/cropyield.duckdb": "e192b9d6021fdae020f9b08123b98648dc4b5274989635927c709a5607cdcd60",
+    "data/metadata/download_manifest.json": "9bb2d31ed98357ee45a3608917cbddb93eba55a8186423c09a52ae14ee43217d",
+    "data/processed/labels_v1.parquet": "49aae383c4489aa98e9e7fe8c31cda6bf1cd752adc8e9540cffdc147a5e0ef92",
+    "data/raw/malawi/mwi_kas_lc_fo_202305_cc_yield.zip": "6ba8dc16762beec48ee1b0498a5540a67088d3b1a0aa2efbcb918afbcee7a304",
+    "data/raw/one_acre_fund_full/one_acre_fund_mel_data_all_countries.xlsx": "ed812dc779a57377fcdb3b002346343d62e3a90cb6b5248f8fa0de62a08a39c8",
+    "data/raw/zimbabwe/Lacuna_Yield_data_geojson-2023.geojson": "0dc4301509072c4306c951d88cf7cc6e0832c46aab921d237341c17bc6bb78cd",
+    "data/splits/kenya_oaf_2019_2020__random_diag.csv": "db6247d269334bf63f338bacc68fb1931b5df74390a472981f100f006cd4a02f",
+    "data/splits/kenya_oaf_2019_2020__s1_cc2km.csv": "752e4ac95980eea57f36685906735c49b0213f498cae7b88c293a360014e8801",
+    "data/splits/kenya_oaf_2019_2020__s2_region.csv": "93a6102262294f186898e4d4ef675233f3153addb39d28b9f19226441911de35",
+    "data/splits/kenya_oaf_2019_2020__temporal.csv": "dd0c3cc68f24ecf1c69de93cf329237cac89d671bed2f7ccf9aad29ef1b6f959",
+    "data/splits/malawi_2023__random_diag.csv": "b65cab99d548bc5b790cefa7654de9ec373461ccbd0783c26fb81c2899764128",
+    "data/splits/malawi_2023__s1_cc2km.csv": "d7536035db17f25e3a3658218ff97bf1e06897ba7d9e4a232c492d51572fd5a2",
+    "data/splits/malawi_2023__s2_region.csv": "a12cdbf1b55c9731b35ce7993ba3afd174e55c7f5cc5effb42d00f1b8985e4db",
+    "data/splits/manifest.json": "b8abf5e47c59d7e6c93620742de65ca5ba6a332d3a701eedc61a67d2533af53f",
+    "data/splits/zimbabwe_2024__random_diag.csv": "3a16126c2bedb7b8dc2162d8cfee2e9918f5f8a09e48ba3c3d84bf5e2fe426cd",
+    "data/splits/zimbabwe_2024__s1_cc2km.csv": "f96a188ad708c2fe9a8e3721e4517b2da3f85a823ca9b485e8d2a36cdb384d61",
+    "data/splits/zimbabwe_2024__s2_region.csv": "5fb70cec3dc6cf79431e2529bb6881f2cca067160990781755f21b481884b766",
+    "data/splits/zimbabwe_lacuna_2022_2023__random_diag.csv": "d6dc5bc2e16ad5fb108652614b5b6898037adda54932a279703ba09c7c227d9f",
+    "data/splits/zimbabwe_lacuna_2022_2023__s1_cc2km.csv": "253f437d30a3742779e164c6b30fda5d613d5fe38decccf2b45ce21d95288dff",
+    "data/splits/zimbabwe_lacuna_2022_2023__s2_region.csv": "da357af13e1fa78d55c812211fc9948d425673dff0426be4d20a396aed827252"
+  },
+  "input_sha256_after": {
+    "configs/sentinel2_scenes_v1.parquet": "d48bff1dc4a455af5f614fbc0dc43b08456833c1b6f2050d2bfac5b2022e60fa",
+    "configs/team_database_v1.json": "c57a284f6334cc824284c85c327a79a5123b305ae4de818eb099de1ffd257b95",
+    "data/audit/malawi_2022_screened_candidates.csv": "5eda1742f125e5f22847c5e8baa03c02a00adfbb770f1b5be19c06c8f3ae9e8e",
+    "data/audit/malawi_2023_screened_candidates.csv": "a4b3f3915396a656137d5b06b4649ff3ec0578efbb4308d4d063488fbe952731",
+    "data/audit/one_acre_fund_full_screened_candidates.csv": "c78e15a95f36ad4048ad09a055d75e64d145b4d0abb675a7d69f164682932090",
+    "data/audit/vision_guided_yield_estimation_screened_candidates.csv": "2c5a730c18a4afbb583228a9ec26fb4729ec17085471536f0fbe3ad079e4dd8a",
+    "data/audit/zimbabwe_screened_candidates.csv": "b5760d3ea75d3019d06c97f8f77ad4d32b5a796185537fc940fc6aab3bd4d14c",
+    "data/cropyield.duckdb": "e192b9d6021fdae020f9b08123b98648dc4b5274989635927c709a5607cdcd60",
+    "data/metadata/download_manifest.json": "9bb2d31ed98357ee45a3608917cbddb93eba55a8186423c09a52ae14ee43217d",
+    "data/processed/labels_v1.parquet": "49aae383c4489aa98e9e7fe8c31cda6bf1cd752adc8e9540cffdc147a5e0ef92",
+    "data/raw/malawi/mwi_kas_lc_fo_202305_cc_yield.zip": "6ba8dc16762beec48ee1b0498a5540a67088d3b1a0aa2efbcb918afbcee7a304",
+    "data/raw/one_acre_fund_full/one_acre_fund_mel_data_all_countries.xlsx": "ed812dc779a57377fcdb3b002346343d62e3a90cb6b5248f8fa0de62a08a39c8",
+    "data/raw/zimbabwe/Lacuna_Yield_data_geojson-2023.geojson": "0dc4301509072c4306c951d88cf7cc6e0832c46aab921d237341c17bc6bb78cd",
+    "data/splits/kenya_oaf_2019_2020__random_diag.csv": "db6247d269334bf63f338bacc68fb1931b5df74390a472981f100f006cd4a02f",
+    "data/splits/kenya_oaf_2019_2020__s1_cc2km.csv": "752e4ac95980eea57f36685906735c49b0213f498cae7b88c293a360014e8801",
+    "data/splits/kenya_oaf_2019_2020__s2_region.csv": "93a6102262294f186898e4d4ef675233f3153addb39d28b9f19226441911de35",
+    "data/splits/kenya_oaf_2019_2020__temporal.csv": "dd0c3cc68f24ecf1c69de93cf329237cac89d671bed2f7ccf9aad29ef1b6f959",
+    "data/splits/malawi_2023__random_diag.csv": "b65cab99d548bc5b790cefa7654de9ec373461ccbd0783c26fb81c2899764128",
+    "data/splits/malawi_2023__s1_cc2km.csv": "d7536035db17f25e3a3658218ff97bf1e06897ba7d9e4a232c492d51572fd5a2",
+    "data/splits/malawi_2023__s2_region.csv": "a12cdbf1b55c9731b35ce7993ba3afd174e55c7f5cc5effb42d00f1b8985e4db",
+    "data/splits/manifest.json": "b8abf5e47c59d7e6c93620742de65ca5ba6a332d3a701eedc61a67d2533af53f",
+    "data/splits/zimbabwe_2024__random_diag.csv": "3a16126c2bedb7b8dc2162d8cfee2e9918f5f8a09e48ba3c3d84bf5e2fe426cd",
+    "data/splits/zimbabwe_2024__s1_cc2km.csv": "f96a188ad708c2fe9a8e3721e4517b2da3f85a823ca9b485e8d2a36cdb384d61",
+    "data/splits/zimbabwe_2024__s2_region.csv": "5fb70cec3dc6cf79431e2529bb6881f2cca067160990781755f21b481884b766",
+    "data/splits/zimbabwe_lacuna_2022_2023__random_diag.csv": "d6dc5bc2e16ad5fb108652614b5b6898037adda54932a279703ba09c7c227d9f",
+    "data/splits/zimbabwe_lacuna_2022_2023__s1_cc2km.csv": "253f437d30a3742779e164c6b30fda5d613d5fe38decccf2b45ce21d95288dff",
+    "data/splits/zimbabwe_lacuna_2022_2023__s2_region.csv": "da357af13e1fa78d55c812211fc9948d425673dff0426be4d20a396aed827252"
+  },
+  "source_code_sha256": {
+    "scripts/audit_data_quality.py": "f28638b78e1b50ecaac0329df323a9f7e18084b3dcf33000effea14882bed344",
+    "src/cropyield/data/quality.py": "9cb0d4786a35b0dddf319115cc9a13595d69c0f8725558e2cecf13419cea62b8",
+    "src/cropyield/data/labels.py": "3166a1e43959cf5113760060945cd96581dcfad10502cf65a2edcc2d1e29326a"
+  },
+  "package_versions": {
+    "duckdb": "1.5.5",
+    "pandas": "3.0.6",
+    "numpy": "2.5.3",
+    "shapely": "2.1.2",
+    "pyarrow": "25.0.1"
+  },
+  "snapshot_note": "Aggregate snapshot only; input paths normalized relative to repository root. Record-level files stay local.",
+  "local_report_directory": "data/runs/data_quality/2026-11-03-final",
+  "validation": {
+    "data_pipeline_tests_passed": 200,
+    "platform_tests_skipped": 2,
+    "quality_tests_passed": 35,
+    "ruff_passed": true,
+    "record_tables_and_report_links_verified": true,
+    "test_command": ".venv/bin/python -m pytest -q --ignore=tests/test_baseline_models.py --ignore=tests/test_baseline_experiment.py --ignore=tests/test_baseline_scoring.py"
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "all_checks_passed": true,
+  "model_arms": 22,
+  "predictions": 33088,
+  "primary_delta_rmse": -0.0444579635759,
+  "primary_ci_independent": [
+    -0.0805399564165441,
+    -0.008586534434270515
+  ],
+  "input_hashes": 36,
+  "input_sources": {
+    "working_tree": 36
+  },
+  "window_anchor": "calendar",
+  "training_rows": {
+    "rule": "include_primary",
+    "source_training_pool": 2456,
+    "source_excluded_zero_rows": 1874,
+    "lacuna_rows_all_include_primary": true
+  },
+  "output_hashes": 19,
+  "feature_reconstruction": "all 5 model variants for all 6212 candidates and all 15 variables; no crop date read",
+  "mode": "separate recursive implementation",
+  "membership_and_permissions": "byte-identical to original",
+  "original_control_predictions": "exact within 1e-12 (Lacuna-only control)",
+  "source_usage_by_method": {
+    "bands_v0_mean_merged": [
+      2367,
+      2335,
+      2354,
+      2357
+    ],
+    "bands_v0_mean_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "bands_v1_calendar_mean_merged": [
+      2367,
+      2335,
+      2354,
+      2357
+    ],
+    "bands_v1_calendar_mean_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "bands_v2_max_merged": [
+      2367,
+      2335,
+      2354,
+      2357
+    ],
+    "bands_v2_max_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "bands_v3_median_merged": [
+      2367,
+      0,
+      0,
+      0
+    ],
+    "bands_v3_median_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "bands_v3_mode_merged": [
+      2367,
+      2335,
+      2354,
+      2357
+    ],
+    "bands_v3_mode_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "indices_v0_mean_merged": [
+      2367,
+      2335,
+      2354,
+      2357
+    ],
+    "indices_v0_mean_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "indices_v1_calendar_mean_merged": [
+      2367,
+      2335,
+      2354,
+      2357
+    ],
+    "indices_v1_calendar_mean_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "indices_v2_max_merged": [
+      2367,
+      2335,
+      2354,
+      2357
+    ],
+    "indices_v2_max_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "indices_v3_median_merged": [
+      2367,
+      2335,
+      2354,
+      2357
+    ],
+    "indices_v3_median_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "indices_v3_mode_merged": [
+      2367,
+      2335,
+      2354,
+      2357
+    ],
+    "indices_v3_mode_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "legacy_indices_mean_max_merged": [
+      2367,
+      2335,
+      2354,
+      2357
+    ],
+    "legacy_indices_mean_max_target": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "verifier_sha256": "3359a5ed0b659c5e3ad1942553b224c58c4deb608269232f207749ac723473e7",
+  "manifest_sha256": "93ad4ed5b67505baeb4f5fbc07e71c2215726b18d0483c0f0f244d39aa112661"
+}

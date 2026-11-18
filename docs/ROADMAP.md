@@ -1,5 +1,7 @@
 # Roadmap (scope reset, 29 October 2026)
 
+> Research background: this is the broader multi-country plan. The current Zimbabwe midterm deliverables, datasets and completed experiments are indexed in [the Zimbabwe guide](zimbabwe/README.md).
+
 **Update, 1 November 2026.** The owner ruled that fine-tuning a foundation model is the goal of the project. That
 ruling wins over each "stretch" below. The next step is one small baseline table, then the arms in section 1
 (`docs/DECISIONS.md`).

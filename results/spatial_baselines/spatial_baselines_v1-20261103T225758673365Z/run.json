@@ -1,0 +1,98 @@
+{
+  "git_commit": "d4b99d64f4e2c4358f43629e0182a876b218fd4d",
+  "git_branch": "codex/spatial-baselines",
+  "working_tree_dirty": false,
+  "source_sha256": {
+    "src/cropyield/__init__.py": "c5f92c5d41f20af5b024738170c577630925ae17943e7e44f35729eb633792b7",
+    "src/cropyield/baselines/__init__.py": "f9c91e798527ccd8250e27c0cd467aa9a35912b21298c5ae4f453d1ec1f8d82c",
+    "src/cropyield/baselines/experiment.py": "669a4758270f591a7e7ff1081a6b0330842551ceb064a6686fc63a647ce901ce",
+    "src/cropyield/baselines/models.py": "bc20bb17d1bcf1ea1de44fa75ffce4a8c28a1a4d9896d2274d4d4be80c1a29b8",
+    "src/cropyield/baselines/scoring.py": "8ad91bde3746d33c8b4376ab4f6fd56d4a694a557154cbd1c5548c68cd2e08b3",
+    "src/cropyield/data/__init__.py": "0f87be3a2521df5517f418b89ca6b9508b6476c04e3e8c0921d4eb01f1cd7050",
+    "src/cropyield/data/cohorts.py": "25bd021b63b59ec84bb188d56b2229485a352b55be89c7729a8b7393c1e9f3e0",
+    "src/cropyield/data/database.py": "675d50c684d1c959dbfdf974e7d5bc6a1134e7a90a677fc9f3eb61c8c4d433c7",
+    "src/cropyield/data/labels.py": "3ce6cdf5fa5e2a4663aad909c0f178d601f07a7e720c804d3e64b3cdb1565bc4",
+    "src/cropyield/data/xy.py": "38140d02b9575963eb7272fa81e6215cdee3dc09ae1cd8d5bbef71efcaa89038",
+    "src/cropyield/eval/__init__.py": "02f64b55af04d39f0816b1652a403a7f821bc33153d15a455abcd8c0b8bbce0a",
+    "src/cropyield/eval/splits.py": "34027f2a2b2fe41dc85b5b4c47fc73c7a77b69afb6d33f1ac4f94c7fcc3755a8",
+    "src/cropyield/features/__init__.py": "85950fee8585ad1fd04ed7eb52b98ef6f3faa11e17efa4cc689c2aa84a2d64ab",
+    "src/cropyield/features/indices.py": "86bd1f16001c407cb0071d19b47ddfb35d398dea2a38250352a33b5e5c0080cf",
+    "src/cropyield/longpath.py": "d94d1cfcd0d118dd4072f96e8a3db176b4cbb3762509763f55967798ff0bf086",
+    "src/cropyield/satellite/__init__.py": "a025c4adc44cb7a71f3e0d93cd540ce76747dc0c15d3420fe5fbaf4587ac3e95",
+    "src/cropyield/satellite/chips.py": "e8241228eba75cb054ac57a62340b493dbdf0d0360586cf16e348f845c294ddb",
+    "src/cropyield/satellite/monthly.py": "5f475e3459c63a176123925452a27b746ed0b29279c09c37a5a99b6b2da2b6c9",
+    "src/cropyield/satellite/records.py": "d03f821da20ef9ed613d7f0e513ea3089a8580ac0d1a703be9fa3c07844a2607",
+    "scripts/run_baselines.py": "e232a292e2f0f304dab59a8bd5b8f7fd8e86934c3b150668181a8ef32f96648a"
+  },
+  "config_sha256": "32f6b4a018abe84c8d9f86d38dad6e03948c6ef03aeb430d0482eacde26b385c",
+  "config": {
+    "experiment": "spatial_baselines_v1",
+    "cohorts": [
+      "malawi_2023",
+      "kenya_oaf_2019_2020",
+      "zimbabwe_lacuna_2022_2023"
+    ],
+    "expected_rows": {
+      "malawi_2023": 251,
+      "kenya_oaf_2019_2020": 3977,
+      "zimbabwe_lacuna_2022_2023": 1880
+    },
+    "arms": [
+      "R0",
+      "R1",
+      "A1"
+    ],
+    "split_family": "s1_cc2km",
+    "min_clear_months": 4,
+    "knn_neighbors": 10,
+    "ridge": {
+      "alphas_logspace": [
+        -3,
+        5,
+        17
+      ],
+      "inner_folds": 5
+    },
+    "seed": 20261029,
+    "bootstrap_draws": 2000
+  },
+  "input_sha256": {
+    "database": "e192b9d6021fdae020f9b08123b98648dc4b5274989635927c709a5607cdcd60",
+    "labels": "49aae383c4489aa98e9e7fe8c31cda6bf1cd752adc8e9540cffdc147a5e0ef92",
+    "split_manifest": "b8abf5e47c59d7e6c93620742de65ca5ba6a332d3a701eedc61a67d2533af53f",
+    "splits": {
+      "malawi_2023": "d7536035db17f25e3a3658218ff97bf1e06897ba7d9e4a232c492d51572fd5a2",
+      "kenya_oaf_2019_2020": "752e4ac95980eea57f36685906735c49b0213f498cae7b88c293a360014e8801",
+      "zimbabwe_lacuna_2022_2023": "253f437d30a3742779e164c6b30fda5d613d5fe38decccf2b45ce21d95288dff"
+    }
+  },
+  "python": "3.12.14",
+  "platform": "macOS-14.5-arm64-arm-64bit",
+  "versions": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "duckdb": "1.5.5",
+    "pyarrow": "25.0.1",
+    "threadpoolctl": "3.7.0"
+  },
+  "target_unit": "t/ha",
+  "row_order": "frozen labels_v1 order",
+  "evaluation_note": "Reproduction on previously inspected research folds; not an untouched final test",
+  "fold_policy": "Only previously evaluated R0/R1/A1; no new model arm is enabled",
+  "run_id": "spatial_baselines_v1-20261103T225758673365Z",
+  "timestamp": "2026-11-03T22:57:58.757040+00:00",
+  "predictions": {
+    "path": "/Users/himan/Desktop/DSC190/data/runs/spatial_baselines/spatial_baselines_v1-20261103T225758673365Z/predictions.parquet",
+    "sha256": "9cdb051405ceadf4a0563ed29890c9459381a6ae4f4ac9059a3dfe86b41cec70",
+    "rows": 18324
+  },
+  "protected_inputs_unchanged": true,
+  "output_sha256": {
+    "summary.csv": "c529c68be20b2bee43924711a49046354595315549ec30e069abb00a150839e7",
+    "fold_fits.csv": "fd827e90b00915f7b7163fd01f376a8a6659cd9ceb9b695553db9ae420eaf920",
+    "metrics.csv": "66e13d1ed0c18c7563d4f511c355d322a29721dba19c901d3955895bb78dbe50",
+    "config.yaml": "32f6b4a018abe84c8d9f86d38dad6e03948c6ef03aeb430d0482eacde26b385c"
+  }
+}

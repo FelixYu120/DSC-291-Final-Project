@@ -1,0 +1,131 @@
+family,outer_fold,model,n_test,rmse
+s1_cc2km,0,Training mean,376,2.061404710123539
+s1_cc2km,0,Clear-month count,376,2.062650085424974
+s1_cc2km,0,NDVI seasonal,376,1.898028442263983
+s1_cc2km,0,GCVI seasonal,376,1.8259504280686982
+s1_cc2km,0,MTCI seasonal,376,2.042121817754724
+s1_cc2km,0,NDVI705 seasonal,376,1.818426584428278
+s1_cc2km,0,NDVI740 seasonal,376,1.9734894643081367
+s1_cc2km,0,All indices seasonal,376,1.7925056712749452
+s1_cc2km,0,Spectral bands seasonal,376,1.7355758576320468
+s1_cc2km,0,MOSAIKS field seasonal,376,1.7115302887661288
+s1_cc2km,0,MOSAIKS chip seasonal,376,1.8221790042854284
+s1_cc2km,0,Presto whole season,376,1.6423444456350877
+s1_cc2km,0,CV-selected seasonal,376,1.6423444456350877
+s1_cc2km,1,Training mean,376,1.9457623780970659
+s1_cc2km,1,Clear-month count,376,1.9457623617814002
+s1_cc2km,1,NDVI seasonal,376,1.7322750584568098
+s1_cc2km,1,GCVI seasonal,376,1.7275123289262213
+s1_cc2km,1,MTCI seasonal,376,1.919408832760764
+s1_cc2km,1,NDVI705 seasonal,376,1.6899458490637516
+s1_cc2km,1,NDVI740 seasonal,376,1.8328658452398767
+s1_cc2km,1,All indices seasonal,376,1.6879256652318249
+s1_cc2km,1,Spectral bands seasonal,376,1.6804583816480623
+s1_cc2km,1,MOSAIKS field seasonal,376,1.6445661014306798
+s1_cc2km,1,MOSAIKS chip seasonal,376,1.615987644701133
+s1_cc2km,1,Presto whole season,376,1.7408021959715236
+s1_cc2km,1,CV-selected seasonal,376,1.7408021959715236
+s1_cc2km,2,Training mean,376,1.8410694191397463
+s1_cc2km,2,Clear-month count,376,1.8746603273440914
+s1_cc2km,2,NDVI seasonal,376,1.7921327414530743
+s1_cc2km,2,GCVI seasonal,376,1.8167197945395617
+s1_cc2km,2,MTCI seasonal,376,1.8108280208657415
+s1_cc2km,2,NDVI705 seasonal,376,1.782940044511923
+s1_cc2km,2,NDVI740 seasonal,376,1.7850257654707868
+s1_cc2km,2,All indices seasonal,376,1.751752933425996
+s1_cc2km,2,Spectral bands seasonal,376,1.6496168049709674
+s1_cc2km,2,MOSAIKS field seasonal,376,1.5559800620778796
+s1_cc2km,2,MOSAIKS chip seasonal,376,1.6333428124521014
+s1_cc2km,2,Presto whole season,376,1.5888760994933226
+s1_cc2km,2,CV-selected seasonal,376,1.5888760994933226
+s1_cc2km,3,Training mean,376,2.1770750478996828
+s1_cc2km,3,Clear-month count,376,2.177075033179357
+s1_cc2km,3,NDVI seasonal,376,2.0301317340882874
+s1_cc2km,3,GCVI seasonal,376,2.011332689809006
+s1_cc2km,3,MTCI seasonal,376,2.182647996706077
+s1_cc2km,3,NDVI705 seasonal,376,1.9406664893348813
+s1_cc2km,3,NDVI740 seasonal,376,2.0918005621552807
+s1_cc2km,3,All indices seasonal,376,1.9222859638249299
+s1_cc2km,3,Spectral bands seasonal,376,1.9762424803852225
+s1_cc2km,3,MOSAIKS field seasonal,376,1.9152426502310893
+s1_cc2km,3,MOSAIKS chip seasonal,376,1.9753021449015449
+s1_cc2km,3,Presto whole season,376,1.7865446524490611
+s1_cc2km,3,CV-selected seasonal,376,1.7865446524490611
+s1_cc2km,4,Training mean,376,1.9890423754701247
+s1_cc2km,4,Clear-month count,376,1.9890423583609016
+s1_cc2km,4,NDVI seasonal,376,1.816454511802137
+s1_cc2km,4,GCVI seasonal,376,1.7879230315216663
+s1_cc2km,4,MTCI seasonal,376,1.9710477556030785
+s1_cc2km,4,NDVI705 seasonal,376,1.7553139037388625
+s1_cc2km,4,NDVI740 seasonal,376,1.8617377193124414
+s1_cc2km,4,All indices seasonal,376,1.763423270673005
+s1_cc2km,4,Spectral bands seasonal,376,1.7761114596814587
+s1_cc2km,4,MOSAIKS field seasonal,376,1.7472151539396399
+s1_cc2km,4,MOSAIKS chip seasonal,376,1.7906968082111931
+s1_cc2km,4,Presto whole season,376,1.6910672943941678
+s1_cc2km,4,CV-selected seasonal,376,1.6910672943941678
+s2_region,0,Training mean,378,2.1825650743228326
+s2_region,0,Clear-month count,378,2.18256508560564
+s2_region,0,NDVI seasonal,378,1.7519821000474018
+s2_region,0,GCVI seasonal,378,1.7238130659619164
+s2_region,0,MTCI seasonal,378,2.1825649817852897
+s2_region,0,NDVI705 seasonal,378,1.6300080483899448
+s2_region,0,NDVI740 seasonal,378,2.031687427196531
+s2_region,0,All indices seasonal,378,1.6828957001565397
+s2_region,0,Spectral bands seasonal,378,1.89657065811167
+s2_region,0,MOSAIKS field seasonal,378,1.8310559301603095
+s2_region,0,MOSAIKS chip seasonal,378,1.8298545083946554
+s2_region,0,Presto whole season,378,1.656030332282504
+s2_region,0,CV-selected seasonal,378,1.656030332282504
+s2_region,1,Training mean,375,2.3659758792582486
+s2_region,1,Clear-month count,375,2.43620652930051
+s2_region,1,NDVI seasonal,375,2.3607903202488867
+s2_region,1,GCVI seasonal,375,2.3234589399444
+s2_region,1,MTCI seasonal,375,2.463752765637164
+s2_region,1,NDVI705 seasonal,375,2.30391115727493
+s2_region,1,NDVI740 seasonal,375,2.352514407861375
+s2_region,1,All indices seasonal,375,2.2793542274352365
+s2_region,1,Spectral bands seasonal,375,2.2708914130184357
+s2_region,1,MOSAIKS field seasonal,375,2.135797466676183
+s2_region,1,MOSAIKS chip seasonal,375,2.32608779771474
+s2_region,1,Presto whole season,375,2.0893083662507537
+s2_region,1,CV-selected seasonal,375,2.0893083662507537
+s2_region,2,Training mean,377,2.028356336433051
+s2_region,2,Clear-month count,377,2.0283563122640995
+s2_region,2,NDVI seasonal,377,1.9851962237772125
+s2_region,2,GCVI seasonal,377,1.9562527706061428
+s2_region,2,MTCI seasonal,377,2.0489527457827927
+s2_region,2,NDVI705 seasonal,377,1.9262590042167147
+s2_region,2,NDVI740 seasonal,377,2.0431845650594207
+s2_region,2,All indices seasonal,377,1.911290259658535
+s2_region,2,Spectral bands seasonal,377,1.9795600581983164
+s2_region,2,MOSAIKS field seasonal,377,1.9312487011185766
+s2_region,2,MOSAIKS chip seasonal,377,2.834544979954652
+s2_region,2,Presto whole season,377,1.8956163512124895
+s2_region,2,CV-selected seasonal,377,1.8956163512124895
+s2_region,3,Training mean,372,1.971864200846562
+s2_region,3,Clear-month count,372,1.9718641861623691
+s2_region,3,NDVI seasonal,372,1.689211080039794
+s2_region,3,GCVI seasonal,372,1.7181971686612678
+s2_region,3,MTCI seasonal,372,1.9718641393640441
+s2_region,3,NDVI705 seasonal,372,1.6615092141943677
+s2_region,3,NDVI740 seasonal,372,1.9132327349862184
+s2_region,3,All indices seasonal,372,1.698863486214921
+s2_region,3,Spectral bands seasonal,372,1.8073646678314377
+s2_region,3,MOSAIKS field seasonal,372,1.7840994667170633
+s2_region,3,MOSAIKS chip seasonal,372,1.7866397495474224
+s2_region,3,Presto whole season,372,1.6118876768126322
+s2_region,3,CV-selected seasonal,372,1.6118876768126322
+s2_region,4,Training mean,378,1.9558716131428757
+s2_region,4,Clear-month count,378,1.9558716034125425
+s2_region,4,NDVI seasonal,378,1.905002195346633
+s2_region,4,GCVI seasonal,378,1.8991258545986551
+s2_region,4,MTCI seasonal,378,1.9558715463338985
+s2_region,4,NDVI705 seasonal,378,1.880459218014972
+s2_region,4,NDVI740 seasonal,378,1.875373618957082
+s2_region,4,All indices seasonal,378,1.8860586016622887
+s2_region,4,Spectral bands seasonal,378,1.7855814026694117
+s2_region,4,MOSAIKS field seasonal,378,1.8049760686659913
+s2_region,4,MOSAIKS chip seasonal,378,2.004055848214803
+s2_region,4,Presto whole season,378,1.882182857449294
+s2_region,4,CV-selected seasonal,378,1.882182857449294

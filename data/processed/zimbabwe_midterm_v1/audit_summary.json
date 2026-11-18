@@ -1,0 +1,99 @@
+{
+  "admin_units_primary": 20,
+  "cleaned_labels": 2266,
+  "clear_months_by_year": [
+    {
+      "months_with_data": 3,
+      "records": 101,
+      "season_year": 2022
+    },
+    {
+      "months_with_data": 4,
+      "records": 68,
+      "season_year": 2022
+    },
+    {
+      "months_with_data": 4,
+      "records": 16,
+      "season_year": 2023
+    },
+    {
+      "months_with_data": 5,
+      "records": 263,
+      "season_year": 2023
+    },
+    {
+      "months_with_data": 6,
+      "records": 691,
+      "season_year": 2023
+    },
+    {
+      "months_with_data": 7,
+      "records": 1127,
+      "season_year": 2023
+    }
+  ],
+  "crop_counts": {
+    "Maize/Corn": 2269,
+    "Sorghum": 217,
+    "Soybeans": 212,
+    "Wheat": 304
+  },
+  "exact_coordinate_reuse_primary": 14,
+  "intercrop_exclusions": 212,
+  "invalid_dates_raw": 0,
+  "irrigation_exclusions": 5,
+  "model_rows": 1880,
+  "near_duplicate_primary": 16,
+  "outside_window_primary": 2,
+  "postharvest_fields": 1810,
+  "postharvest_scenes": 3934,
+  "preplanting_fields": 152,
+  "primary_labels": 1880,
+  "raw_maize": 2269,
+  "screened_2022": 169,
+  "screened_2023": 2097,
+  "source_records": 3002,
+  "splits": {
+    "s1_cc2km": {
+      "groups": {
+        "test": 57,
+        "train": 174,
+        "validation": 58
+      },
+      "minimum_distance_km": {
+        "train_to_test": 2.0487324670706197,
+        "train_to_validation": 2.022120756081833,
+        "validation_to_test": 2.0107582835531326
+      },
+      "new_models_may_score_test": false,
+      "rows": {
+        "test": 376,
+        "train": 1128,
+        "validation": 376
+      },
+      "test_status": "historical_previously_evaluated"
+    },
+    "s2_region": {
+      "groups": {
+        "test": 2,
+        "train": 15,
+        "validation": 3
+      },
+      "minimum_distance_km": {
+        "train_to_test": 3.4647189970713668,
+        "train_to_validation": 20.535107598505043,
+        "validation_to_test": 1.6677181534971144
+      },
+      "new_models_may_score_test": false,
+      "rows": {
+        "test": 378,
+        "train": 1127,
+        "validation": 375
+      },
+      "test_status": "historical_previously_evaluated"
+    }
+  },
+  "unit_mismatch_rows": 3,
+  "zero_yield_primary": 28
+}

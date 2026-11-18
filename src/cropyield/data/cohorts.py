@@ -1,7 +1,7 @@
 """Cohorts: which screened audit rows form one labelled cohort, and its fixed season window.
 
 A cohort is one audit dataset restricted to the years, country and management filter in
-docs/STRUCTURE.md. Rows keep every source column so each observation can be traced back to
+docs/DATA.md. Rows keep every source column so each observation can be traced back to
 the provider file through ``dataset``, ``source_id`` and ``source_row``.
 """
 from __future__ import annotations

@@ -1,0 +1,214 @@
+{
+  "config": {
+    "alphas": [
+      0.01,
+      0.1,
+      1,
+      10,
+      100,
+      1000
+    ],
+    "bootstrap_draws": 2000,
+    "buffer_km": 2,
+    "domain_weight_clip": [
+      0.05,
+      20
+    ],
+    "evaluation_status": "followup_exploratory_nested_spatial_cv_no_new_blind_test",
+    "experiment": "zimbabwe_transfer_diagnosis_v2",
+    "feature_families": [
+      "seasonal",
+      "monthly",
+      "presto"
+    ],
+    "inner_folds": 3,
+    "learning_fractions": [
+      0.25,
+      0.5
+    ],
+    "matched_subset_seeds": [
+      606,
+      707,
+      808
+    ],
+    "merge_run": "data/runs/zimbabwe_merge_v2",
+    "primary_method": "transfer_selector",
+    "primary_reference": "target_selector",
+    "quality_max_relative_cut_difference": 1,
+    "quality_min_months": 6,
+    "reserved_fold": 0,
+    "seed": 20261108,
+    "shuffle_seeds": [
+      101,
+      202,
+      303,
+      404,
+      505
+    ],
+    "source_ratios": [
+      0,
+      0.1,
+      0.3,
+      1
+    ],
+    "target_folds": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "training_rows": "include_primary",
+    "tree_iterations": 120,
+    "tree_leaf_nodes": [
+      7,
+      15
+    ]
+  },
+  "inputs": {
+    "configs\\zimbabwe_transfer_diagnosis_v2.json": "5eec2efd9f1feaaf1538ec2560b38e2915f67c9aa8688f10ae0bccb56f8057d5",
+    "data\\cropyield.duckdb": "e192b9d6021fdae020f9b08123b98648dc4b5274989635927c709a5607cdcd60",
+    "data\\runs\\zimbabwe_merge_v2\\PROTOCOL.md": "39d371055aa08084b982e1046bdb5f726e6e815ccb4b157e44a1f06cec19a9c1",
+    "data\\runs\\zimbabwe_merge_v2\\RESULTS.md": "c46e56ddb5cc7b3ea561e5f3644f85510ceacd9307f90cc24211e052094f158e",
+    "data\\runs\\zimbabwe_merge_v2\\combined_data.csv": "27511fb5a861c8a34a351a15c978c7d4d99437880a49a569bde806809b127b88",
+    "data\\runs\\zimbabwe_merge_v2\\combined_data.parquet": "7d8c603e1ca50093ad2e1d41e6c74cc3670f8b49abc1af8c5ad9be641f4cb7e5",
+    "data\\runs\\zimbabwe_merge_v2\\comparison.png": "67b0e2938b290b7cad08e844946b6a03384892e3054d12063df05e84ff02e0f2",
+    "data\\runs\\zimbabwe_merge_v2\\data_summary.json": "aec1f899e6b0560571151bed273cc56f5a8d4ee57f76bd3c94136732018de42e",
+    "data\\runs\\zimbabwe_merge_v2\\fold_metrics.csv": "5322da5191b82123c42a29f270827801a1fe0a6d8b396c49e9517acfbf37901e",
+    "data\\runs\\zimbabwe_merge_v2\\harmonized_labels.parquet": "6234cbc4149c6c1fde2a4d6b313a9729e6906680a5171aa9a6361411e09b656a",
+    "data\\runs\\zimbabwe_merge_v2\\manifest.json": "7af129ce951054ae4fac9886cb574b7e832a681dad1855374f71a0ee3e60cd18",
+    "data\\runs\\zimbabwe_merge_v2\\metrics.csv": "db039e7753a7c3f21f934ea6959bdd5bca29209f9243405fc1a77bbf3c85c4eb",
+    "data\\runs\\zimbabwe_merge_v2\\paired_differences.csv": "2fae7b4abc90f541195743e9a0cb3f47469fdb228936d066d93c8782fe2c200c",
+    "data\\runs\\zimbabwe_merge_v2\\predictions.csv": "1636cec09167135338969139649b2b3c1b718dab75c4369897539183c9ac9b1f",
+    "data\\runs\\zimbabwe_merge_v2\\selected_parameters.csv": "a6e4ae178e54de8e9207c494e0805ee5c94146af5f2c93751c26bc938f950202",
+    "data\\runs\\zimbabwe_merge_v2\\source_2024_audit.csv": "4bbda4f9e4b5a5da3b819decadc1b563a24a69fc1f3e929971cd6c6f700d49b4",
+    "data\\runs\\zimbabwe_merge_v2\\source_spatial_permissions.csv": "578ce12e952601db24d71579fb5ee56360a86024292a4ac5b393fd4c64b0961c",
+    "data\\runs\\zimbabwe_merge_v2\\target_memberships.csv": "90f1dc5e484b0fe507a232f101a45c434e9f8364942575ae708403b932373870",
+    "data\\runs\\zimbabwe_merge_v2\\tuning.csv": "0ebfccf5547e8cc442cfa5c4a45584374e2b1cb3b80000edf3cab0a86ef992fb",
+    "data\\splits\\zimbabwe_2024__s1_cc2km.csv": "f96a188ad708c2fe9a8e3721e4517b2da3f85a823ca9b485e8d2a36cdb384d61",
+    "docs\\ZIMBABWE_TRANSFER_DIAGNOSIS_PROTOCOL.md": "08619bb93872ce2c1dc3c720b322fdbd7d22a818fd2680ed078b3fcdc778a9c5",
+    "requirements.txt": "758d3b0fe92e4efa02aa1f9e5d67f18aacb868c8df2a13d09b1880cc1ee5a061",
+    "scripts\\step10_diagnose_zimbabwe_transfer.py": "cfe1e615ee7bfb097e832f540165335bb5ed07ad4e6f39309b5813608944e36c",
+    "src\\cropyield\\data\\handoff.py": "070fcfb23db4167374ad40f88bf76ef2b400aff546f4190422e6836cd8231b77",
+    "src\\cropyield\\data\\labels.py": "1e993aa24beb74c348b64268642b1774ecd8dbe3bbba10757940ffa3bee6b21d",
+    "src\\cropyield\\data\\xy.py": "41743292fd48c3df77d08a616aa5d20ef6c8bb4a618c5e6f28dc6cd083f69048",
+    "src\\cropyield\\eval\\splits.py": "138dd5cd18abb26da00f6cb6fb1c2615a46e0ee0f8cb7ad91b3f98abde789a85",
+    "src\\cropyield\\experiments\\zimbabwe_diagnosis.py": "c07df37387575c063ef9c2beb2d009285b58cbd2a8d57aa36603c298bd400ce6",
+    "src\\cropyield\\experiments\\zimbabwe_merge.py": "ebff7a50dfb6dca15550908906c47045ff44f331368f53f586e47b7e3e694fd6"
+  },
+  "outputs": {
+    "PROTOCOL.md": {
+      "bytes": 8563,
+      "sha256": "e119008dedf2b0e8714b15fc12752c66296251a9d0a8c42035cfdb046402588f"
+    },
+    "RESULTS.md": {
+      "bytes": 8154,
+      "sha256": "eae5a0767ce73b265763811cbdc281816f36af470b766b28c283756a8fea7c7f"
+    },
+    "cohort_summary.csv": {
+      "bytes": 333,
+      "sha256": "2516d4ecd82b0a38ac9532c4bb2e923f22fff5f37bd452b0d860eebb3ce1d4af"
+    },
+    "diagnosis.png": {
+      "bytes": 172988,
+      "sha256": "9b4f9d85135e4a13020ad26734647134e6d8ea6a8e1f86f4f561c7e4f317b3c1"
+    },
+    "domain_separability.csv": {
+      "bytes": 181,
+      "sha256": "06a431a9b2e2ffc1566f8c9e5b7983e20808c0fbc71020eaff6f27f8364a605e"
+    },
+    "error_decomposition.csv": {
+      "bytes": 576,
+      "sha256": "a17387647f6cd5d9ae3d89a0d8564b162831ba77d2e0cb8cb0ee1659f335caa9"
+    },
+    "feature_correlations.csv": {
+      "bytes": 1794,
+      "sha256": "242431528f08c9b5c448b812b7f447086323122eb351f7c781407fba718dd4d3"
+    },
+    "feature_dictionary.json": {
+      "bytes": 5520,
+      "sha256": "d43c2bf7a456ccbd56fee83c53cf2cc11fa9506cb0d2deecf0b6d46404e3d8f2"
+    },
+    "features_monthly.parquet": {
+      "bytes": 3780993,
+      "sha256": "f962783876d8038bd94644162126e43b67ab1b9c9c3850325ca98b2d170cf2b3"
+    },
+    "features_presto.parquet": {
+      "bytes": 3359160,
+      "sha256": "391fdd042aba13f54f52e72a199a7e766af6e5660eba5b99c2343211108c163c"
+    },
+    "fit_accounting.csv": {
+      "bytes": 76913,
+      "sha256": "9962663650b48468580ad95bc792ff148f3e4c0a0d9692388db801609bffc49f"
+    },
+    "fold_metrics.csv": {
+      "bytes": 11560,
+      "sha256": "15b9aa4a3fb9c7940828d409415c9c858ec2de084883fdca221a1ea946a34e56"
+    },
+    "metrics.csv": {
+      "bytes": 3569,
+      "sha256": "73d854a6577733f08a84995da927c17e10d3bf4afec77e11a50b6f13c380729c"
+    },
+    "paired_differences.csv": {
+      "bytes": 3721,
+      "sha256": "a5daf18e3520c48b844f551ddc8671d454490616f9c524ced01456e4a1d889f5"
+    },
+    "predictions.csv": {
+      "bytes": 4173701,
+      "sha256": "4ade29d984d4797300c3adfe1662929a4dd7d546dc0d79e66b2631fe92b83788"
+    },
+    "quality_summary.json": {
+      "bytes": 412,
+      "sha256": "2824553647f01af9cc7814a0746bea44a27d28914f84931a2373f33e4ff52f03"
+    },
+    "row_quality.csv": {
+      "bytes": 1798287,
+      "sha256": "375387ab006cc149638bbf30cad75773480ab1897b692aef783c26741b138fc0"
+    },
+    "selected_parameters.csv": {
+      "bytes": 9305,
+      "sha256": "d7b0843b43b151550aaaba7eebe8bb20954bab6d52545ee619da2d86f2e4b320"
+    },
+    "source_diagnostic_summary.json": {
+      "bytes": 186,
+      "sha256": "f362833e84dbe838feb2730cdc68dad1378ec45a408d9460d1edfbfbfb721625"
+    },
+    "source_metrics.csv": {
+      "bytes": 646,
+      "sha256": "0033ad28a29a77f82a5d77d7ef6643c4158b57a60a87c79600c7b683df27002d"
+    },
+    "source_predictions.csv": {
+      "bytes": 1235265,
+      "sha256": "79055961bc2276784eece76dade64b216edee7d2843b6477e6f0114bd1ea538b"
+    },
+    "source_selected_parameters.csv": {
+      "bytes": 764,
+      "sha256": "770eb303d308ccb6cbe0907d2f85cb3e6cffcd580665de2dd74f9bcaf342eac0"
+    },
+    "source_spatial_permissions.csv": {
+      "bytes": 3575173,
+      "sha256": "578ce12e952601db24d71579fb5ee56360a86024292a4ac5b393fd4c64b0961c"
+    },
+    "source_splits.csv": {
+      "bytes": 143168,
+      "sha256": "f8f7f49760ca453806474bac36a98808b2a258dadce35e4bd22d4bca688bb858"
+    },
+    "target_memberships.csv": {
+      "bytes": 1253975,
+      "sha256": "90f1dc5e484b0fe507a232f101a45c434e9f8364942575ae708403b932373870"
+    },
+    "tuning.csv": {
+      "bytes": 88317,
+      "sha256": "b0eee1036ea001772b883caed077beea515c367f5d852977d7a5fd4f91f3f362"
+    }
+  },
+  "python": "3.12.10",
+  "versions": {
+    "duckdb": "1.5.5",
+    "matplotlib": "3.11.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1"
+  }
+}

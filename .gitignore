@@ -9,7 +9,18 @@ data/raw/vision_guided_yield_estimation/q_field_photo.zip
 
 # Added 2026-10-26 with the project structure.
 data/features/
-data/runs/
+# Keep scratch runs and duplicate archives local; track the reviewed Zimbabwe releases.
+data/runs/*
+!data/runs/zimbabwe_merge_v1/
+!data/runs/zimbabwe_transfer_diagnosis_v1/
+!data/runs/zimbabwe_weather_v1/
+!data/runs/zimbabwe_weather_compact_v1/
+!data/runs/zimbabwe_aggregation_v1/
+!data/runs/zimbabwe_multiyear_v1/
+!data/runs/zimbabwe_weather_validation_v1.json
+!data/runs/zimbabwe_weather_compact_validation_v1.json
+!data/runs/zimbabwe_weather_compact_support_v1.csv
+!data/runs/zimbabwe_weather_compact_candidate_v1.csv
 .pytest_cache/
 .ruff_cache/
 *.egg-info/
@@ -24,6 +35,20 @@ notebook_rebuild/
 # Added 2026-10-29: the project database, rebuilt by scripts/step6_build_database.py.
 data/*.duckdb
 data/*.duckdb.wal
+data/v2/*.duckdb
+data/v2/*.duckdb.wal
 
 # Added 2026-10-31: local files moved out of data/ (_parked/LANDING.md).
 _parked/local/
+
+# Added 2026-11-08: TensorBoard logs of the Presto runs (large, rebuilt by the runs).
+experiments/presto_finetune/tensorboard/
+
+# Added 2026-11-08: Presto debug checkpoints and every TensorBoard event file (rebuilt by the runs or the exporter),
+# and the footprint pixel windows (features, 28.6 MB, rebuilt by experiments/footprint/windows.py).
+experiments/presto_debug/runs/**/checkpoint.pt
+experiments/presto_debug/runs/**/tensorboard/
+experiments/presto_debug/runs/latest/comparison/
+experiments/presto_debug/runs/comparison_archive/
+events.out.tfevents.*
+experiments/footprint/windows.parquet

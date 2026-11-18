@@ -1,0 +1,32 @@
+{
+  "experiment": "zimbabwe_merge_v2",
+  "training_rows": "include_primary",
+  "target_cohort": "zimbabwe_lacuna_2022_2023",
+  "target_year": 2023,
+  "auxiliary_cohort": "zimbabwe_2024",
+  "target_folds": [1, 2, 3, 4],
+  "reserved_fold": 0,
+  "split_family": "s1_cc2km",
+  "calendar_months": [12, 1, 2, 3, 4, 5, 6],
+  "minimum_clear_months": 4,
+  "auxiliary_buffer_km": 2.0,
+  "inner_folds": 3,
+  "ridge_alphas": [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0],
+  "source_weight_ratios": [0.0, 0.1, 0.3, 1.0],
+  "tree_leaf_nodes": [7, 15],
+  "tree_iterations": 120,
+  "bootstrap_draws": 2000,
+  "seed": 20261107,
+  "primary_method": "pooled_adaptive",
+  "primary_reference": "lacuna_only",
+  "methods": [
+    "train_mean", "lacuna_only", "pooled_naive", "pooled_intercept",
+    "pooled_adaptive", "lacuna_tree", "pooled_tree"
+  ],
+  "dropped_from_v1": {
+    "pooled_positive_sensitivity": "identical to pooled_adaptive: include_primary 2024 rows hold no zeros",
+    "pooled_zero_weight_sensitivity": "identical to pooled_adaptive: include_primary 2024 rows hold no zeros"
+  },
+  "evaluation_status": "exploratory_nested_spatial_cross_validation_not_a_new_blind_test",
+  "prediction_setting": "retrospective_yield_estimation"
+}

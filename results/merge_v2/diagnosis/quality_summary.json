@@ -1,0 +1,12 @@
+{
+  "box_pearson_all": 0.8997734267283893,
+  "box_pearson_positive": 0.8681491981073421,
+  "missing_labels": 723,
+  "naive_excess_mse_share_from_squared_bias": 0.998983457497975,
+  "positive_exactly_equal_cuts": 11,
+  "positive_median_relative_difference": 0.35170753215741846,
+  "positive_relative_difference_gt_1": 250,
+  "recorded_zeros": 1874,
+  "two_cut_n": 4290,
+  "two_cut_positive_n": 2416
+}

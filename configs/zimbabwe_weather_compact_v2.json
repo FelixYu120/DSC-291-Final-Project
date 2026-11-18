@@ -1,0 +1,24 @@
+{
+  "experiment": "zimbabwe_weather_compact_v2",
+  "training_rows": "include_primary",
+  "merge_run": "data/runs/zimbabwe_merge_v2",
+  "diagnosis_run": "data/runs/zimbabwe_transfer_diagnosis_v2",
+  "weather_release": "data/processed/zimbabwe_weather_v2",
+  "weather_run": "data/runs/zimbabwe_weather_v2",
+  "seed": 20261108,
+  "target_folds": [1, 2, 3, 4],
+  "reserved_fold": 0,
+  "buffer_km": 2,
+  "alphas": [0.01, 0.1, 1, 10, 100, 1000],
+  "source_ratios": [0, 0.1, 0.3, 1],
+  "tree_leaf_nodes": [7, 15],
+  "tree_iterations": 120,
+  "bootstrap_draws": 2000,
+  "feature_sets": {
+    "compact2": ["wx_rain_percent_normal_jan_mar", "wx_t2m_anomaly_c_jan_mar"],
+    "compact4": ["wx_rain_percent_normal_jan_mar", "wx_t2m_anomaly_c_jan_mar", "wx_rain_percent_normal_oct_dec", "wx_t2m_anomaly_c_oct_dec"]
+  },
+  "primary_method": "compact4_tree_transfer",
+  "primary_reference": "compact4_tree_target",
+  "evaluation_status": "exploratory_followup_on_same_frozen_splits_not_a_new_blind_test"
+}

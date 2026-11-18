@@ -1,0 +1,176 @@
+{
+  "all_checks_passed": true,
+  "model_arms": 26,
+  "predictions": 39104,
+  "primary_delta_rmse": -0.0481154859959,
+  "primary_ci_independent": [
+    -0.08848467532780215,
+    -0.010358221966732719
+  ],
+  "input_hashes": 36,
+  "output_hashes": 18,
+  "feature_reconstruction": "all six variants for all6212 candidates and all15 variables",
+  "mode": "separate recursive implementation",
+  "membership_and_permissions": "byte-identical to original",
+  "original_control_predictions": "exact within1e-12",
+  "source_usage_by_method": {
+    "bands_v0_mean_merged": [
+      4226,
+      4191,
+      4194,
+      4213
+    ],
+    "bands_v0_mean_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "bands_v1_calendar_mean_merged": [
+      4226,
+      4191,
+      4194,
+      4213
+    ],
+    "bands_v1_calendar_mean_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "bands_v1_preharvest_mean_merged": [
+      4226,
+      0,
+      4194,
+      4213
+    ],
+    "bands_v1_preharvest_mean_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "bands_v2_max_merged": [
+      4226,
+      4191,
+      4194,
+      4213
+    ],
+    "bands_v2_max_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "bands_v3_median_merged": [
+      4226,
+      0,
+      0,
+      0
+    ],
+    "bands_v3_median_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "bands_v3_mode_merged": [
+      4226,
+      4191,
+      4194,
+      4213
+    ],
+    "bands_v3_mode_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "indices_v0_mean_merged": [
+      4226,
+      4191,
+      4194,
+      4213
+    ],
+    "indices_v0_mean_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "indices_v1_calendar_mean_merged": [
+      4226,
+      4191,
+      4194,
+      4213
+    ],
+    "indices_v1_calendar_mean_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "indices_v1_preharvest_mean_merged": [
+      4226,
+      4191,
+      4194,
+      4213
+    ],
+    "indices_v1_preharvest_mean_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "indices_v2_max_merged": [
+      4226,
+      4191,
+      4194,
+      4213
+    ],
+    "indices_v2_max_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "indices_v3_median_merged": [
+      4226,
+      4191,
+      4194,
+      4213
+    ],
+    "indices_v3_median_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "indices_v3_mode_merged": [
+      4226,
+      4191,
+      4194,
+      4213
+    ],
+    "indices_v3_mode_target": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "legacy_indices_mean_max_merged": [
+      4226,
+      4191,
+      4194,
+      4213
+    ],
+    "legacy_indices_mean_max_target": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "verifier_sha256": "bd87b75321f61630c72b9418733e1237ec06a5436581b4d5deeca6c6af8ba4e2",
+  "manifest_sha256": "f198be758cec100a56f9af422eec2f8620fb895007dc270435308ba93edd9087"
+}
