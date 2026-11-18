@@ -87,5 +87,18 @@ folds 1–4, each look logged.
 | [tests/](tests/) | Automated checks; run `python -m pytest -q` (add `experiments/time_features experiments/stepup experiments/fold0` for the experiment tests) |
 | [_parked/](_parked/LANDING.md) | Archived earlier code and results; excluded from the current workflow |
 
+### Additional Presto inputs
+
+Zimbabwe Sentinel-1, ERA5-Land, SRTM, CHIRPS, SoilGrids and AlphaEarth inputs are documented in
+[`docs/EXTRA_INPUTS.md`](docs/EXTRA_INPUTS.md). The reproducible construction workflow is shown in
+[`notebooks/06_build_extra_inputs.ipynb`](notebooks/06_build_extra_inputs.ipynb), and coverage and quality checks
+are shown in [`notebooks/05_extra_inputs_audit.ipynb`](notebooks/05_extra_inputs_audit.ipynb).
+
+The supporting scripts are under [`scripts/optional/extra_inputs/`](scripts/optional/extra_inputs/). Small audit
+summaries are committed under [`data/audit/extra_inputs/`](data/audit/extra_inputs/); field-level generated feature
+tables and downloaded rasters remain outside Git.
+
+Licences and attribution: `data/README.txt`. Keep the provider citations when you use or share the data.
+
 Data licences and original-provider attribution are in [data/README.txt](data/README.txt).
 Weather attribution and exact retrieval methods are in [the methods report](docs/zimbabwe/METHODS.md#sources-and-provenance).

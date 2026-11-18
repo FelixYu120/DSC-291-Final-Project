@@ -56,6 +56,15 @@ still makes v1. The v2 database is a team file like v1; you need none of these t
 | `step7_check_data.py` | `--version 2` | the report for the `labels_v2` rows on the v2 database (with Malawi 2022) |
 | `baselines/baseline_table.py` | `--version 2` | `results/v2/`: folds 1–4 scored, fold 0 trains only |
 
+The main install (`python -m pip install -r requirements.txt`) covers everything.
+
+## Optional Zimbabwe extra inputs
+
+The scripts in [`optional/extra_inputs/`](optional/extra_inputs/) reproduce the additional Sentinel-1,
+ERA5-Land, SRTM, CHIRPS, SoilGrids and AlphaEarth input workflow. These inputs are an experimental extension and
+do not modify the frozen label or split files. See [`../docs/EXTRA_INPUTS.md`](../docs/EXTRA_INPUTS.md) for data
+coverage, licences and modelling recommendations.
+
 ## Zimbabwe experiments: steps 9–15
 
 New work uses the v2 configs. Steps 8, 14 and 15 default to v2; steps 9–13 still default to their v1 config, so

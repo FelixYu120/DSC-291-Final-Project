@@ -1,0 +1,34 @@
+{
+  "observations": 2266,
+  "observation_month_rows": 20394,
+  "months_per_observation": [
+    9
+  ],
+  "srtm_local_complete_observations": 2266,
+  "chirps_complete_rows": 20394,
+  "soilgrids_complete_observations": 2265,
+  "alphaearth_status": "integrated_from_gee",
+  "gee_status": "integrated",
+  "gee_audit": {
+    "gee_csv_files": [
+      "zimbabwe_presto_s1_era5_srtm_2022_2023_part1_s2022_oct_dec.csv",
+      "zimbabwe_presto_s1_era5_srtm_2022_2023_part2_s2022_jan_mar.csv",
+      "zimbabwe_presto_s1_era5_srtm_2022_2023_part3_s2022_apr_jun.csv",
+      "zimbabwe_presto_s1_era5_srtm_2022_2023_part4_s2023_oct_dec.csv",
+      "zimbabwe_presto_s1_era5_srtm_2022_2023_part5_s2023_jan_mar.csv",
+      "zimbabwe_presto_s1_era5_srtm_2022_2023_part6_s2023_apr_jun.csv"
+    ],
+    "rows": 20394,
+    "s1_complete_rows": 704,
+    "s1_complete_observations_all_9_months": 31,
+    "era5_complete_rows": 20394,
+    "srtm_complete_rows": 20394,
+    "chosen_orbits": {
+      "desc": 2128,
+      "asc": 138
+    },
+    "alphaearth_dimensions": 64,
+    "alphaearth_complete_observations": 2266
+  },
+  "important_geometry_limit": "The source has points, not field polygons; values are point pixels or 3x3 summaries, not exact field means."
+}

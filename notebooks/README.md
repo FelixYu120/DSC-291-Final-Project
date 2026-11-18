@@ -54,6 +54,13 @@ These notebooks run the real code on the real data in small cells and write noth
 | [duckdb_v1_tour.ipynb](duckdb_v1_tour.ipynb) | The tables and views of the v1 database, with SQL only | `data/cropyield.duckdb` |
 | [zimbabwe_master.ipynb](zimbabwe_master.ipynb) | The Zimbabwe master table (labels, season indices, Presto, MOSAIKS) | `data/cropyield.duckdb` |
 
+## Extra-input audits
+
+| Notebook | What it shows | Needs to rerun |
+|---|---|---|
+| [07_kenya_extra_inputs_analysis.ipynb](07_kenya_extra_inputs_analysis.ipynb) | Kenya coverage, seasonal radar/weather profiles, 2 km within-village variation, point-support limits and model-input decisions | external Kenya Earth Engine and SoilGrids tables; saved outputs are embedded |
+| [08_malawi_extra_inputs_analysis.ipynb](08_malawi_extra_inputs_analysis.ipynb) | Malawi polygon-level coverage, seasonal profiles, 2 km within-village variation and model-input decisions | external Malawi Earth Engine and SoilGrids tables; saved outputs are embedded |
+
 ## Experiment notebook
 
 | Notebook | What it shows | Needs |
