@@ -57,7 +57,7 @@ function imageForMonth(monthString, seasonYear) {
       ee.Date.fromYMD(seasonYear, 1, 1),
       ee.Date.fromYMD(ee.Number(seasonYear).add(1), 1, 1)
     )
-    .filterBounds(allRegion).mosaic().select('A.*');
+    .mosaic().select('A.*');
   var raw = s1ForMonth(start, 'ASCENDING', 'asc')
     .addBands(s1ForMonth(start, 'DESCENDING', 'desc'))
     .addBands(era).addBands(chirps).addBands(elevation).addBands(slope).addBands(alphaEarth);
@@ -103,6 +103,10 @@ var batches = [
 
 print('Malawi polygons', fields.size());
 print('Expected rows across all exports', 7101);
+print('AlphaEarth 2022 tiles', ee.ImageCollection('GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL')
+  .filterDate('2022-01-01', '2023-01-01').size());
+print('AlphaEarth 2023 tiles', ee.ImageCollection('GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL')
+  .filterDate('2023-01-01', '2024-01-01').size());
 batches.forEach(function(batch) {
   var prefix = 'malawi_presto_s1_era5_srtm_2022_2023_' + batch.name;
   Export.table.toDrive({
