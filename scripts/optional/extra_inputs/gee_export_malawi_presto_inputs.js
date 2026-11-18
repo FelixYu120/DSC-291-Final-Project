@@ -32,11 +32,27 @@ function s1ForMonth(start, passName, suffix) {
       return image.set('dateDist', ee.Number(image.get('system:time_start')).subtract(mid.millis()).abs());
     })
     .sort('dateDist');
-  var closest = ee.Number(collection.first().get('dateDist'));
+  var hasImages = collection.size().gt(0);
+  var closest = ee.Number(ee.Algorithms.If(
+    hasImages,
+    collection.aggregate_min('dateDist'),
+    0
+  ));
   var maxDiff = closest.max(15 * 24 * 60 * 60 * 1000);
   var kept = collection.filter(ee.Filter.lte('dateDist', maxDiff));
-  var raw = kept.select(['VV', 'VH']).median();
-  var count = kept.select('VV').count();
+  var emptyRaw = ee.Image.constant([0, 0])
+    .rename(['VV', 'VH'])
+    .updateMask(ee.Image.constant(0));
+  var raw = ee.Image(ee.Algorithms.If(
+    hasImages,
+    kept.select(['VV', 'VH']).median(),
+    emptyRaw
+  ));
+  var count = ee.Image(ee.Algorithms.If(
+    hasImages,
+    kept.select('VV').count(),
+    ee.Image.constant(0)
+  ));
   return raw.rename(['VV_' + suffix, 'VH_' + suffix])
     .addBands(count.rename('s1_' + suffix + '_count'));
 }
