@@ -16,6 +16,7 @@ Run commands from the repository root and keep the output directory outside Git.
 | `assemble_kenya_extra_inputs.py` | Validate and combine Kenya point-level Earth Engine and SoilGrids inputs. |
 | `build_malawi_extra_inputs_notebook.py` | Build the executed Malawi audit notebook, figures and English summary. |
 | `build_kenya_extra_inputs_notebook.py` | Build the executed Kenya audit notebook, figures and English summary. |
+| `build_three_country_extra_inputs_duckdb.py` | Package raw and processed Zimbabwe, Kenya and Malawi extra inputs into one DuckDB file. |
 | `prepare_kenya_malawi_assets.py` | Build data-v2 Kenya point and Malawi polygon upload assets plus canonical month keys. |
 | `gee_export_kenya_presto_inputs.js` | Export Kenya Sentinel-1, ERA5-Land, CHIRPS, SRTM and AlphaEarth values. |
 | `gee_export_malawi_presto_inputs.js` | Export polygon-median Malawi Sentinel-1, ERA5-Land, CHIRPS, SRTM and AlphaEarth values. |
