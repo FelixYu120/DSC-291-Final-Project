@@ -193,7 +193,7 @@ def main() -> None:
         ),
         code_cell(
             "from pathlib import Path\nimport json, os\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\n"
-            "ROOT = Path(os.environ.get('KENYA_MALAWI_EXTRA_INPUTS_ROOT', r'" + str(root) + "'))\n"
+            "ROOT = Path(os.environ.get('KENYA_MALAWI_EXTRA_INPUTS_ROOT', '../Google Earth/Kenya Malawi')).resolve()\n"
             "DERIVED, REPORTS = ROOT / 'derived', ROOT / 'reports'\n"
             "monthly = pd.read_parquet(DERIVED / 'malawi_model_ready_monthly_extra_inputs.parquet')\n"
             "static = pd.read_parquet(DERIVED / 'malawi_model_ready_static_extra_inputs.parquet')\n"

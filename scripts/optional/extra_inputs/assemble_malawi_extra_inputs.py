@@ -337,13 +337,13 @@ def main() -> None:
         "months_per_observation": sorted(monthly.groupby("obs_id").size().unique().tolist()),
         "cohort_counts": static.groupby("cohort").size().to_dict(),
         "outputs": {
-            "monthly_csv": str(monthly_csv),
-            "monthly_parquet": str(monthly_parquet),
-            "static_csv": str(static_csv),
-            "static_parquet": str(static_parquet),
+            "monthly_csv": str(monthly_csv.relative_to(root)),
+            "monthly_parquet": str(monthly_parquet.relative_to(root)),
+            "static_csv": str(static_csv.relative_to(root)),
+            "static_parquet": str(static_parquet.relative_to(root)),
         },
-        "quality_report": str(reports / "malawi_feature_quality_summary.json"),
-        "village_variation_report": str(reports / "malawi_within_village_variation.csv"),
+        "quality_report": str((reports / "malawi_feature_quality_summary.json").relative_to(root)),
+        "village_variation_report": str((reports / "malawi_within_village_variation.csv").relative_to(root)),
     }
     (reports / "malawi_combined_inputs_summary.json").write_text(
         json.dumps(summary, indent=2), encoding="utf-8"
