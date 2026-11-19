@@ -52,3 +52,9 @@ experiments/presto_debug/runs/latest/comparison/
 experiments/presto_debug/runs/comparison_archive/
 events.out.tfevents.*
 experiments/footprint/windows.parquet
+
+# Added 2026-11-19: the pass archive (python -m cropyield.archive...). Staging and the database stay local;
+# the README, dictionary, manifest and checksum of the release are small and are tracked.
+data/passarchive_v1/staging/
+data/passarchive_v1/release/*.duckdb
+data/passarchive_v1/release/*.building*
