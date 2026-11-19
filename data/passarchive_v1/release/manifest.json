@@ -1,0 +1,92 @@
+{
+  "release": "passarchive_v1",
+  "built_at_utc": "2026-11-19T14:46:35+00:00",
+  "git_commit": "aea4350f7d4f8d09b7159ed8176cd7a739e2e9b4",
+  "duckdb_version": "1.5.5",
+  "row_counts": {
+    "source_files": 6,
+    "source_records": 42379,
+    "fields": 35510,
+    "field_source_crosswalk": 42379,
+    "locations": 32939,
+    "labels": 35510,
+    "label_measurements": 96502,
+    "splits": 69833,
+    "split_specs": 30,
+    "tiles": 95,
+    "location_tiles": 41371,
+    "footprint_pixels": 312988,
+    "acquisitions": 2160,
+    "granules": 23659,
+    "scenes": 66085,
+    "scene_items": 49185,
+    "catalog_queries": 701,
+    "passes": 8248916,
+    "pass_samples": 10757700,
+    "pixel_samples": 259808279,
+    "coverage_months": 852240,
+    "source_reconciliation": 19,
+    "field_xy": 35510
+  },
+  "passes_by_sample_status": {
+    "sampled_10m_bands": 421,
+    "sampled_nodata": 72555,
+    "sampled_all_bands": 5611314,
+    "outside_swath_per_catalogue": 2483065,
+    "not_sampled_no_public_file": 81561
+  },
+  "reused_10m_samples": 783,
+  "file": "passarchive_v1.duckdb",
+  "bytes": 2678075392,
+  "sha256": "7a02a6fe7b0147dad9ba1ac7380a29224ecf6261847173182c11ece64990e4bf",
+  "source_files": [
+    {
+      "dataset": "one_acre_fund_full",
+      "title": "One Acre Fund MEL data, all countries (workbook, sheet Data)",
+      "licence": "CC BY 4.0",
+      "path": "raw/one_acre_fund_full/one_acre_fund_mel_data_all_countries.xlsx",
+      "sha256": "ed812dc779a57377fcdb3b002346343d62e3a90cb6b5248f8fa0de62a08a39c8",
+      "rows_in_scope": 26268
+    },
+    {
+      "dataset": "one_acre_fund_curated",
+      "title": "One Acre Fund MEL maize survey data 2016-2022, curated (Zenodo 11122388)",
+      "licence": "CC BY 4.0",
+      "path": "raw/one_acre_fund_curated/One_Acre_Fund_MEL_maize_survey_data_2016-2022.csv",
+      "sha256": "f305a3d3e48015bd877dc9df5c53b1715c61f940d58383d57d4dfb68c59c6ff0",
+      "rows_in_scope": 7258
+    },
+    {
+      "dataset": "zimbabwe",
+      "title": "Lacuna Fund / PULA Advisors Zimbabwe crop cuts (Zenodo 10060610)",
+      "licence": "CC BY 4.0",
+      "path": "raw/zimbabwe/Lacuna_Yield_data_geojson-2023.geojson",
+      "sha256": "0dc4301509072c4306c951d88cf7cc6e0832c46aab921d237341c17bc6bb78cd",
+      "rows_in_scope": 3002
+    },
+    {
+      "dataset": "vision_guided_yield_estimation",
+      "title": "Scalable Vision-Guided Crop Yield Estimation Dataset (Zenodo 17626117)",
+      "licence": "CC BY 4.0",
+      "path": "raw/vision_guided_yield_estimation/metadata.csv",
+      "sha256": "bbd1451564a24f0e2a7f7c6966cb13b5f9ae7948bd0608068310ef7c4867e003",
+      "rows_in_scope": 5055
+    },
+    {
+      "dataset": "malawi_2022",
+      "title": "FAO / NASA Harvest Malawi crop-cut campaign 2022",
+      "licence": "CC BY",
+      "path": "raw/malawi/mwi_mwi_lc_fo_202205_averageyield_v1.zip",
+      "sha256": "4adcadf8fc790d3c91f2fcce1a5033fb8cafbf4d73310a779d396f03999dd95d",
+      "rows_in_scope": 529
+    },
+    {
+      "dataset": "malawi_2023",
+      "title": "FAO / NASA Harvest Malawi crop-cut campaign 2023",
+      "licence": "CC BY",
+      "path": "raw/malawi/mwi_kas_lc_fo_202305_cc_yield.zip",
+      "sha256": "6ba8dc16762beec48ee1b0498a5540a67088d3b1a0aa2efbcb918afbcee7a304",
+      "rows_in_scope": 267
+    }
+  ]
+}

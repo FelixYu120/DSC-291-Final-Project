@@ -9,6 +9,8 @@ and tests whether rainfall and temperature improve prediction. Earlier Malawi/Ke
 
 | I want to… | Open |
 |---|---|
+| Get the databases and know where each file goes | [Where to put the data](docs/DATA_SETUP.md) |
+| See every survey row and every Sentinel-2 pass for Kenya, Malawi and Zimbabwe (pass archive, 19 Nov) | [Overview notebook](notebooks/pass_archive_overview.ipynb) · [query it yourself](notebooks/pass_archive_query.ipynb) |
 | Browse the project's figures and explore Zimbabwe yield and weather maps | [Visual atlas notebook](notebooks/zimbabwe_visual_atlas.ipynb) · [Download the figures](results/visual_atlas/README.md) |
 | Read the one-page basic-feature Ridge summary | [Zimbabwe summary](docs/zimbabwe/SUMMARY.md) |
 | Find everything added for Zimbabwe, in step order | [Zimbabwe project guide](docs/zimbabwe/README.md) |

@@ -4,6 +4,19 @@ For data files and reports, use the [Zimbabwe project guide](../docs/zimbabwe/RE
 
 The [Zimbabwe visual atlas](zimbabwe_visual_atlas.ipynb) opens with four described satellite-backed maps of measured yield, model error, greenness and weather, followed by four other Zimbabwe charts and a gallery of 106 visuals from the project, its archives and provider manuals. The notebook embeds the figures and their explanations. Yield, prediction error and greenness use recorded field coordinates with regional close-ups. Each gallery ID has a caption, source link and full-resolution view. [Download the new figures or browse the source index](../results/visual_atlas/README.md).
 
+## Start here for the data
+
+[pass_archive_overview.ipynb](pass_archive_overview.ipynb): what the pass archive holds, to skim in a few minutes.
+Surveys by country, year and crop; coordinates and a label-free check of what the pixel shows; every Sentinel-2 pass
+and where its values come from; coverage by month; one field with all its passes; how to get X and y (`field_xy`,
+`master`, your own monthly rule with a frozen split); what to handle with care; checks. It needs only
+`data/passarchive_v1/release/passarchive_v1.duckdb` (2.7 GB, not in Git; see
+[where to put the data](../docs/DATA_SETUP.md)), opens it read-only and runs in about one minute. The saved outputs
+show everything without a run. The country outlines on the map are optional.
+
+[pass_archive_query.ipynb](pass_archive_query.ipynb): the same file, to query yourself. One cell opens it read-only
+and lists its tables and views; one cell holds a query to change (`select * from master limit 10`). No plots.
+
 ## Start here for the results
 
 [lacuna_results_consensus.ipynb](lacuna_results_consensus.ipynb): every current Lacuna number in one place, rebuilt
