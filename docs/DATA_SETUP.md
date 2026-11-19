@@ -22,6 +22,18 @@ The two files named `cropyield.duckdb` are different files: keep both, each in i
 - **To rerun the earlier results:** the two `cropyield.duckdb` files (one clear scene per month, 11,364 labels).
   They are unchanged. See the [dataset guide](DATASET.md).
 
+## The data folder at a glance
+
+| Folder or file | What it is | In Git |
+|---|---|---|
+| `data/passarchive_v1/release/` | **Current.** The pass archive database with its README, dictionary, manifest and checksum | all but the `.duckdb` |
+| `data/raw/`, `data/metadata/` | The original provider files and their download records | yes |
+| `data/audit/`, `data/processed/`, `data/splits/` | Data v1: screening evidence, `labels_v1`, frozen splits, Zimbabwe releases | yes |
+| `data/v2/` | Data v2: labels, audit and splits with Malawi 2022 | all but the `.duckdb` |
+| `data/runs/` | Recorded Zimbabwe experiment releases (pinned by checksum) | the reviewed ones |
+| `data/cropyield.duckdb` | Data v1 database (old, kept for the earlier results) | no |
+| `data/passarchive_v1/staging/`, `data/imagery/`, `data/features/`, `data/models/` | Local working files: staged downloads, image chips, features, model weights | no |
+
 ## Check a download
 
 ```bash

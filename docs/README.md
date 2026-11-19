@@ -1,5 +1,12 @@
 # Documentation
 
+**Map of this folder.** Start: [where to put the data](DATA_SETUP.md), then the [dataset guide](DATASET.md) and the
+[evaluation rules](EVALUATION.md). Zimbabwe work: [zimbabwe/](zimbabwe/README.md) and the dated `ZIMBABWE_*` protocols
+below. Extra inputs (Earth Engine, Sentinel-1, AlphaEarth): the four `EXTRA_INPUTS*` and `GEE_*` pages. Paper text:
+[paper/](paper/README.md). Reviews: [quality/](quality/). History: [DECISIONS.md](DECISIONS.md),
+[DATA_V2_PLAN.md](DATA_V2_PLAN.md), [archive/](archive/BRANCH_HISTORY.md). Several pages are pinned by checksum and
+keep their path (see "Reference contracts" below), so this folder is ordered by this map, not by moving files.
+
 For the current deliverable, start with the [Zimbabwe project guide](zimbabwe/README.md).
 
 For Felix and Florian's paper contribution, use the [paper materials](paper/README.md): an editable data sources and preparation section, a one-page results summary, a complete results ledger and the bibliography. They quote the v1 runs of 7 Nov; the rule-compliant v2 values are in the [results notebook](../notebooks/lacuna_results_consensus.ipynb), section 6.1.
@@ -25,6 +32,9 @@ For Felix and Florian's paper contribution, use the [paper materials](paper/READ
 
 | Topic | Document |
 |---|---|
+| Which database file goes where, and how to check a download | [DATA_SETUP.md](DATA_SETUP.md) |
+| The pass archive (19 Nov): every survey row, every Sentinel-2 pass, all bands, nothing filtered | [release README](../data/passarchive_v1/release/README.md), [overview notebook](../notebooks/pass_archive_overview.ipynb) |
+| Extra inputs for the three countries: plan, Kenya and Malawi, results, Earth Engine guide | [EXTRA_INPUTS.md](EXTRA_INPUTS.md), [EXTRA_INPUTS_KENYA_MALAWI.md](EXTRA_INPUTS_KENYA_MALAWI.md), [EXTRA_INPUTS_RESULTS.md](EXTRA_INPUTS_RESULTS.md), [GEE_EXTRA_INPUTS_GUIDE.md](GEE_EXTRA_INPUTS_GUIDE.md) |
 | The whole dataset: files, cleaning, quality register, splits, known anomalies, how to reproduce | [DATASET.md](DATASET.md) |
 | The data v2 plan, written before any v2 score (kept word for word) | [DATA_V2_PLAN.md](DATA_V2_PLAN.md) |
 

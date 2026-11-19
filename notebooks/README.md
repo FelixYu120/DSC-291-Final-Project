@@ -55,17 +55,20 @@ paths are in [scripts/README.md](../scripts/README.md#moved-on-8-nov-2026).
 The second guide uses Zimbabwe, not Malawi: Lacuna 2023 is the target population and Zimbabwe 2024 is the auxiliary
 training source. Both guides retain the distinction between historical data policies and later authorized experiments.
 
-## Walkthroughs and tours
+## Archive: the first pipeline and the old databases
 
-These notebooks run the real code on the real data in small cells and write nothing. Open them from the
-`notebooks/` folder; they find the repository folder from there.
+Moved to [archive/](archive/) on 19 Nov 2026, unchanged except for the folder they start from. They describe the
+data v1 pipeline and database (one clear scene per month); for new work use the pass archive notebooks at the top.
+Open them from `notebooks/archive/`.
 
 | Notebook | What it shows | Needs |
 |---|---|---|
-| [step3_labels_walkthrough.ipynb](step3_labels_walkthrough.ipynb) | How `labels_v1` is built, one piece at a time | the clone |
-| [step4_splits_walkthrough.ipynb](step4_splits_walkthrough.ipynb) | How the frozen split files are built, one piece at a time | the clone |
-| [duckdb_v1_tour.ipynb](duckdb_v1_tour.ipynb) | The tables and views of the v1 database, with SQL only | `data/cropyield.duckdb` |
-| [zimbabwe_master.ipynb](zimbabwe_master.ipynb) | The Zimbabwe master table (labels, season indices, Presto, MOSAIKS) | `data/cropyield.duckdb` |
+| [step3_labels_walkthrough.ipynb](archive/step3_labels_walkthrough.ipynb) | How `labels_v1` is built, one piece at a time | the clone |
+| [step4_splits_walkthrough.ipynb](archive/step4_splits_walkthrough.ipynb) | How the frozen split files are built, one piece at a time | the clone |
+| [duckdb_v1_tour.ipynb](archive/duckdb_v1_tour.ipynb) | The tables and views of the v1 database, with SQL only | `data/cropyield.duckdb` |
+| [zimbabwe_master.ipynb](archive/zimbabwe_master.ipynb) | The Zimbabwe master table (labels, season indices, Presto, MOSAIKS) | `data/cropyield.duckdb` |
+| [season_features_lacuna.ipynb](archive/season_features_lacuna.ipynb) | Season features for the Lacuna fields from the v1 database | `data/cropyield.duckdb` |
+| [first_baselines/](archive/first_baselines/) | The first baseline notebook, the first data overview and their saved figures and tables (was the top-level folder `notebook/`) | the clone |
 
 ## Extra-input audits
 
