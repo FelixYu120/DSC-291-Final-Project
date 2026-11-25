@@ -11,7 +11,7 @@ python scripts/quality/select_passarchive_imagery.py `
 The output must be a new directory. `--limit-fields 100` runs a small pilot.
 For Allen's maize comparison across growing seasons that cross calendar years,
 add `--window-kind both --crop maize`; see the executed
-[`allen_median3_cleaning.ipynb`](../../notebooks/allen_median3_cleaning.ipynb).
+[`allen_top15_cleaning.ipynb`](../../notebooks/allen_top15_cleaning.ipynb).
 The source DuckDB is read-only. Three files are produced:
 
 - `scene_decisions.parquet`: one sampled L2A candidate per field and scene,
