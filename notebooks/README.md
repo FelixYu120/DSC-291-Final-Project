@@ -17,6 +17,12 @@ show everything without a run. The country outlines on the map are optional.
 [pass_archive_query.ipynb](pass_archive_query.ipynb): the same file, to query yourself. One cell opens it read-only
 and lists its tables and views; one cell holds a query to change (`select * from master limit 10`). No plots.
 
+[allen_median3_cleaning.ipynb](allen_median3_cleaning.ipynb): Allen's executed, label-free image-cleaning proposal.
+It compares the best single pass with the median of up to three independent clear passes per field-month, audits
+coverage and feature differences, and produces a small matched model handoff for Zida under
+`data/passarchive_v1/cleaning/`. The source database is the same pass archive; the large intermediate scene
+tables are generated in ignored `data/features/`.
+
 ## Start here for the results
 
 [lacuna_results_consensus.ipynb](lacuna_results_consensus.ipynb): every current Lacuna number in one place, rebuilt
