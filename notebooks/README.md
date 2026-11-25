@@ -17,7 +17,7 @@ show everything without a run. The country outlines on the map are optional.
 [pass_archive_query.ipynb](pass_archive_query.ipynb): the same file, to query yourself. One cell opens it read-only
 and lists its tables and views; one cell holds a query to change (`select * from master limit 10`). No plots.
 
-[allen_top15_cleaning.ipynb](allen_top15_cleaning.ipynb): Allen's executed, label-free image-cleaning proposal.
+[allen_top15_cleaning.ipynb](allen_top15_cleaning.ipynb): Executed, label-free image-cleaning notebook.
 It uses the original image-quality screen and top-15 ranks, then compares the best single pass with the median of the selected passes per field-month, audits
 coverage and feature differences, and produces a small matched model handoff for Zida under
 `data/passarchive_v1/cleaning/`. The source database is the same pass archive; the large intermediate scene

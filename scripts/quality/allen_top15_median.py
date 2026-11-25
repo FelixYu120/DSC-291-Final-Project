@@ -1,4 +1,4 @@
-"""Allen's label-free monthly median of the existing top-15 quality selection.
+"""Label-free monthly median of the existing top-15 quality selection.
 
 Run after select_passarchive_imagery.py --window-kind both --crop maize.
 The pass archive is never changed. Model scaling/imputation belongs inside CV.
